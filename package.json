@@ -1,0 +1,21 @@
+{
+  "name": "steps",
+  "version": "1.0.0",
+  "description": "Just Testing AngularJS",
+  "main": "server.js",
+  "scripts": {
+    "test": "karma start",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.5.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0"
+  }
+}

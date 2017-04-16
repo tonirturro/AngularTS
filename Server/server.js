@@ -5,7 +5,7 @@ const app = express();
 const server = http.createServer(app);
 
 const view_path = "/View";
-const server_path = "/Server";
+const lib_path = "/Lib";
 
 // Main page and includes 
 app.get("/", function(err, res) {
@@ -17,19 +17,19 @@ app.get(form_path, function(err, res) {
     res.sendFile(__dirname + form_path);
 })
 
-const grid_path =   view_path + "/users_grid.htm";
+const grid_path =  view_path + "/users_grid.htm";
 app.get(grid_path, function(err,res) {
     res.sendFile(__dirname + grid_path);
 });
 
 // Bootstrap
-const bootstrap_path = "/bower_components/bootstrap/dist/css/bootstrap.css";
+const bootstrap_path = lib_path + "/bootstrap.css";
 app.get(bootstrap_path, function(err, res) {
     res.sendFile(__dirname + bootstrap_path);
 });
 
-// 
-const angular_path = "/bower_components/angular/angular.js";
+// Angular
+const angular_path = lib_path + "/angular.js";
 app.get(angular_path, function(err, res) {
     res.sendFile(__dirname + angular_path);
 });
@@ -43,7 +43,7 @@ app.get(app_path, function(err, res) {
 // The simulated 
 const model_path = "/data.json";
 app.get(model_path, function(err, res) {
-    res.sendFile(__dirname + server_path + model_path);
+    res.sendFile(__dirname + model_path);
 });
 
 // App start

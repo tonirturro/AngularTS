@@ -2,4 +2,7 @@
 node_modules/
 
 # Typescript Output
-Src/Server/*.js
+Server/*.js.map
+Server/*.js
+
+

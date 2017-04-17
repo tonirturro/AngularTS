@@ -1,8 +1,7 @@
 import * as http from 'http';
-import * as debug from 'debug';
 import App from "./App";
 
-debug('ts-expres: server');
+console.log('ts-expres: server');
 
 const port = 3000;
 const server = http.createServer(App);
@@ -30,5 +29,5 @@ server.on('error', (error : NodeJS.ErrnoException) => {
 server.on('listening', () => {
   let addr = server.address();
   let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
-  debug(`Listening on ${bind}`);   
+  console.log(`Listening on ${bind}`);   
 });

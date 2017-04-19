@@ -5,4 +5,8 @@ node_modules/
 Server/*.js.map
 Server/*.js
 
-
+/.vs/Solution/.vs/Solution/v15
+/bin
+/obj/Debug
+/.vs/Solution/.vs/AngularTS/v15
+/npm-debug.log

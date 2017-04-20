@@ -11,3 +11,4 @@ Server/*.js
 /.vs/Solution/.vs/AngularTS/v15
 /npm-debug.log
 /.vs/Solution/.vs/Solution/v14
+/.vs/Solution/.vs/config/applicationhost.config

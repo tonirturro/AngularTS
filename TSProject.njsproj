@@ -24,9 +24,6 @@
     <Content Include="package.json" />
     <Content Include="tsconfig.json" />
     <Content Include="README.md" />
-    <Compile Include="gulpfile.js">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="karma.conf.js" />
     <Content Include="Server\data.json" />
     <Content Include="Server\Lib\bootstrap.css" />

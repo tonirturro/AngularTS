@@ -10,3 +10,4 @@ Server/*.js
 /obj/Debug
 /.vs/Solution/.vs/AngularTS/v15
 /npm-debug.log
+/.vs/Solution/.vs/Solution/v14

@@ -7,9 +7,9 @@ import * as bodyParser from 'body-parser';
 class App {
     // Routes
 
-    private readonly rest_path = "/REST";
-    private readonly view_path = "/View";
-    private readonly lib_path = "/Lib";
+    private readonly restPath = "/REST";
+    private readonly viewPath = "/View";
+    private readonly libPath = "/Lib";
 
     // Host express
     public express: express.Application;
@@ -18,55 +18,55 @@ class App {
     constructor() {
         this.express = express();
         this.setStaticServer();
-        this.setRESTServer();
+        this.setRestServer();
         this.routes();
     }
 
     // Configure the files that will be served statically.
     private setStaticServer(): void {
         // Main page and includes
-        const index_path = this.view_path + "/index.htm";
-        this.express.get("/", function(err, res) {
-            res.sendFile(__dirname + index_path);
+        const indexPath = this.viewPath + "/index.htm";
+        this.express.get("/", (err, res) => {
+            res.sendFile(__dirname + indexPath);
         });
 
-        const form_path = this.view_path + "/users_form.htm";
-        this.express.get(form_path, function(err, res) {
-            res.sendFile(__dirname + form_path);
+        const formPath = this.viewPath + "/users_form.htm";
+        this.express.get(formPath, (err, res) => {
+            res.sendFile(__dirname + formPath);
         })
 
-        const grid_path =this.view_path + "/users_grid.htm";
-        this.express.get(grid_path, function(err,res) {
-            res.sendFile(__dirname + grid_path);
+        const gridPath =this.viewPath + "/users_grid.htm";
+        this.express.get(gridPath, (err, res) => {
+            res.sendFile(__dirname + gridPath);
         });
 
         // Bootstrap
-        const bootstrap_path = this.lib_path + "/bootstrap.css";
-        this.express.get(bootstrap_path, function(err, res) {
-            res.sendFile(__dirname + bootstrap_path);
+        const bootstrapPath = this.libPath + "/bootstrap.css";
+        this.express.get(bootstrapPath, (err, res) => {
+            res.sendFile(__dirname + bootstrapPath);
         });
 
         // Angular
-        const angular_path = this.lib_path + "/angular.js";
-        this.express.get(angular_path, function(err, res) {
-            res.sendFile(__dirname + angular_path);
+        const angularPath = this.libPath + "/angular.js";
+        this.express.get(angularPath, (err, res) => {
+            res.sendFile(__dirname + angularPath);
         });
 
         // Application
-        const app_path =this.view_path + "/scripts/main.js";
-        this.express.get(app_path, function(err, res) {
-            res.sendFile(__dirname + app_path);
+        const appPath =this.viewPath + "/scripts/main.js";
+        this.express.get(appPath, (err, res) => {
+            res.sendFile(__dirname + appPath);
         });
 
         // The simulated model
-        const model_path = "/data.json";
-        this.express.get(model_path, function(err, res) {
-            res.sendFile(__dirname + model_path);
+        const modelPath = "/data.json";
+        this.express.get(modelPath, (err, res) => {
+            res.sendFile(__dirname + modelPath);
         });
     }
 
     // Configure Express middleware for REST API
-    private setRESTServer() {
+    private setRestServer() {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
     }
@@ -82,7 +82,7 @@ class App {
             });
         });
 
-        this.express.use(this.rest_path, router);
+        this.express.use(this.restPath, router);
     }
 }
 

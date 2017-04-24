@@ -12,3 +12,4 @@ Server/*.js
 /npm-debug.log
 /.vs/Solution/.vs/Solution/v14
 /.vs/Solution/.vs/config/applicationhost.config
+/.ntvs_analysis.dat

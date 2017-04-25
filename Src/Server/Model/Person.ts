@@ -2,7 +2,7 @@
 // Defines the Person entity
 // 
 
-class Person {
+export class Person {
     id: number;
     givenName: string;
     famillyName: string;

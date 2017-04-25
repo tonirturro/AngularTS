@@ -1,22 +1,22 @@
-import * as http from 'http';
+import * as http from "http";
 import App from "./App";
 
-console.log('ts-expres: server');
+console.log("ts-expres: server");
 
 const port = 3000;
 const server = http.createServer(App);
 server.listen(port);
 
 // Failed to listen
-server.on('error', (error : NodeJS.ErrnoException) => {
-  if (error.syscall !== 'listen') throw error;
-  let bind = (typeof port === 'string') ? 'Pipe ' + port : 'Port ' + port;
+server.on("error", (error : NodeJS.ErrnoException) => {
+  if (error.syscall !== "listen") throw error;
+  const bind = `port ${port}`;
   switch(error.code) {
-    case 'EACCES':
+    case "EACCES":
       console.error(`${bind} requires elevated privileges`);
       process.exit(1);
       break;
-    case 'EADDRINUSE':
+    case "EADDRINUSE":
       console.error(`${bind} is already in use`);
       process.exit(1);
       break;
@@ -26,8 +26,8 @@ server.on('error', (error : NodeJS.ErrnoException) => {
 });
 
 // Listening success
-server.on('listening', () => {
-  let addr = server.address();
-  let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
+server.on("listening", () => {
+  const addr = server.address();
+  const bind = `port ${addr.port}`;
   console.log(`Listening on ${bind}`);   
 });

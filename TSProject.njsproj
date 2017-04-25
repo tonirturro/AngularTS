@@ -32,12 +32,16 @@
     <Content Include="Server\View\users_form.htm" />
     <Content Include="Server\View\users_grid.htm" />
     <Compile Include="Server\View\scripts\main.js" />
-    <Compile Include="spec\Backend\first.spec.js" />
     <Compile Include="spec\Frontend\MainController.spec.js" />
     <Content Include="spec\support\jasmine.json" />
     <TypeScriptCompile Include="Src\Server\App.ts" />
     <TypeScriptCompile Include="Src\Server\Model\Person.ts" />
-    <TypeScriptCompile Include="Src\Server\server.ts" />
+    <TypeScriptCompile Include="Src\Server\Repository\Data.spec.ts" />
+    <TypeScriptCompile Include="Src\Server\Repository\Data.ts" />
+    <TypeScriptCompile Include="Src\Server\server.ts">
+      <ExcludeFromSourceAnalysis>True</ExcludeFromSourceAnalysis>
+      <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
+    </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Server" />
@@ -45,12 +49,12 @@
     <Folder Include="Server\View" />
     <Folder Include="Server\View\scripts" />
     <Folder Include="spec" />
-    <Folder Include="spec\Backend" />
     <Folder Include="spec\Frontend" />
     <Folder Include="spec\support" />
     <Folder Include="Src" />
     <Folder Include="Src\Server" />
     <Folder Include="Src\Server\Model\" />
+    <Folder Include="Src\Server\Repository\" />
     <Folder Include="TSProject" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />

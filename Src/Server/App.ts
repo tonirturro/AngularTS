@@ -1,8 +1,8 @@
 
 // Define and export a singletpn for the application.
-import * as express from 'express';
-import * as logger from 'morgan';
-import * as bodyParser from 'body-parser';
+import * as express from "express";
+import * as logger from "morgan";
+import * as bodyParser from "body-parser";
 import * as fs from "fs";
 
 class App {
@@ -13,7 +13,7 @@ class App {
     private readonly libPath = "/Lib";
 
     // Host express
-    public express: express.Application;
+    express: express.Application;
 
     // Initialzes a new instance of the App class
     constructor() {
@@ -40,7 +40,7 @@ class App {
         const formPath = this.viewPath + "/users_form.htm";
         this.express.get(formPath, (err, res) => {
             res.sendFile(__dirname + formPath);
-        })
+        });
 
         const gridPath =this.viewPath + "/users_grid.htm";
         this.express.get(gridPath, (err, res) => {
@@ -68,20 +68,20 @@ class App {
 
     // Configure Express middleware for REST API
     private setRestServer() {
-        this.express.use(logger('dev'));
+        this.express.use(logger("dev"));
         this.express.use(bodyParser.json());
     }
 
     // Configure routes
     private routes(): void
     {
-        let router = express.Router();
+        const router = express.Router();
 
         router.get("/", (req, res) => {
 
             // Send the simulated model
             const modelPath = "/data.json";
-            fs.readFile(__dirname + modelPath, function(err, data) {
+            fs.readFile(__dirname + modelPath, (err, data) => {
                 if (err) {
                     // File not found
                     res.sendStatus(400);

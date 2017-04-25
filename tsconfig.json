@@ -7,6 +7,7 @@
     },
     "include": [
       "Src/Server/*.ts",
-      "Src/Server/Model/*.ts"
+      "Src/Server/Model/*.ts",
+      "Src/Server/Repository/*.ts"
     ]
 }

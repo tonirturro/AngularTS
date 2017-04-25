@@ -6,6 +6,7 @@
         "outDir": "Server"
     },
     "include": [
-        "Src/Server/*.ts"
+      "Src/Server/*.ts",
+      "Src/Server/Model/*.ts"
     ]
 }

@@ -36,6 +36,7 @@
     <Compile Include="spec\Frontend\MainController.spec.js" />
     <Content Include="spec\support\jasmine.json" />
     <TypeScriptCompile Include="Src\Server\App.ts" />
+    <TypeScriptCompile Include="Src\Server\Model\Person.ts" />
     <TypeScriptCompile Include="Src\Server\server.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +50,7 @@
     <Folder Include="spec\support" />
     <Folder Include="Src" />
     <Folder Include="Src\Server" />
+    <Folder Include="Src\Server\Model\" />
     <Folder Include="TSProject" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />

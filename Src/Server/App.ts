@@ -3,6 +3,7 @@
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
+import * as fs from "fs";
 
 class App {
     // Routes
@@ -24,6 +25,12 @@ class App {
 
     // Configure the files that will be served statically.
     private setStaticServer(): void {
+        // No Icon
+        const iconPath = "favicon.ico";
+        this.express.get(iconPath, (err, res) => {
+            res.send(204);
+        });
+
         // Main page and includes
         const indexPath = this.viewPath + "/index.htm";
         this.express.get("/", (err, res) => {
@@ -57,12 +64,6 @@ class App {
         this.express.get(appPath, (err, res) => {
             res.sendFile(__dirname + appPath);
         });
-
-        // The simulated model
-        const modelPath = "/data.json";
-        this.express.get(modelPath, (err, res) => {
-            res.sendFile(__dirname + modelPath);
-        });
     }
 
     // Configure Express middleware for REST API
@@ -77,9 +78,18 @@ class App {
         let router = express.Router();
 
         router.get("/", (req, res) => {
-            res.json({
-                message: 'Hello World'
+
+            // Send the simulated model
+            const modelPath = "/data.json";
+            fs.readFile(__dirname + modelPath, function(err, data) {
+                if (err) {
+                    // File not found
+                    res.sendStatus(400);
+                } else {
+                    res.json(JSON.parse(data.toString()));
+                }
             });
+
         });
 
         this.express.use(this.restPath, router);

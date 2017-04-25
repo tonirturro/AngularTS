@@ -66,7 +66,7 @@ myApp.controller('MainController', ['$scope', "$http", "$interval", "$log", func
     }
 
     // Read the model
-    $http.get("data.json").then(function(response) {
+    $http.get("REST").then(function(response) {
         $scope.message = response.data.message;
         $scope.listItems = response.data.items;
         $scope.people =  response.data.people;

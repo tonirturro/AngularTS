@@ -48,5 +48,16 @@ describe("Data test repository",
             expect(firstPersonInList.givenName).toBe(expectedGivenName);
             expect(firstPersonInList.famillyName).toBe(expectedFamillyName);
         });
+
+        it("Allow to delete a person", () => {
+            objectToTest.addPerson(new Person(1, "aaa", "bbb"));
+            var personToDelete = objectToTest.people[0];
+
+            var result = objectToTest.deletePerson(personToDelete.id);
+
+            expect(result).toBeTruthy;
+            expect(objectToTest.people.length).toBe(0);
+        });
+
     });
 

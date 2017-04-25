@@ -36,4 +36,23 @@ export class Data {
         this.people.push(newPerson);
         return true;
     }
+
+    //
+    // Deletes a person
+    //
+    deletePerson(idToDelete: number): boolean {
+        // Check if already exists
+        var index = 0;
+        for (let i of this.people) {
+            if (i.id === idToDelete) {
+                this.people.splice(index, 1);
+                return true;
+            }
+
+            index++;
+        }
+
+        // Not found
+        return false;
+    }
 }

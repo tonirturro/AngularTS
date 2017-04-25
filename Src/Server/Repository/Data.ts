@@ -19,4 +19,21 @@ export class Data {
             this.items.push(entry);
         }
     }
+
+    //
+    // Adds a person
+    //
+    addPerson(newPerson: Person): boolean {
+
+        // Check if already exists
+        for (let i of this.people) {
+            if (i.id === newPerson.id) {
+                return false;
+            }
+        }
+
+        // Add otherwise
+        this.people.push(newPerson);
+        return true;
+    }
 }

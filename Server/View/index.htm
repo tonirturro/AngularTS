@@ -5,13 +5,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="Lib/bootstrap.css" rel="stylesheet">
-        <script src="Lib/angular.js"></script>
         <script src="Lib/system.js"></script>
         <script src="Lib/system.config.js"></script>
         <script>
-            System.import('View/app.js').then(function () {
-                angular.bootstrap(document, ['myApp']);
-            });
+            System.import('View/app.js');
         </script>
     </head>
     <body ng-controller="MainController">

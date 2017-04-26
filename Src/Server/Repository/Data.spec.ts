@@ -49,6 +49,15 @@ describe("Data test repository",
             expect(firstPersonInList.famillyName).toBe(expectedFamillyName);
         });
 
+        it("A person can't be added twice", () => {
+            const newPerson = new Person(1, "aaa", "bbb");
+
+            objectToTest.addPerson(newPerson);
+            var result = objectToTest.addPerson(newPerson);
+
+            expect(result).toBeFalsy;
+        });
+
         it("Allow to delete a person", () => {
             objectToTest.addPerson(new Person(1, "aaa", "bbb"));
             var personToDelete = objectToTest.people[0];
@@ -57,6 +66,17 @@ describe("Data test repository",
 
             expect(result).toBeTruthy;
             expect(objectToTest.people.length).toBe(0);
+        });
+
+        it("Only the person deleted is deleted", () => {
+            var person1 = new Person(1, "aaa", "bbb");
+            var person2 = new Person(2, "ccc", "ddd");
+            objectToTest.addPerson(person1);
+            objectToTest.addPerson(person2);
+
+            objectToTest.deletePerson(person1.id);
+
+            expect(objectToTest.people[0].id).toBe(person2.id);
         });
 
     });

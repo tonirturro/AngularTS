@@ -4,20 +4,41 @@
 // Class definition for the repository
 //
 export class Data {
-    message: string;
-    items: string[];
-    people: Person[];
+    private _message: string;
+    private _items: string[];
+    private _people: Person[];
 
     //
     // Initializes a new instance of the Data class
     //
     constructor(message: string, items: string[]) {
-        this.message = message;
-        this.items = [];
-        this.people = [];
+        this._message = message;
+        this._items = [];
+        this._people = [];
         for (let entry of items) {
-            this.items.push(entry);
+            this._items.push(entry);
         }
+    }
+
+    //
+    // Gets people
+    //
+    get people(): Person[] {
+        return this._people;
+    }
+
+    //
+    // Gets items
+    //
+    get items(): string[] {
+        return this._items;
+    }
+
+    //
+    // Gets message
+    //
+    get message(): string {
+        return this._message;
     }
 
     //
@@ -26,14 +47,14 @@ export class Data {
     addPerson(newPerson: Person): boolean {
 
         // Check if already exists
-        for (let i of this.people) {
+        for (let i of this._people) {
             if (i.id === newPerson.id) {
                 return false;
             }
         }
 
         // Add otherwise
-        this.people.push(newPerson);
+        this._people.push(newPerson);
         return true;
     }
 
@@ -43,9 +64,9 @@ export class Data {
     deletePerson(idToDelete: number): boolean {
         // Check if already exists
         var index = 0;
-        for (let i of this.people) {
+        for (let i of this._people) {
             if (i.id === idToDelete) {
-                this.people.splice(index, 1);
+                this._people.splice(index, 1);
                 return true;
             }
 

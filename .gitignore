@@ -4,6 +4,7 @@ node_modules/
 # Typescript Output
 /Server/
 /Server/Model
+/Server/View
 
 # Node stuff
 /npm-debug.log

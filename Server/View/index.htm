@@ -1,12 +1,18 @@
-<!DOCTYPE html>
-<html lang="en" ng-app="myApp">
+﻿<!DOCTYPE html>
+<html lang="en">
     <head>
         <title>Angular JS</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="Lib\bootstrap.css" rel="stylesheet">
-        <script src="Lib\angular.js"></script>
-        <script src="View/scripts/main.js"></script>
+        <link href="Lib/bootstrap.css" rel="stylesheet">
+        <script src="Lib/angular.js"></script>
+        <script src="Lib/system.js"></script>
+        <script src="Lib/system.config.js"></script>
+        <script>
+            System.import('View/app.js').then(function () {
+                angular.bootstrap(document, ['myApp']);
+            });
+        </script>
     </head>
     <body ng-controller="MainController">
         <div class="container">

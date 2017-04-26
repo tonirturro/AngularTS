@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es3",
+        "target": "es5",
         "module": "commonjs",
         "sourceMap": true,
         "outDir": "Server"
@@ -8,6 +8,7 @@
     "include": [
       "Src/Server/*.ts",
       "Src/Server/Model/*.ts",
-      "Src/Server/Repository/*.ts"
+      "Src/Server/Repository/*.ts",
+      "Src/Server/View/*.ts"
     ]
 }

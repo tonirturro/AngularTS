@@ -1,10 +1,11 @@
 import * as http from "http";
-import App from "./App";
+import * as express from "express";
+import { App } from "./App";
 
 console.log("ts-expres: server");
 
 const port = 3000;
-const server = http.createServer(App);
+const server = http.createServer(new App(express()).express);
 server.listen(port);
 
 // Failed to listen

@@ -2,9 +2,11 @@
 node_modules/
 
 # Typescript Output
-/Server/
+/Server/*.js
+/Server/*.map
 /Server/Model
 /Server/View
+/Server/Repository
 
 # Node stuff
 /npm-debug.log

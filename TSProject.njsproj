@@ -31,7 +31,9 @@
     <Content Include="Server\View\index.htm" />
     <Content Include="Server\View\users_form.htm" />
     <Content Include="Server\View\users_grid.htm" />
-    <Compile Include="Server\Lib\system.config.js" />
+    <Compile Include="Server\Lib\system.config.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Server\Lib\system.js" />
     <Compile Include="Server\View\scripts\main.js" />
     <Compile Include="spec\Frontend\MainController.spec.js" />

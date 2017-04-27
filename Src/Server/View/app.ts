@@ -2,13 +2,14 @@
 * The main module
 */
 
-import { angular } from "angular";
+import * as angular from "angular";
 import { MainController } from "./MainController";
 
-let app = angular.module('myApp', []).controller('MainController', MainController);
+var app;
 
 angular.element(document).ready(() => {
-    angular.bootstrap(document.body, app.name);
+    let app = angular.module('myApp', []).controller('MainController', MainController);
+    angular.bootstrap(document.body, ['myApp']);
 });
 
 export default app;

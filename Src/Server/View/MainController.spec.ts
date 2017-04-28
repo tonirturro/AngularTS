@@ -22,36 +22,36 @@ describe("Controller Test", function () {
     });
 
     it("Troggle Info Visibility", function () {
-        mockScope.TroggleInfo();
+        mockScope.troggleInfo();
         expect(mockScope.infoAvailable).toBeFalsy();
         expect(mockScope.infoMessage).toEqual("Show Info");
     });
 
     it("Change Familly Name", function () {
         var newName = "NewFamillyName";
-        mockScope.ChangeFamillyName(newName);
+        mockScope.changeFamillyName(newName);
         expect(mockScope.newFamillyName).toEqual(newName);
     });
 
     it("Change Given Name", function () {
         var newName = "NewGivenName";
-        mockScope.ChangeGivenName(newName);
+        mockScope.changeGivenName(newName);
         expect(mockScope.newGivenName).toEqual(newName);
     });
 
     it("Add Contact", function () {
         mockScope.people = [];
-        mockScope.AddContact();
+        mockScope.addContact();
         expect(mockScope.people.length).toEqual(1);
     });
 
     it("Delete Contact", function () {
         mockScope.people = [];
-        mockScope.AddContact();
+        mockScope.addContact();
 
         var idToDelete = mockScope.people[0].id;
 
-        mockScope.DeleteContact(idToDelete);
+        mockScope.deleteContact(idToDelete);
         expect(mockScope.people.length).toEqual(0);
     });
 

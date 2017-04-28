@@ -8,7 +8,7 @@
         <script src="Lib/system.js"></script>
         <script src="Lib/system.config.js"></script>
         <script>
-            System.import('View/app.js');
+            System.import('View/Boot');
         </script>
     </head>
     <body ng-controller="MainController">
@@ -16,7 +16,7 @@
            <h1>{{message}} - seconds elapsed : {{seconds}}</h1>           
         </div>
         <div class="container">
-            <button type="button" class="btn btn-info" ng-click="TroggleInfo()">{{infoMessage}}</button>
+            <button type="button" class="btn btn-info" ng-click="troggleInfo()">{{infoMessage}}</button>
             <ul ng-show="infoAvailable">
                 <li ng-repeat="item in listItems" >{{item}}</li>
             </ul>            

@@ -17,11 +17,14 @@
   },
   "devDependencies": {
     "@types/angular": "^1.6.15",
+    "@types/angular-mocks": "^1.5.9",
     "@types/body-parser": "^1.16.3",
     "@types/debug": "0.0.29",
     "@types/express": "^4.0.35",
     "@types/jasmine": "^2.5.47",
     "@types/morgan": "^1.7.32",
-    "@types/node": "^7.0.13"
+    "@types/node": "^7.0.13",
+    "karma-systemjs": "^0.16.0",
+    "systemjs": "^0.20.12"
   }
 }

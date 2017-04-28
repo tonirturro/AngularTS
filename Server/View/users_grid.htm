@@ -10,7 +10,7 @@
         <tr ng-repeat="person in people | orderBy:sortOrder">
             <td>{{person.givenName}}</td>
             <td>{{person.famillyName}}</td>
-            <td><button type="button" class="btn btn-danger" ng-click="DeleteContact(person.id)">x</button></td>
+            <td><button type="button" class="btn btn-danger" ng-click="deleteContact(person.id)">x</button></td>
         </tr>
     </tbody>
 </table>                         

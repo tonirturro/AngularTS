@@ -3,19 +3,20 @@
 
 module.exports = function (config) {
     config.set({
+        
+        plugins: ['karma-systemjs'],
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine'],
+        frameworks: ['systemjs', 'jasmine'],
 
         // list of files / patterns to load in the browser
         files: [
             'bower_components/angular/angular.js',
             'bower_components/angular/angular-mocks.js',
-            'Server/View/scripts/main.js',
-            'spec/Frontend/**/*[sS]pec.js'
-        ],
-
+            'Server/View/MainController.js',
+            'Server/View/MainController.spec.js'
+       ],
 
 
         // test results reporter to use
@@ -23,10 +24,8 @@ module.exports = function (config) {
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['progress'],
 
-
         // web server port
         port: 9876,
-
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher

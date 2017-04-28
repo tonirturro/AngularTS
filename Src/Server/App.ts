@@ -58,59 +58,59 @@ export class App {
         });
 
         // Main page and includes
-        const indexPath = this.viewPath + "/index.htm";
+        const indexPath = `${this.viewPath}/index.htm`;
         this._express.get("/", (err, res) => {
             res.sendFile(__dirname + indexPath);
         });
 
-        const formPath = this.viewPath + "/users_form.htm";
+        const formPath = `${this.viewPath}/users_form.htm`;
         this._express.get(formPath, (err, res) => {
             res.sendFile(__dirname + formPath);
         });
 
-        const gridPath =this.viewPath + "/users_grid.htm";
+        const gridPath = `${this.viewPath}/users_grid.htm`;
         this._express.get(gridPath, (err, res) => {
             res.sendFile(__dirname + gridPath);
         });
 
         // Bootstrap
-        const bootstrapPath = this.libPath + "/bootstrap.css";
+        const bootstrapPath = `${this.libPath}/bootstrap.css`;
         this._express.get(bootstrapPath, (err, res) => {
             res.sendFile(__dirname + bootstrapPath);
         });
 
         // Angular
-        const angularPath = this.libPath + "/angular.js";
+        const angularPath = `${this.libPath}/angular.js`;
         this._express.get(angularPath, (err, res) => {
             res.sendFile(__dirname + angularPath);
         });
 
         // System.js
-        const systemJSPath = this.libPath + "/system.js";
+        const systemJSPath = `${this.libPath}/system.js`;
         this._express.get(systemJSPath, (err, res) => {
             res.sendFile(__dirname + systemJSPath);
         });
 
         // System.config.js
-        const systemJSConfigPath = this.libPath + "/system.config.js";
+        const systemJSConfigPath = `${this.libPath}/system.config.js`;
         this._express.get(systemJSConfigPath, (err, res) => {
             res.sendFile(__dirname + systemJSConfigPath);
         });
 
-        // Application
-        const appPath = this.viewPath + "/app.js";
-        this._express.get(appPath, (err, res) => {
-            res.sendFile(__dirname + appPath);
+        // Boot
+        const bootPath = `${this.viewPath}/Boot`;
+        this._express.get(bootPath, (err, res) => {
+            res.sendFile(__dirname + bootPath + ".js");
         });
 
         // Main Controller
-        const mainControllerPath = this.viewPath + "/MainController";
+        const mainControllerPath = `${this.viewPath}/MainController`;
         this._express.get(mainControllerPath, (err, res) => {
             res.sendFile(__dirname + mainControllerPath + ".js");
         });
 
         // Person
-        const personPath = this.modelPath + "/Person";
+        const personPath = `${this.modelPath}/Person`;
         this._express.get(personPath, (err, res) => {
             res.sendFile(__dirname + personPath + ".js");
         })

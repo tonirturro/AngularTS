@@ -1,83 +1,155 @@
 ﻿/*
-* The main controller
+**
+** The main controller
+**
 */
-
 import { Person } from "../Model/Person";
 
-export  class MainController {
-    static $inject = ['$scope', "$http", "$interval", "$log", function ($scope, $http, $interval, $log) {
+/*
+** Model definition
+**/
+interface IModel {
+    _message: string;
+    _items: string[];
+    _people: Person[];
+}
 
-        // Init fields
-        var maxId = 0;
+/*
+** Scope definition
+**/
+export interface IMainControllerScope extends ng.IScope {
+    message: string;
+    listItems: string[];
+    people: Person[];
+    infoMessage: string;
+    infoAvailable: boolean;
+    newGivenName: string;
+    newFamillyName: string;
+    seconds: number;
+    troggleInfo: () => void;
+    changeGivenName: (string) => void;
+    changeFamillyName: (string) => void;
+    addContact: () => void;
+    deleteContact: (number) => void;
+    updateOrder: (string) => void;
+    sortOrder: string;
+}
 
-        // Init properties
-        $scope.sortOrder = "+famillyName";
-        $scope.infoMessage = "Hide Info";
-        $scope.infoAvailable = true;
-        $scope.newGivenName = "Given Name";
-        $scope.newFamillyName = "Familly name";
-        $scope.seconds = 0;
+/*
+** Controller definition
+*/
+export class MainController {
 
-        // Init Methods
-        $scope.TroggleInfo = function () {
-            if ($scope.infoAvailable) {
-                $scope.infoAvailable = false;
-                $scope.infoMessage = "Show Info";
-            } else {
-                $scope.infoAvailable = true;
-                $scope.infoMessage = "Hide Info";
-            }
+    //
+    // Literals
+    //
+    private readonly hideInfoStr = "Hide Info";
+    private readonly showInfoStr = "Show Info";
+
+    //
+    // Fields
+    // 
+    private maxId: number;
+
+    //
+    // Dependencies declaration
+    //
+    static $inject = ["$scope", "$http", "$log", "$interval"];
+
+    //
+    // Constructor
+    // 
+    constructor(
+        private viewModel: IMainControllerScope,
+        private httpService: ng.IHttpService,
+        private logService: ng.ILogService,
+        private intervalService: ng.IIntervalService) {
+
+        this.setControllerProperties();
+        this.setControllerFunctions();
+        this.readModel();
+        this.setCounter();
+    }
+
+    //
+    // Controller properties
+    // 
+   private setControllerProperties(): void {
+        this.viewModel.sortOrder = "+famillyName";
+        this.viewModel.infoMessage = this.hideInfoStr;
+        this.viewModel.infoAvailable = true;
+        this.viewModel.newGivenName = "Given Name";
+        this.viewModel.newFamillyName = "Familly name";
+        this.viewModel.seconds = 0;
+    }
+
+    //
+    // Controller functions
+    //    
+    private setControllerFunctions(): void {
+        // Troggling info visibility
+        this.viewModel.troggleInfo = () => {
+            this.viewModel.infoAvailable = !this.viewModel.infoAvailable;
+            this.viewModel.infoMessage = this.viewModel.infoAvailable ? this.hideInfoStr : this.showInfoStr;
         }
 
-        $scope.ChangeFamillyName = function (name) {
-            $scope.newFamillyName = name;
+        // Edit names
+        this.viewModel.changeGivenName = newGivenName => {
+            this.viewModel.newGivenName = newGivenName;
         }
 
-        $scope.ChangeGivenName = function (name) {
-            $scope.newGivenName = name;
+        this.viewModel.changeFamillyName = newFamillyName => {
+            this.viewModel.newFamillyName = newFamillyName;
         }
 
-        $scope.AddContact = function () {
-            $scope.people.push(new Person(++maxId, $scope.newGivenName, $scope.newFamillyName));
-            $log.info("Added Contact With ID : " + maxId);
+        // Add Contact
+        this.viewModel.addContact = () => {
+            this.viewModel.people.push(new Person(++this.maxId, this.viewModel.newGivenName, this.viewModel.newFamillyName));
+            this.logService.info(`Added Contact With ID ${this.maxId}`);
         }
 
-        $scope.DeleteContact = function (id) {
-            for (var i = 0; i < $scope.people.length; i++) {
-                if ($scope.people[i].id === id) {
-                    $scope.people.splice(i, 1);
+        // Delete Contact
+        this.viewModel.deleteContact = id => {
+            for (var i = 0; i < this.viewModel.people.length; i++) {
+                if (this.viewModel.people[i].id === id) {
+                    this.viewModel.people.splice(i, 1);
                     break;
                 }
             }
 
-            $log.info("Deleted contact of ID : " + id);
+            this.logService.info(`Deleted contact of ID : ${id}`);
         }
 
-        $scope.UpdateOrder = function (sortOrder) {
-            // needed to let it work inside a include
-            $scope.sortOrder = sortOrder;
+        // Sort order
+        this.viewModel.updateOrder = sortOrder => {
+            this.viewModel.sortOrder = sortOrder;
         }
+   }
 
-        // Read the model
-        $http.get("REST").then(function (response) {
-            $scope.message = response.data.message;
-            $scope.listItems = response.data.items;
-            $scope.people = response.data.people;
-            for (var i = 0; i < $scope.people.length; i++) {
-                if (maxId < $scope.people[i].id) {
-                    maxId = $scope.people[i].id;
+    //
+    // Model access
+    //
+    private readModel(): void {
+        this.maxId = 0;
+        this.httpService.get("REST").then(response => {
+            var info = <IModel> response.data;
+            this.viewModel.message = info._message;
+            this.viewModel.listItems = info._items;
+            this.viewModel.people = info._people;
+            for (var i = 0; i < info._people.length; i++) {
+                if (this.maxId < info._people[i].id) {
+                    this.maxId = info._people[i].id;
                 }
+
+                this.logService.info(`Last ID used : ${this.maxId}`);
             }
-
-            $log.info("Last ID used : " + maxId);
         });
+    }
 
-        // Time counter
-        var IncrementCounter = function () {
-            $scope.seconds++;
-        }
-
-        // Count time elapsed
-        $interval(IncrementCounter, 1000);
-    }]
+    //
+    // Enable Counter
+    //
+    private setCounter(): void {
+        this.intervalService(() => { this.viewModel.seconds++; }, 1000)
+    }
 }

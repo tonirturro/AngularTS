@@ -35,8 +35,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Server\Lib\system.js" />
-    <Compile Include="Server\View\scripts\main.js" />
-    <Compile Include="spec\Frontend\MainController.spec.js" />
     <Content Include="spec\support\jasmine.json" />
     <TypeScriptCompile Include="Src\Server\App.spec.ts">
       <SubType>Code</SubType>
@@ -50,16 +48,15 @@
       <ExcludeFromSourceAnalysis>True</ExcludeFromSourceAnalysis>
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="Src\Server\View\MainController.spec.ts" />
     <TypeScriptCompile Include="Src\Server\View\MainController.ts" />
-    <TypeScriptCompile Include="Src\Server\View\app.ts" />
+    <TypeScriptCompile Include="Src\Server\View\Boot.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Server" />
     <Folder Include="Server\Lib" />
     <Folder Include="Server\View" />
-    <Folder Include="Server\View\scripts" />
     <Folder Include="spec" />
-    <Folder Include="spec\Frontend" />
     <Folder Include="spec\support" />
     <Folder Include="Src" />
     <Folder Include="Src\Server" />

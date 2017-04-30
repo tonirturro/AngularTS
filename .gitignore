@@ -20,3 +20,5 @@ node_modules/
 /.vs/Solution/.vs/config/applicationhost.config
 /.ntvs_analysis.dat
 
+# Karma coverage
+/coverage/Chrome 58.0.3029 (Windows 10 0.0.0)/html

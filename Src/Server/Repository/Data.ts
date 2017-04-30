@@ -1,4 +1,4 @@
-﻿import {Person} from "../Model/Person";
+﻿import {Person} from "../View/Model/Person";
 
 //
 // Class definition for the repository

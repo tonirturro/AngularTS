@@ -27,21 +27,19 @@
     <Compile Include="karma.conf.js" />
     <Content Include="Server\data.json" />
     <Content Include="Server\Lib\bootstrap.css" />
-    <Compile Include="Server\Lib\angular.js" />
     <Content Include="Server\View\index.htm" />
     <Content Include="Server\View\users_form.htm" />
     <Content Include="Server\View\users_grid.htm" />
     <Compile Include="Server\Lib\system.config.js">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Server\Lib\system.js" />
     <Content Include="spec\support\jasmine.json" />
     <TypeScriptCompile Include="Src\Server\App.spec.ts">
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
     <TypeScriptCompile Include="Src\Server\App.ts" />
-    <TypeScriptCompile Include="Src\Server\Model\Person.ts" />
+    <TypeScriptCompile Include="Src\Server\View\Model\Person.ts" />
     <TypeScriptCompile Include="Src\Server\Repository\Data.spec.ts" />
     <TypeScriptCompile Include="Src\Server\Repository\Data.ts" />
     <TypeScriptCompile Include="Src\Server\server.ts">
@@ -60,7 +58,7 @@
     <Folder Include="spec\support" />
     <Folder Include="Src" />
     <Folder Include="Src\Server" />
-    <Folder Include="Src\Server\Model\" />
+    <Folder Include="Src\Server\View\Model\" />
     <Folder Include="Src\Server\View\" />
     <Folder Include="Src\Server\Repository\" />
     <Folder Include="TSProject" />

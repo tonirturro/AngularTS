@@ -24,7 +24,17 @@
     "@types/jasmine": "^2.5.47",
     "@types/morgan": "^1.7.32",
     "@types/node": "^7.0.13",
+    "angular": "^1.6.4",
+    "angular-mocks": "^1.6.4",
+    "jasmine": "^2.6.0",
+    "jasmine-core": "^2.6.1",
+    "karma": "^1.6.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.1.0",
     "karma-systemjs": "^0.16.0",
-    "systemjs": "^0.20.12"
+    "karma-typescript": "^3.0.1",
+    "systemjs": "^0.20.12",
+    "traceur": "0.0.111",
+    "typescript": "^2.3.2"
   }
 }

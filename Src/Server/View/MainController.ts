@@ -3,7 +3,7 @@
 ** The main controller
 **
 */
-import { Person } from "../Model/Person";
+import { Person } from "./Model/Person";
 
 /*
 ** Model definition

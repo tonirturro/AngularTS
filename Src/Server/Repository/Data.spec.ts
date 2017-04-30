@@ -1,5 +1,5 @@
 ﻿import { Data } from "./Data";
-import { Person } from "../Model/Person";
+import { Person } from "../View/Model/Person";
 
 describe("Data test repository",
     () => {

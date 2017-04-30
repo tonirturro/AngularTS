@@ -1,51 +1,52 @@
 ﻿import * as angular from "angular";
-import { IMainControllerScope } from "./MainController";
+import "angular-mocks";
+import { IMainControllerScope, MainController } from "./MainController";
 
 describe("Controller Test", function () {
 
     // Arrange
-    var mockScope = <IMainControllerScope>{};
-    var controller;
+    let mockScope: IMainControllerScope;
+    let controller: MainController;
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(angular.mock.inject(function ($controller, $rootScope) {
+    beforeEach(inject(($controller, $rootScope) => {
         mockScope = $rootScope.$new();
         controller = $controller("MainController", {
             $scope: mockScope
         });
     }));
 
-    it("Initial Info Visibility", function () {
+    it("Initial Info Visibility", () => {
         expect(mockScope.infoAvailable).toBeTruthy();
         expect(mockScope.infoMessage).toEqual("Hide Info");
     });
 
-    it("Troggle Info Visibility", function () {
+    it("Troggle Info Visibility", () => {
         mockScope.troggleInfo();
         expect(mockScope.infoAvailable).toBeFalsy();
         expect(mockScope.infoMessage).toEqual("Show Info");
     });
 
-    it("Change Familly Name", function () {
+    it("Change Familly Name", () => {
         var newName = "NewFamillyName";
         mockScope.changeFamillyName(newName);
         expect(mockScope.newFamillyName).toEqual(newName);
     });
 
-    it("Change Given Name", function () {
+    it("Change Given Name", () => {
         var newName = "NewGivenName";
         mockScope.changeGivenName(newName);
         expect(mockScope.newGivenName).toEqual(newName);
     });
 
-    it("Add Contact", function () {
+    it("Add Contact", () => {
         mockScope.people = [];
         mockScope.addContact();
         expect(mockScope.people.length).toEqual(1);
     });
 
-    it("Delete Contact", function () {
+    it("Delete Contact", () => {
         mockScope.people = [];
         mockScope.addContact();
 

@@ -4,15 +4,17 @@ import * as express from "express";
 import * as logger from "morgan";
 import * as bodyParser from "body-parser";
 import * as fs from "fs";
+import * as path from "path";
 import { Data } from "./Repository/Data";
-import { Person } from "./Model/Person";
+import { Person } from "./View/Model/Person";
 
 export class App {
     // Routes
     private readonly restPath = "/REST";
     private readonly viewPath = "/View";
     private readonly libPath = "/Lib";
-    private readonly modelPath = "/Model";
+    private readonly modelPath = `${this.viewPath}/Model`;
+    private readonly nodeModulesPath = "/node_modules";
 
     // Host express
     private _express: express.Application;
@@ -80,15 +82,15 @@ export class App {
         });
 
         // Angular
-        const angularPath = `${this.libPath}/angular.js`;
+        const angularPath = `${this.nodeModulesPath}/angular/angular.js`;
         this._express.get(angularPath, (err, res) => {
-            res.sendFile(__dirname + angularPath);
+            res.sendFile(path.resolve(`.${angularPath}`));
         });
 
         // System.js
-        const systemJSPath = `${this.libPath}/system.js`;
+        const systemJSPath = "/system.js";
         this._express.get(systemJSPath, (err, res) => {
-            res.sendFile(__dirname + systemJSPath);
+            res.sendFile(path.resolve(`.${this.nodeModulesPath}/systemjs/dist/${systemJSPath}`));
         });
 
         // System.config.js

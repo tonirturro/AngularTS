@@ -4,25 +4,22 @@
 module.exports = function (config) {
     config.set({
         
-        plugins: ['karma-systemjs'],
-
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['systemjs', 'jasmine'],
+        frameworks: ['jasmine', "karma-typescript"],
 
-        // list of files / patterns to load in the browser
         files: [
-            'bower_components/angular/angular.js',
-            'bower_components/angular/angular-mocks.js',
-            'Server/View/MainController.js',
-            'Server/View/MainController.spec.js'
-       ],
+            { pattern: "Src/Server/View/**/*.ts" }
+        ],
 
+        preprocessors: {
+            "Src/Server/View/**/*.ts": ["karma-typescript"]
+        },
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ['progress', "karma-typescript"],
 
         // web server port
         port: 9876,
@@ -30,6 +27,5 @@ module.exports = function (config) {
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: ['Chrome']
-
     });
 };

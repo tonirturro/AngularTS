@@ -1,10 +1,15 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "sourceMap": true,
-        "outDir": "Server"
-    },
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true,
+    "outDir": "Server",
+    "types": [
+      "angular",
+      "angular-mocks",
+      "jasmine"
+    ]
+  },
     "include": [
       "Src/Server/*.ts",
       "Src/Server/Model/*.ts",

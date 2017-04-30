@@ -2,7 +2,7 @@
     baseURL: "/",
     defaultExtensions: true,
     map: {
-        "angular": "Lib/angular.js"
+        "angular": "node_modules/angular/angular.js"
     },
     meta: {
         'angular': {

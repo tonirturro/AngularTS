@@ -49,6 +49,12 @@
     <TypeScriptCompile Include="Src\Server\View\MainController.spec.ts" />
     <TypeScriptCompile Include="Src\Server\View\MainController.ts" />
     <TypeScriptCompile Include="Src\Server\View\Boot.ts" />
+    <TypeScriptCompile Include="Src\Server\View\Services\DataService.spec.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Src\Server\View\Services\DataService.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Server" />
@@ -61,6 +67,7 @@
     <Folder Include="Src\Server\View\Model\" />
     <Folder Include="Src\Server\View\" />
     <Folder Include="Src\Server\Repository\" />
+    <Folder Include="Src\Server\View\Services\" />
     <Folder Include="TSProject" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />

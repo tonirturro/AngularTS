@@ -4,15 +4,7 @@
 **
 */
 import { Person } from "./Model/Person";
-
-/*
-** Model definition
-**/
-interface IModel {
-    _message: string;
-    _items: string[];
-    _people: Person[];
-}
+import { DataService } from "./Services/DataService"
 
 /*
 ** Scope definition
@@ -54,20 +46,26 @@ export class MainController {
     //
     // Dependencies declaration
     //
-    static $inject = ["$scope", "$http", "$log", "$interval"];
+    static $inject = ["$scope", "$log", "$interval", "dataService"];
 
     //
     // Constructor
     // 
     constructor(
         private viewModel: IMainControllerScope,
-        private httpService: ng.IHttpService,
         private logService: ng.ILogService,
-        private intervalService: ng.IIntervalService) {
+        private intervalService: ng.IIntervalService,
+        private dataService: DataService) {
 
         this.setControllerProperties();
         this.setControllerFunctions();
-        this.readModel();
+        this.dataService.readModel(() => {
+            this.maxId = this.dataService.maxId;
+            this.viewModel.message = this.dataService.message;
+            this.viewModel.listItems = this.dataService.listItems;
+            this.viewModel.people = this.dataService.people;
+        });
+
         this.setCounter();
     }
 
@@ -125,26 +123,6 @@ export class MainController {
             this.viewModel.sortOrder = sortOrder;
         }
    }
-
-    //
-    // Model access
-    //
-    private readModel(): void {
-        this.maxId = 0;
-        this.httpService.get("REST").then(response => {
-            var info = <IModel> response.data;
-            this.viewModel.message = info._message;
-            this.viewModel.listItems = info._items;
-            this.viewModel.people = info._people;
-            for (var i = 0; i < info._people.length; i++) {
-                if (this.maxId < info._people[i].id) {
-                    this.maxId = info._people[i].id;
-                }
-
-                this.logService.info(`Last ID used : ${this.maxId}`);
-            }
-        });
-    }
 
     //
     // Enable Counter

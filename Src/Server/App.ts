@@ -14,6 +14,7 @@ export class App {
     private readonly viewPath = "/View";
     private readonly libPath = "/Lib";
     private readonly modelPath = `${this.viewPath}/Model`;
+    private readonly servicesPath = `${this.viewPath}/Services`;
     private readonly nodeModulesPath = "/node_modules";
 
     // Host express
@@ -111,6 +112,12 @@ export class App {
             res.sendFile(__dirname + mainControllerPath + ".js");
         });
 
+        // Data service
+        const dataServicePath = `${this.servicesPath}/DataService`;
+        this._express.get(dataServicePath, (err, res) => {
+            res.sendFile(__dirname + dataServicePath + ".js");
+        });
+           
         // Person
         const personPath = `${this.modelPath}/Person`;
         this._express.get(personPath, (err, res) => {

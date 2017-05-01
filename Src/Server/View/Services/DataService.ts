@@ -15,7 +15,7 @@ interface IModel {
 */
 export class DataService {
 
-    private maxId: number;
+    private _maxId: number;
     private _message: string;
     private _listItems: string[];
     private _people: Person[];
@@ -23,26 +23,28 @@ export class DataService {
     constructor(
         private $http: angular.IHttpService, 
         private $log: angular.ILogService)  {
-        this.maxId = 0;
+        this._maxId = 0;
     }
 
-     readModel(): void {
+     readModel(callBack:() => void): void {
 
         let info: IModel;
 
-        this.maxId = 0;
+        this._maxId = 0;
         this.$http.get("REST").then(response => {
             info = <IModel>response.data;
             this._message = info._message;
             this._listItems = info._items;
             this._people = info._people;
             for (var i = 0; i < info._people.length; i++) {
-                if (this.maxId < info._people[i].id) {
-                    this.maxId = info._people[i].id;
+                if (this._maxId < info._people[i].id) {
+                    this._maxId = info._people[i].id;
                 }
 
-                this.$log.info(`Last ID used : ${this.maxId}`);
+                this.$log.info(`Last ID used : ${this._maxId}`);
             }
+
+            callBack();
         });
     }
 
@@ -65,5 +67,12 @@ export class DataService {
     */
     get people(): Person[] {
         return this._people;
+    }
+
+    /*
+    ** Get the max id property
+    */
+    get maxId(): number {
+        return this._maxId;
     }
 }

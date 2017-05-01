@@ -17,10 +17,12 @@ describe("Data Service Test", () => {
         httpBackend = _$httpBackend_;
     }));
 
-    it("Reads the data", () => {
+    it("Reads the data", (done) => {
         httpBackend.expectGET('REST').respond(200, { _message: testMessage, _items:[], _people:[] });
-        service.readModel();
+        service.readModel(() => {
+            expect(service.message).toBe(testMessage);
+            done();
+        });
         httpBackend.flush();
-        expect(service.message).toBe(testMessage);
     })
 })

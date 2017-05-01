@@ -10,10 +10,11 @@
       "jasmine"
     ]
   },
-    "include": [
-      "Src/Server/*.ts",
-      "Src/Server/Model/*.ts",
-      "Src/Server/Repository/*.ts",
-      "Src/Server/View/*.ts"
-    ]
+  "include": [
+    "Src/Server/*.ts",
+    "Src/Server/Repository/*.ts",
+    "Src/Server/View/*.ts",
+    "Src/Server/View/Model/*.ts",
+    "Src/Server/View/Services/*.ts"
+  ]
 }

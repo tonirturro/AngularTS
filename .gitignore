@@ -14,11 +14,11 @@ node_modules/
 # Visual Studio stuff
 /.vs/Solution/.vs/Solution/v15
 /bin
-/obj/Debug
+/obj/**/*
 /.vs/Solution/.vs/AngularTS/v15
 /.vs/Solution/.vs/Solution/v14
 /.vs/Solution/.vs/config/applicationhost.config
 /.ntvs_analysis.dat
 
 # Karma coverage
-/coverage/Chrome 58.0.3029 (Windows 10 0.0.0)/html
+/coverage/**/*

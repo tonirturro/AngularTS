@@ -12,13 +12,19 @@
   },
   "main": "app.js",
   "dependencies": {
-    "express": "^4.14.0"
+    "angular": "^1.6.4",
+    "bootstrap": "^3.3.7",
+    "express": "^4.14.0",
+    "open": "0.0.5",
+    "systemjs": "^0.20.12"
   },
   "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/express": "^4.0.35",
     "@types/express-serve-static-core": "^4.0.44",
     "@types/mocha": "^2.2.41",
+    "@types/angular": "^1.6.17",
+    "@types/angular-mocks": "^1.5.9",
     "chai": "^3.5.0",
     "mocha": "^3.3.0"
   }

@@ -6,3 +6,6 @@ App/**/*.js
 wwwroot/App/**/*.js
 App/**/*.js.map
 wwwroot/App/**/*.js.map
+
+#karma coverage
+coverage/

@@ -1,24 +1,8 @@
-# Node modules
+#node stuff
 node_modules/
 
-# Typescript Output
-/Server/*.js
-/Server/*.map
-/Server/Model
-/Server/View
-/Server/Repository
-
-# Node stuff
-/npm-debug.log
-
-# Visual Studio stuff
-/.vs/Solution/.vs/Solution/v15
-/bin
-/obj/**/*
-/.vs/Solution/.vs/AngularTS/v15
-/.vs/Solution/.vs/Solution/v14
-/.vs/Solution/.vs/config/applicationhost.config
-/.ntvs_analysis.dat
-
-# Karma coverage
-/coverage/**/*
+#ts output
+App/**/*.js
+wwwroot/App/**/*.js
+App/**/*.js.map
+wwwroot/App/**/*.js.map

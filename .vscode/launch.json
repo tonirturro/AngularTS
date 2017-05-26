@@ -7,29 +7,31 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch via NPM",
-            "runtimeExecutable": "npm",
-            "windows": {
-                "runtimeExecutable": "npm.cmd"
-            },
-            "runtimeArgs": [
-                "run-script",
-                "debug"
+            "name": "Launch Tests",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "-u",
+                "tdd",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceRoot}/App",
+                "--recursive"
             ],
-            "port": 5858
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Front End",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceRoot}/Server/server.js"
-        },
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "Attach to Port",
-            "address": "localhost",
-            "port": 5858
+            "name": "Launch BackEnd",
+            "program": "${workspaceRoot}/server.js"
         }
     ]
 }

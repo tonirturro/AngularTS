@@ -1,9 +1,0 @@
-{
-  "spec_dir": "spec",
-  "spec_files": [
-    "../Server/*[sS]pec.js",
-    "../Server/Repository/*[sS]pec.js"
-  ],
-  "stopSpecOnExpectationFailure": false,
-  "random": false
-}

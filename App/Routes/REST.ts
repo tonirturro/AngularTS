@@ -17,6 +17,9 @@ class RestRouter {
         this._router.get('/', (req: express.Request, res: express.Response) => {
             res.json(this._data.entities);
         });
+        this._router.get('/pages', (req: express.Request, res: express.Response) => {
+            res.json(this._data.entities.pages);
+        });
     }
 
     get router(): express.Router {

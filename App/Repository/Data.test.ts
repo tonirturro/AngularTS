@@ -75,4 +75,10 @@ describe("Data test repository", () => {
 
         expect(objectToTest.people[0].id).to.equal(person2.id);
     });
+
+    it("Can read pages", () => {
+        var pages = objectToTest.getPages();
+
+        expect(pages.length).to.be.greaterThan(0);
+    });
 });

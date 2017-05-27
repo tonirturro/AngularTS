@@ -1,5 +1,6 @@
 ﻿import { Entities } from "../Model/Entities";
 import { Person } from "../Model/Person";
+import { Page } from "../Model/Page";
 
 //
 // Class definition for the repository
@@ -24,6 +25,10 @@ export class Data {
         for (let entry of items) {
             this._entities.items.push(entry);
         }
+
+        this._entities.pages = [];
+        this._entities.pages.push(new Page(1, 1, 1, 1, 1));
+        this._entities.pages.push(new Page(2, 1, 1, 1, 1));
     }
 
     //
@@ -88,5 +93,13 @@ export class Data {
 
         // Not found
         return false;
+    }
+
+    /**
+     * Gets the available pages
+     */
+    getPages(): Page[]
+    {
+        return this._entities.pages;
     }
 }

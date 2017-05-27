@@ -1,0 +1,47 @@
+<div class="container">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <td>Page Size</td>
+                <td>Print Quality</td>
+                <td>Media Type</td>
+                <td>Destination</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="page in $ctrl.pages">
+                <td>
+                    <select ng-model="page.pageSize">
+                        <option value="0">A3</option>
+                        <option value="1">A2</option>
+                        <option value="2">A1</option>
+                        <option value="3">A0</option>
+                    </select>
+                </td>
+                <td>
+                    <select ng-model="page.printQuality">
+                        <option value="0">Fast</option>
+                        <option value="1">Normal</option>
+                        <option value="2">Best</option>
+                    </select>
+                </td>
+                <td>
+                    <select ng-model="page.mediaType">
+                        <option value="0">Plain</option>
+                        <option value="1">Coated</option>
+                        <option value="2">Photo</option>
+                    </select>
+                </td>
+                <td>
+                    <select ng-model="page.destination">
+                        <option value="0">Basket</option>
+                        <option value="1">Stacker</option>
+                        <option value="2">Folder</option>
+                    </select>
+                </td>
+                <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deleteContact(person.id)">x</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

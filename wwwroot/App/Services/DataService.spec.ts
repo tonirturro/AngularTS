@@ -2,6 +2,7 @@ import * as angular from "angular";
 import "angular-mocks";
 import { DataService } from "./DataService"
 import { Person } from "../Model/Person";
+import { Page } from "../Model/Page";
 
 const testMessage = "Test Message";
 const testItem = "Test Item";
@@ -71,6 +72,18 @@ describe("Data Service Test",
                     expect(service.people.length).toBe(beforeDelete);
                     done();
                 });
+                httpBackend.flush();
+            });
+
+        it("Reads Pages",
+            (done) => {
+                httpBackend.whenGET('REST/pages').respond(200,[ new Page(1,2,3,4,5) ]);
+
+                service.getPages().then( pages => {
+                    expect(pages.length).toBe(1);
+                    done();
+                });
+
                 httpBackend.flush();
             });
     });

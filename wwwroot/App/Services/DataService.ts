@@ -1,5 +1,6 @@
 import * as angular from "angular"
 import { Person } from "../Model/Person";
+import { Page } from "../Model/Page";
 
 /*
 ** Model definition
@@ -22,7 +23,8 @@ export class DataService {
 
     constructor(
         private $http: angular.IHttpService,
-        private $log: angular.ILogService) {
+        private $log: angular.ILogService,
+        private $q: angular.IQService) {
         this._maxId = 0;
         this._people = [];
     }
@@ -106,5 +108,24 @@ export class DataService {
         }
 
         return false;
+    }
+
+    /**
+     * Gets pages from backend
+     */
+    getPages():angular.IPromise<Page[]> {
+
+        var deferred = this.$q.defer();
+
+        this.$http.get("REST/pages").then(response => {
+            let pages:Page[] = <Page[]>response.data;
+            deferred.resolve(pages);
+        },
+        errors => {
+            this.$log.error("Failure to get REST/pages");
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
     }
 }

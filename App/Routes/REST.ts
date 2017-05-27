@@ -1,27 +1,30 @@
-﻿/*
- * GET users listing.
- */
-
-import * as express from "express";
+﻿import * as express from "express";
 import { Data } from "../Repository/Data";
-import { Person } from "../Model/Person";
 
+/**
+ * Handles the routes to the REST api
+ */
 class RestRouter {
 
     private _router: express.Router;
     private _data: Data;
 
+    /**
+     * Initializes a new instance of the RestRouter class.
+     */
     constructor() {
-        this._data = new Data("Contact List : Node/Express Backend", ["You can add contacts", "You can delete contacts", "You can sort contacts"]);
+        this._data = new Data();
         this._router = express.Router();
-        this._router.get('/', (req: express.Request, res: express.Response) => {
-            res.json(this._data.entities);
-        });
+
+        // Access to the pages repository
         this._router.get('/pages', (req: express.Request, res: express.Response) => {
-            res.json(this._data.entities.pages);
+            res.json(this._data.getPages());
         });
     }
 
+    /**
+    /* Retrieve the router
+    */
     get router(): express.Router {
         return this._router;
     }

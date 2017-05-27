@@ -1,9 +1,8 @@
-﻿import { Person } from "./Person";
-import { Page } from "./Page";
+﻿import { Page } from "./Page";
 
+/**
+ * ORM definition
+ */
 export class Entities {
-    message: string;
-    items: string[];
-    people: Person[];
     pages: Page[];
 }

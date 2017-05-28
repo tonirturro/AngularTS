@@ -20,6 +20,17 @@ class RestRouter {
         this._router.get('/pages', (req: express.Request, res: express.Response) => {
             res.json(this._data.getPages());
         });
+
+        // Add new page
+        this._router.put('/pages', (req: express.Request, res: express.Response) => {
+            res.json({ success: true });
+        });
+
+        // Delete a page
+        this._router.delete('/pages/:pageId', (req: express.Request, res: express.Response) => {
+            var pageIdToDelete = parseInt(req.params.pageId)
+            res.json({ deletedPageId: pageIdToDelete, success: true });
+        });
     }
 
     /**

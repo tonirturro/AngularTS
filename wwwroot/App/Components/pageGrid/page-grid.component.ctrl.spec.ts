@@ -2,7 +2,6 @@ import * as angular from "angular";
 import "angular-mocks";
 import { PageGridController } from "./page-grid.component.ctrl";
 import { DataService } from "../../Services/DataService";
-import { Page } from "../../Model/Page";
 
 describe("Page grid controller", () => {
 
@@ -17,7 +16,7 @@ describe("Page grid controller", () => {
 
         dataServiceToMock = dataService;
         httpBackend = $httpBackend;
-        httpBackend.whenGET('REST/pages').respond(200, [new Page(1, 2, 3, 4, 5)]);
+        httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination:0}]);
         controller = $componentController("pageGrid");
         httpBackend.flush();
     }));

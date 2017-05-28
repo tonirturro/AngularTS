@@ -25,8 +25,21 @@ export class DataService {
 
         var deferred = this.$q.defer();
 
-        this.$http.get("REST/pages").then(response => {
-            let pages:Page[] = <Page[]>response.data;
+        this.$http.get<[{ id, pageSize:number, printQuality:number, mediaType:number, destination:number}]>("REST/pages").then(response => {
+            let pages: Page[];
+
+            pages = [];
+
+            // Translate from the model
+            response.data.forEach(newPage => {
+                pages.push(new Page(
+                    newPage.id,
+                    newPage.pageSize.toString(),
+                    newPage.printQuality.toString(),
+                    newPage.mediaType.toString(),
+                    newPage.destination.toString()))
+            });
+           
             deferred.resolve(pages);
         },
         errors => {

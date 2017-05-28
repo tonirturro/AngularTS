@@ -1,7 +1,6 @@
 import * as angular from "angular";
 import "angular-mocks";
 import { DataService } from "./DataService"
-import { Page } from "../Model/Page";
 
 describe("Data Service Test",
     () => {
@@ -18,7 +17,7 @@ describe("Data Service Test",
     
         it("Reads Pages",
             (done) => {
-                httpBackend.whenGET('REST/pages').respond(200,[ new Page(1,2,3,4,5) ]);
+                httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
                 service.getPages().then( pages => {
                     expect(pages.length).toBe(1);
@@ -27,4 +26,29 @@ describe("Data Service Test",
 
                 httpBackend.flush();
             });
+
+        it("Translate from the model", (done) => {
+            var expectedPageSize = 3;
+            var expectedPrintQuality = 0;
+            var expectedMediaType = 1;
+            var expectedDestination = 2;
+
+            httpBackend.whenGET('REST/pages').respond(200, [{
+                id: 1,
+                pageSize: expectedPageSize,
+                printQuality: expectedPrintQuality,
+                mediaType: expectedMediaType,
+                destination: expectedDestination
+            }]);
+
+            service.getPages().then(pages => {
+                expect(pages[0].pageSize).toBe(expectedPageSize.toString());
+                expect(pages[0].printQuality).toBe(expectedPrintQuality.toString());
+                expect(pages[0].mediaType).toBe(expectedMediaType.toString());
+                expect(pages[0].destination).toBe(expectedDestination.toString());
+                done();
+            });
+
+            httpBackend.flush();
+        })
     });

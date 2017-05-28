@@ -14,7 +14,7 @@ export class Data {
     constructor() {
         this._entities = new Entities();
         this._entities.pages = [];
-        this._entities.pages.push(new Page(1, 1, 1, 1, 1));
+        this._entities.pages.push(new Page(1, 1, 1, 0, 0));
         this._entities.pages.push(new Page(2, 1, 1, 1, 1));
     }
 

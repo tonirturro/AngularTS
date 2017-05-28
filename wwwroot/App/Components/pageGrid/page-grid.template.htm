@@ -6,7 +6,7 @@
                 <td>Print Quality</td>
                 <td>Media Type</td>
                 <td>Destination</td>
-                <td>Actions</td>
+                <td><button type="button" class="btn btn-info" ng-click="$ctrl.addPage()">Add Page</button></td>
             </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
                         <option value="2">Folder</option>
                     </select>
                 </td>
-                <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deleteContact(person.id)">x</button></td>
+                <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>
             </tr>
         </tbody>
     </table>

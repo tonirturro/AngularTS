@@ -56,11 +56,29 @@ export class DataService {
     addNewPage(): angular.IPromise<boolean> {
         var deferred = this.$q.defer();
 
-        this.$http.put("REST/pages", {}).then(response => {
-            deferred.resolve(true);
+        this.$http.put<{ success: boolean }>("REST/pages", {}).then(response => {
+            deferred.resolve(response.data.success);
         },
         errors => {
             this.$log.error("Failure to put REST/pages");
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
+     * Delete an existing page
+     * @param idToDelete is the id for the page to be deleted
+     */
+    deletePage(idToDelete: number): angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        this.$http.delete<{ deletedPageId: number, success: boolean }>(`REST/pages/${idToDelete}`).then(response => {
+            deferred.resolve(response.data.success && response.data.deletedPageId == idToDelete);
+        },
+        errors => {
+            this.$log.error(`Failure to delete REST/pages/${idToDelete}`);
             deferred.reject(errors.data);
         });
 

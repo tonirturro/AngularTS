@@ -51,4 +51,28 @@ describe("Data Service Test",
 
             httpBackend.flush();
         })
+
+        it("Can add pages", (done) => {
+            httpBackend.whenPUT('REST/pages').respond(200, { success: true });
+
+            service.addNewPage().then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        });
+
+        it("Can delete pages", (done) => {
+            var idTodelete = 1;
+
+            httpBackend.whenDELETE(`REST/pages/${idTodelete}`).respond(200, { deletedPageId: idTodelete, success: true });
+
+            service.deletePage(idTodelete).then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        })
     });

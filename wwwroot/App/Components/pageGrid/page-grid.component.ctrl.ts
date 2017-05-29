@@ -42,4 +42,18 @@ export class PageGridController {
         });
     }
 
+    /**
+     * Request a page deletion
+     * @param pageTodelete is the page id to be deletd
+     */
+    deletePage(pageTodelete: number): void {
+        this._dataService.deletePage(pageTodelete).then(sucess => {
+            if (sucess) {
+                this._dataService.getPages().then(pages => {
+                    this.pages_ = pages;
+                });
+            }
+        });
+    }
+
 }

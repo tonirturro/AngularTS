@@ -6,7 +6,10 @@ import { Page } from "../Model/Page";
  */
 export class Data {
 
+    // Track page index
     private _lastIndex;
+
+    // Reference to the data entities from this repository.
     private _entities: Entities;
 
     /**
@@ -16,7 +19,6 @@ export class Data {
         this._entities = new Entities();
         this._entities.pages = [];
         this._lastIndex = 0;
-        this.newPage();
     }
 
     /**
@@ -33,11 +35,15 @@ export class Data {
         this._entities.pages.push(new Page(this._lastIndex++, 0, 0, 0, 0));
     }
 
+    /**
+     * Deletes an existing page
+     * @param idToDelete is the id for the page to be deleted.
+     */
     deletePage(idToDelete: number): boolean {
         var indexToDelete = -1;
 
         for (var i = 0; i < this._entities.pages.length; i++) {
-            if (this._entities.pages[i].id = idToDelete)
+            if (this._entities.pages[i].id == idToDelete)
             {
                 indexToDelete = i;
                 break;
@@ -45,7 +51,7 @@ export class Data {
         }
 
         if (indexToDelete >= 0) {
-            this._entities.pages.slice(indexToDelete, 1);
+            this._entities.pages.splice(indexToDelete, 1);
             return true;
         } else {
             return false;

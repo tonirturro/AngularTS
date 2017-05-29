@@ -6,6 +6,7 @@ import { DataService } from "../../Services/DataService";
  * Handles the bindings inside the component
  */
 export class PageGridController {
+    private _dataService: DataService;
     private pages_: Page[];
 
     /**
@@ -15,7 +16,8 @@ export class PageGridController {
      */
     constructor(private logService: angular.ILogService,private dataService: DataService)
     {
-        dataService.getPages().then(pages => {
+        this._dataService = dataService;
+        this._dataService.getPages().then(pages => {
             this.pages_ = pages;
         });
     }
@@ -26,4 +28,18 @@ export class PageGridController {
     get pages(): Page[] {
         return this.pages_;
     }
+
+    /**
+     * Request a new page
+     */
+    addPage(): void {
+        this._dataService.addNewPage().then(sucess => {
+            if (sucess) {
+                this._dataService.getPages().then(pages => {
+                    this.pages_ = pages;
+                });
+            }
+        });
+    }
+
 }

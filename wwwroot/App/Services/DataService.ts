@@ -49,4 +49,21 @@ export class DataService {
 
         return deferred.promise;
     }
+
+    /**
+     * Request a new page
+     */
+    addNewPage(): angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        this.$http.put("REST/pages", {}).then(response => {
+            deferred.resolve(true);
+        },
+        errors => {
+            this.$log.error("Failure to put REST/pages");
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
 }

@@ -9,6 +9,7 @@ export class PageGridController {
     private _dataService: DataService;
     private pages_: Page[];
 
+
     /**
      * Initializes a new instance of the PageGridController class.
      * @param logService is the Angular log service

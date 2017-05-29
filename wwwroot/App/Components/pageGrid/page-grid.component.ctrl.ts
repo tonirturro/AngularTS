@@ -17,6 +17,7 @@ export class PageGridController {
     constructor(private logService: angular.ILogService,private dataService: DataService)
     {
         this._dataService = dataService;
+        this.pages_ = [];
         this._dataService.getPages().then(pages => {
             this.pages_ = pages;
         });

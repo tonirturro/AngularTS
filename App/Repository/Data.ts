@@ -57,4 +57,27 @@ export class Data {
             return false;
         }
     }
+
+    /**
+     * Updates the page size for a page
+     * @param pageId is the id for the page to be updated
+     * @param newValue is the new page size value
+     */
+    updatePageSize(pageId: number, newValue: number):boolean {
+        let pageToUpdate:Page = null;
+        var pageFound = this._entities.pages.some(page => {
+            if (page.id === pageId) {
+                pageToUpdate = page;
+                return true;
+            }
+
+            return false;
+        });
+
+        if (pageFound) {
+            pageToUpdate.pageSize = newValue;
+        }
+
+        return pageFound;
+    }
 }

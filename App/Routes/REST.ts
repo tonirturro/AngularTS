@@ -4,7 +4,7 @@ import { Data } from "../Repository/Data";
 /**
  * Handles the routes to the REST api
  */
-class RestRouter {
+export class RestRouter {
 
     private _router: express.Router;
     private _data: Data;
@@ -12,8 +12,8 @@ class RestRouter {
     /**
      * Initializes a new instance of the RestRouter class.
      */
-    constructor() {
-        this._data = new Data();
+    constructor(data : Data) {
+        this._data = data;
         this._router = express.Router();
 
         // Access to the pages repository
@@ -45,6 +45,3 @@ class RestRouter {
         return this._router;
     }
 }
-
-
-export default new RestRouter().router;

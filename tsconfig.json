@@ -5,6 +5,10 @@
     "noEmitOnError": true,
     "removeComments": false,
     "sourceMap": true,
+    "lib": [
+      "dom",
+      "es2015"
+    ],
     "target": "es5"
   },
   "include": [

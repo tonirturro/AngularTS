@@ -36,6 +36,16 @@ export class RestRouter {
                 success: result
             });
         });
+
+        // Update page size
+        this._router.put('/pages/:pageId/pageSize/:newValue', (req: express.Request, res: express.Response) => {
+            var pageIdToUpdate = parseInt(req.params.pageId);
+            var newValue = parseInt(req.params.newValue);
+            var result = this._data.updatePageSize(pageIdToUpdate, newValue);
+            res.json({
+                succes: result
+            });
+        });
     }
 
     /**

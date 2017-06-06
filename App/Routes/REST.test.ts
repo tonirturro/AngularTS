@@ -6,6 +6,9 @@ let app = require('../app');
 
 describe('REST Route', () => {
 
+    const ExpectedPageId = 1;
+    const ExpectedPageSize = 0;
+
     chai.use(chaiHttp);
 
     it("Get pages responds ok", (done) => {
@@ -23,7 +26,7 @@ describe('REST Route', () => {
         chai.request(app.application)
             .get("/REST/pages")
             .then(res => {
-                expect(spy.calledOnce).to.be.true;
+                expect(spy.calledOnce).true;
                 done();
             });
     });
@@ -42,14 +45,14 @@ describe('REST Route', () => {
         chai.request(app.application)    
             .put("/REST/pages")
             .then(res => {
-                expect(spy.calledOnce).to.be.true;
+                expect(spy.calledOnce).true;
                 done();
             });
     });
 
     it("Delete page responds ok", (done) => {
         chai.request(app.application)
-            .del("/REST/pages/1")
+            .del(`/REST/pages/${ExpectedPageId}`)
             .then(res => {
                 expect(res.status).to.equal(200);
                 done();
@@ -59,11 +62,31 @@ describe('REST Route', () => {
     it("Delete page calls delete page with the right page number", (done) => {
         var spy = sinon.spy(app.dependencies.dataLayer, 'deletePage');
         chai.request(app.application)
-            .del("/REST/pages/1")
+            .del(`/REST/pages/${ExpectedPageId}`)
             .then(res => {
-                expect(spy.calledOnce).to.be.true;
-                expect(spy.calledWith(1)).to.be.true;
+                expect(spy.calledOnce).true;
+                expect(spy.calledWith(ExpectedPageId)).true;
                 done();
             });        
+    });
+
+    it("Update page size responds oK", (done) => {
+        chai.request(app.application)
+            .put(`/REST/pages/${ExpectedPageId}/pageSize/${ExpectedPageSize}`)
+            .then(res => {
+                expect(res.status).to.equal(200);
+                done();
+            });
+    });
+
+    it("Update page size calls update size with the right parameters", (done) => {
+        var spy = sinon.spy(app.dependencies.dataLayer, 'updatePageSize');
+        chai.request(app.application)
+            .put(`/REST/pages/${ExpectedPageId}/pageSize/${ExpectedPageSize}`)
+            .then(res => {
+                expect(spy.calledOnce).true;
+                expect(spy.calledWith(ExpectedPageId,ExpectedPageSize)).true;
+                done();
+            });
     });
 });

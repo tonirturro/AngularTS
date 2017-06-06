@@ -52,4 +52,19 @@ describe("Page grid controller", () => {
 
         expect(dataServiceToMock.deletePage).toHaveBeenCalledWith(idTodelete);
     });
+
+    it("Can update page size", () => {
+        const idToUpdate = 2;
+        const newPageSize = 0;
+
+        spyOn(dataServiceToMock, "updatePageSize").and.callFake(() => {
+            var deferred = promiseService.defer();
+            deferred.resolve(true);
+            return deferred.promise;
+        });
+        
+        controller.updatePageSize(idToUpdate, newPageSize);
+
+        expect(dataServiceToMock.updatePageSize).toHaveBeenCalledWith(idToUpdate, newPageSize);
+    });
 });

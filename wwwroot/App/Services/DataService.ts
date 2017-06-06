@@ -84,4 +84,23 @@ export class DataService {
 
         return deferred.promise;
     }
+
+    /**
+     * Updates the page size for an existing page
+     * @param idToUpdate is the id for the page to be updated
+     * @param newValue is the new page size value
+     */
+    updatePageSize(idToUpdate:number, newValue:number):angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        this.$http.put<{ success: boolean }>(`REST/pages/${idToUpdate}/pageSize/${newValue}`, {}).then(response => {
+            deferred.resolve(response.data.success);
+        },
+        errors => {
+            this.$log.error(`Failure to put REST/pages/${idToUpdate}/pageSize/${newValue}`);
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;       
+    }
 }

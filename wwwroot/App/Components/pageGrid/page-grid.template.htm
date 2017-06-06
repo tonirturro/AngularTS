@@ -12,7 +12,7 @@
         <tbody>
             <tr ng-repeat="page in $ctrl.pages">
                 <td>
-                    <select ng-model="page.pageSize">
+                    <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.id, page.pageSize)">
                         <option value="0">A3</option>
                         <option value="1">A2</option>
                         <option value="2">A1</option>

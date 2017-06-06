@@ -28,10 +28,10 @@ describe("Data Service Test",
             });
 
         it("Translate from the model", (done) => {
-            var expectedPageSize = 3;
-            var expectedPrintQuality = 0;
-            var expectedMediaType = 1;
-            var expectedDestination = 2;
+            const expectedPageSize = 3;
+            const expectedPrintQuality = 0;
+            const expectedMediaType = 1;
+            const expectedDestination = 2;
 
             httpBackend.whenGET('REST/pages').respond(200, [{
                 id: 1,
@@ -64,7 +64,7 @@ describe("Data Service Test",
         });
 
         it("Can delete pages", (done) => {
-            var idTodelete = 1;
+            const idTodelete = 1;
 
             httpBackend.whenDELETE(`REST/pages/${idTodelete}`).respond(200, { deletedPageId: idTodelete, success: true });
 
@@ -75,4 +75,18 @@ describe("Data Service Test",
 
             httpBackend.flush();
         })
+
+        it("Can update page size", (done) => {
+            const idToUpdate = 2;
+            const newPageSize = 0;
+
+            httpBackend.whenPUT(`REST/pages/${idToUpdate}/pageSize/${newPageSize}`).respond(200, { success: true });
+
+            service.updatePageSize(idToUpdate, newPageSize).then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        });
     });

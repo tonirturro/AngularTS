@@ -35,12 +35,8 @@ export class PageGridController {
      * Request a new page
      */
     addPage(): void {
-        this._dataService.addNewPage().then(sucess => {
-            if (sucess) {
-                this._dataService.getPages().then(pages => {
-                    this.pages_ = pages;
-                });
-            }
+        this._dataService.addNewPage().then(success => {
+            this.updatePages(success);
         });
     }
 
@@ -49,13 +45,31 @@ export class PageGridController {
      * @param pageTodelete is the page id to be deletd
      */
     deletePage(pageTodelete: number): void {
-        this._dataService.deletePage(pageTodelete).then(sucess => {
-            if (sucess) {
-                this._dataService.getPages().then(pages => {
-                    this.pages_ = pages;
-                });
-            }
+        this._dataService.deletePage(pageTodelete).then(success => {
+            this.updatePages(success);
         });
     }
 
+    /**
+     * Request a page size update
+     * @param pageToUpdate is the page id to be updated
+     * @param newValue is the new page size value
+     */
+    updatePageSize(pageToUpdate: number, newValue: number):void {
+        this._dataService.updatePageSize(pageToUpdate, newValue).then(success => {
+            this.updatePages(success);
+        });
+    }
+
+    /**
+     * Updates the pages with the new values
+     * @param success if we need to update
+     */
+    private updatePages(success:boolean):void {
+        if (success) {
+            this._dataService.getPages().then(pages => {
+                this.pages_ = pages;
+            });
+        }
+    }
 }

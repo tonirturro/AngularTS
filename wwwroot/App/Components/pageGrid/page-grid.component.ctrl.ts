@@ -62,7 +62,7 @@ export class PageGridController {
      * @param newValue is the new page size value
      */
     updatePageSize(pageToUpdate: number, newValue: number):void {
-        this.dataService.updatePageSize(pageToUpdate, newValue).then(success => {
+        this.dataService.updatePageSize([pageToUpdate], newValue).then(success => {
             this.updatePages(success);
         });
     }

@@ -88,16 +88,21 @@ export class DataService {
     /**
      * Updates the page size for an existing page
      * @param idToUpdate is the id for the page to be updated
-     * @param newValue is the new page size value
+     * @param newValueToSet is the new page size value
      */
-    updatePageSize(idToUpdate:number, newValue:number):angular.IPromise<boolean> {
+    updatePageSize(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
         var deferred = this.$q.defer();
 
-        this.$http.put<{ success: boolean }>(`REST/pages/${idToUpdate}/pageSize/${newValue}`, {}).then(response => {
+        var data = {
+            pages : pages,
+            newValue : newValueToSet
+        };
+
+        this.$http.put<{ success: boolean }>('REST/pages/pageSize', JSON.stringify(data)).then(response => {
             deferred.resolve(response.data.success);
         },
         errors => {
-            this.$log.error(`Failure to put REST/pages/${idToUpdate}/pageSize/${newValue}`);
+            this.$log.error('Failure to put REST/pages/pageSize');
             deferred.reject(errors.data);
         });
 

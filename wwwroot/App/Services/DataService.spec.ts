@@ -80,9 +80,9 @@ describe("Data Service Test",
             const idToUpdate = 2;
             const newPageSize = 0;
 
-            httpBackend.whenPUT(`REST/pages/${idToUpdate}/pageSize/${newPageSize}`).respond(200, { success: true });
+            httpBackend.whenPUT('REST/pages/pageSize').respond(200, { success: true });
 
-            service.updatePageSize(idToUpdate, newPageSize).then(success => {
+            service.updatePageSize([idToUpdate], newPageSize).then(success => {
                 expect(success).toBeTruthy();
                 done();
             });

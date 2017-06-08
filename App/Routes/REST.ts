@@ -38,10 +38,10 @@ export class RestRouter {
         });
 
         // Update page sizes
-        this._router.put('/pages/pageSize/:newValue', (req: express.Request, res: express.Response) => {
+        this._router.put('/pages/pageSize', (req: express.Request, res: express.Response) => {
             var pages = req.body.pages;
             if (pages) {
-                var newValue = parseInt(req.params.newValue);
+                var newValue = req.body.newValue;
                 var result = true;
 
                 pages.forEach(page => {

@@ -49,6 +49,6 @@ describe("Page grid controller", () => {
         
         controller.updatePageSize(idToUpdate, newPageSize);
 
-        expect(dataServiceToMock.updatePageSize).toHaveBeenCalledWith(idToUpdate, newPageSize);
+        expect(dataServiceToMock.updatePageSize).toHaveBeenCalledWith([idToUpdate], newPageSize);
     });
 });

@@ -2,9 +2,9 @@ import * as angular from "angular";
 import "angular-mocks";
 import { PageGridController } from "./page-grid.component.ctrl";
 import { DataService } from "../../Services/DataService";
+import { Page } from "../../Model/Page";
 
 describe("Page grid controller", () => {
-
 
     let controller: PageGridController;
     let dataServiceToMock: DataService;
@@ -12,14 +12,10 @@ describe("Page grid controller", () => {
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, dataService, $q) => {
+    beforeEach(inject(($componentController, $q, dataService) => {
         dataServiceToMock = dataService;
         promiseService = $q;
-        spyOn(dataServiceToMock, "getPages").and.callFake(() => {
-            var deferred = promiseService.defer();
-            deferred.resolve([]);
-            return deferred.promise;
-        });
+        spyOn(dataServiceToMock, "getPages").and.returnValue(promiseService.defer().promise);
         controller = $componentController("pageGrid");
     }));
 
@@ -28,11 +24,9 @@ describe("Page grid controller", () => {
     });
 
     it("Can add pages", () => {
-        spyOn(dataServiceToMock, "addNewPage").and.callFake(() => {
-            var deferred = promiseService.defer();
-            deferred.resolve(true);
-            return deferred.promise;
-        });
+        var deferred = promiseService.defer();
+
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(deferred.promise);
 
         controller.addPage();
 

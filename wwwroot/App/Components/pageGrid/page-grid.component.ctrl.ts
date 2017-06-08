@@ -6,20 +6,26 @@ import { DataService } from "../../Services/DataService";
  * Handles the bindings inside the component
  */
 export class PageGridController {
-    private _dataService: DataService;
+
+    // The pages displayed at the grid
     private pages_: Page[];
 
+    // The pages elected at the grid
+    private selectedPages_: number[];
 
     /**
      * Initializes a new instance of the PageGridController class.
+     * @param promiseService is the service to generate promises
      * @param logService is the Angular log service
      * @param dataService is the connection to the backend service
      */
-    constructor(private logService: angular.ILogService,private dataService: DataService)
+    constructor(
+        private logService: angular.ILogService,
+        private dataService: DataService)
     {
-        this._dataService = dataService;
         this.pages_ = [];
-        this._dataService.getPages().then(pages => {
+        this.selectedPages_ = [];
+        this.dataService.getPages().then(pages => {
             this.pages_ = pages;
         });
     }
@@ -35,7 +41,7 @@ export class PageGridController {
      * Request a new page
      */
     addPage(): void {
-        this._dataService.addNewPage().then(success => {
+        this.dataService.addNewPage().then(success => {
             this.updatePages(success);
         });
     }
@@ -45,7 +51,7 @@ export class PageGridController {
      * @param pageTodelete is the page id to be deletd
      */
     deletePage(pageTodelete: number): void {
-        this._dataService.deletePage(pageTodelete).then(success => {
+        this.dataService.deletePage(pageTodelete).then(success => {
             this.updatePages(success);
         });
     }
@@ -56,9 +62,40 @@ export class PageGridController {
      * @param newValue is the new page size value
      */
     updatePageSize(pageToUpdate: number, newValue: number):void {
-        this._dataService.updatePageSize(pageToUpdate, newValue).then(success => {
+        this.dataService.updatePageSize(pageToUpdate, newValue).then(success => {
             this.updatePages(success);
         });
+    }
+
+    /**
+     * Page selection
+     * @param event is the event generating the click
+     * @param page is the selected page
+     */
+    selectPage(event: MouseEvent, selectedPage: Page): void
+    {
+        // Discard selection from action controls
+        var isSelector = event.srcElement.attributes.getNamedItem("ng-model");
+        var isButton = event.srcElement.attributes.getNamedItem("ng-click");
+        if (isSelector || isButton) {
+            return;
+        }
+
+        // Set selection
+        var isMultiSelection = event.ctrlKey;
+        if (isMultiSelection) {
+            var indexOfSelectedPage = this.selectedPages_.indexOf(selectedPage.id);
+            if (indexOfSelectedPage < 0) {
+                this.selectedPages_.push(selectedPage.id);
+            } else {
+                this.selectedPages_.splice(indexOfSelectedPage, 1);
+            }
+        } else {
+            this.selectedPages_ = [selectedPage.id];
+        }
+
+        // Show selection styles
+        this.displaySelection();
     }
 
     /**
@@ -67,9 +104,24 @@ export class PageGridController {
      */
     private updatePages(success:boolean):void {
         if (success) {
-            this._dataService.getPages().then(pages => {
+            this.dataService.getPages().then(pages => {
                 this.pages_ = pages;
+                this.displaySelection();
             });
         }
+    }
+
+    /**
+     * Displays the visual selection
+     */
+    private displaySelection(): void {
+        // Set selected style
+        this.pages_.forEach(page => {
+            if (this.selectedPages_.indexOf(page.id) < 0) {
+                page.class = "";
+            } else {
+                page.class = "item-selected"
+            }
+        });
     }
 }

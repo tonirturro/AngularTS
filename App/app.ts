@@ -1,4 +1,5 @@
 ﻿import * as express from "express";
+import * as bodyParser from "body-parser";
 import path = require('path');
 
 import routes from './Routes/index';
@@ -15,6 +16,7 @@ var restApi = new RestRouter(data).router;
 
 // Initialize app
 app.use(express.static(path.resolve(root)));
+app.use(bodyParser.json());
 
 app.use('/', routes);
 app.use('/REST', restApi);

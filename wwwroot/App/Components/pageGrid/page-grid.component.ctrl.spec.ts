@@ -24,9 +24,7 @@ describe("Page grid controller", () => {
     });
 
     it("Can add pages", () => {
-        var deferred = promiseService.defer();
-
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(deferred.promise);
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.defer().promise);
 
         controller.addPage();
 
@@ -36,11 +34,7 @@ describe("Page grid controller", () => {
     it("Can delete pages", () => {
         const idTodelete = 5;
 
-        spyOn(dataServiceToMock, "deletePage").and.callFake(() => {
-            var deferred = promiseService.defer();
-            deferred.resolve(true);
-            return deferred.promise;
-        });
+        spyOn(dataServiceToMock, "deletePage").and.returnValue(promiseService.defer().promise);
 
         controller.deletePage(idTodelete);
 
@@ -51,11 +45,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 2;
         const newPageSize = 0;
 
-        spyOn(dataServiceToMock, "updatePageSize").and.callFake(() => {
-            var deferred = promiseService.defer();
-            deferred.resolve(true);
-            return deferred.promise;
-        });
+        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(promiseService.defer().promise);
         
         controller.updatePageSize(idToUpdate, newPageSize);
 

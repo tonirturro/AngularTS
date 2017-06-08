@@ -72,7 +72,7 @@ describe('REST Route', () => {
 
     it("Update page size responds oK", (done) => {
         chai.request(app.application)
-            .put(`/REST/pages/${ExpectedPageId}/pageSize/${ExpectedPageSize}`)
+            .put(`/REST/pages/pageSize/${ExpectedPageSize}`)
             .then(res => {
                 expect(res.status).to.equal(200);
                 done();
@@ -82,7 +82,9 @@ describe('REST Route', () => {
     it("Update page size calls update size with the right parameters", (done) => {
         var spy = sinon.spy(app.dependencies.dataLayer, 'updatePageSize');
         chai.request(app.application)
-            .put(`/REST/pages/${ExpectedPageId}/pageSize/${ExpectedPageSize}`)
+            .put(`/REST/pages/pageSize/${ExpectedPageSize}`)
+            .set('content-type', 'application/json')
+            .send({ "pages" : [ExpectedPageId] })
             .then(res => {
                 expect(spy.calledOnce).true;
                 expect(spy.calledWith(ExpectedPageId,ExpectedPageSize)).true;

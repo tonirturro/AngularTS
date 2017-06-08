@@ -37,14 +37,25 @@ export class RestRouter {
             });
         });
 
-        // Update page size
-        this._router.put('/pages/:pageId/pageSize/:newValue', (req: express.Request, res: express.Response) => {
-            var pageIdToUpdate = parseInt(req.params.pageId);
-            var newValue = parseInt(req.params.newValue);
-            var result = this._data.updatePageSize(pageIdToUpdate, newValue);
-            res.json({
-                succes: result
-            });
+        // Update page sizes
+        this._router.put('/pages/pageSize/:newValue', (req: express.Request, res: express.Response) => {
+            var pages = req.body.pages;
+            if (pages) {
+                var newValue = parseInt(req.params.newValue);
+                var result = true;
+
+                pages.forEach(page => {
+                    result = result && this._data.updatePageSize(page, newValue);
+                })
+
+                res.json({
+                    succes: result
+                });                
+            } else {
+                res.json({
+                    succes: false
+                });                                
+            }
         });
     }
 

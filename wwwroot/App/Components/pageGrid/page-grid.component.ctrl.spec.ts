@@ -46,8 +46,9 @@ describe("Page grid controller", () => {
         const newPageSize = 0;
 
         spyOn(dataServiceToMock, "updatePageSize").and.returnValue(promiseService.defer().promise);
-        
-        controller.updatePageSize(idToUpdate, newPageSize);
+
+        controller.selectedPages = [idToUpdate];
+        controller.updatePageSize(newPageSize);
 
         expect(dataServiceToMock.updatePageSize).toHaveBeenCalledWith([idToUpdate], newPageSize);
     });

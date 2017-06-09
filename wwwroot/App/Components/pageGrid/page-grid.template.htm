@@ -12,11 +12,11 @@
         <tbody>
             <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages" ng-click="$ctrl.selectPage($event,page)">
                 <td>
-                    <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.id, page.pageSize)">
-                        <option value="0">A3</option>
-                        <option value="1">A2</option>
-                        <option value="2">A1</option>
-                        <option value="3">A0</option>
+                    <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
+                        <option id="option" value="0">A3</option>
+                        <option id="option" value="1">A2</option>
+                        <option id="option" value="2">A1</option>
+                        <option id="option" value="3">A0</option>
                     </select>
                 </td>
                 <td>

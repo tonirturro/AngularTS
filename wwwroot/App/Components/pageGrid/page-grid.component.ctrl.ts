@@ -38,6 +38,13 @@ export class PageGridController {
     }
 
     /**
+    * Sets the selected pages for testing purposes, todo: review alternative
+    */
+    set selectedPages(selectedPages: number[]) {
+        this.selectedPages_ = selectedPages;
+    }
+
+    /**
      * Request a new page
      */
     addPage(): void {
@@ -58,13 +65,14 @@ export class PageGridController {
 
     /**
      * Request a page size update
-     * @param pageToUpdate is the page id to be updated
      * @param newValue is the new page size value
      */
-    updatePageSize(pageToUpdate: number, newValue: number):void {
-        this.dataService.updatePageSize([pageToUpdate], newValue).then(success => {
-            this.updatePages(success);
-        });
+    updatePageSize(newValue: number): void {
+        if (this.selectedPages_.length > 0) {
+            this.dataService.updatePageSize(this.selectedPages_, newValue).then(success => {
+                this.updatePages(success);
+            });
+        }
     }
 
     /**
@@ -74,10 +82,27 @@ export class PageGridController {
      */
     selectPage(event: MouseEvent, selectedPage: Page): void
     {
-        // Discard selection from action controls
+        // ignore click on selector
+        if (event.srcElement.id === "option")
+        {
+            return;
+        }
+
+        // Do dot break multiselection if clicked on control
         var isSelector = event.srcElement.attributes.getNamedItem("ng-model");
         var isButton = event.srcElement.attributes.getNamedItem("ng-click");
         if (isSelector || isButton) {
+            if (this.selectedPages_.indexOf(selectedPage.id) < 0) {
+                this.selectedPages_.push(selectedPage.id);
+                if (this.selectedPages_.length > 1) {
+                    this.selectedPages_.push(selectedPage.id);
+                } else {
+                    this.selectedPages_ = [selectedPage.id]
+                }
+
+                this.displaySelection();   
+            }
+
             return;
         }
 

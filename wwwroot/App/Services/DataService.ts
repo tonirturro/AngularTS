@@ -99,9 +99,7 @@ export class DataService {
         };
 
         this.$http.put<{ success: boolean }>('REST/pages/pageSize', JSON.stringify(data)).then(response => {
-            // todo: why sucess is not resolved
-            // deferred.resolve(response.data.success);
-            deferred.resolve(true);
+            deferred.resolve(response.data.success);
         },
         errors => {
             this.$log.error('Failure to put REST/pages/pageSize');

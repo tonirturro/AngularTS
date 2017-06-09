@@ -49,11 +49,11 @@ export class RestRouter {
                 })
 
                 res.json({
-                    succes: result
+                    success: result
                 });                
             } else {
                 res.json({
-                    succes: false
+                    success: false
                 });                                
             }
         });

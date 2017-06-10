@@ -89,4 +89,18 @@ describe("Data Service Test",
 
             httpBackend.flush();
         });
+
+        it("Can update print quality", (done) => {
+            const idToUpdate = 2;
+            const newPrintQuality = 2;
+
+            httpBackend.whenPUT('REST/pages/printQuality').respond(200, { success: true });
+
+            service.updatePrintQuality([idToUpdate], newPrintQuality).then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        });
     });

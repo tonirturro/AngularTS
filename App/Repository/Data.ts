@@ -64,19 +64,43 @@ export class Data {
      * @param newValue is the new page size value
      */
     updatePageSize(pageId: number, newValue: number):boolean {
-        let pageToUpdate:Page = null;
-        var pageFound = this._entities.pages.some(page => {
-            if (page.id === pageId) {
-                pageToUpdate = page;
-                return true;
-            }
+        let pageToUpdate:Page = this.getPage(pageId);
 
-            return false;
-        });
-
-        if (pageFound) {
+        if (pageToUpdate != null) {
             pageToUpdate.pageSize = newValue;
+            return true;
         }
+
+        return false;
+    }
+
+    /**
+     * Updates the print qualty  for a page
+     * @param pageId is the id for the page to be updated
+     * @param newValue is the new print quality value
+     */
+    updatePrintQuality(pageId: number, newValue: number):boolean {
+        let pageToUpdate:Page = this.getPage(pageId);
+
+        if (pageToUpdate != null) {
+            pageToUpdate.printQuality = newValue;
+            return true;
+        }
+            
+        return false;
+    }
+
+    /**
+     * Finds a page from its id
+     * @param pageId is the id for the page to be found
+     */
+    private getPage(pageId: number): Page {
+        let pageFound:Page = null;
+        this._entities.pages.forEach(page => {
+            if (page.id === pageId) {
+                 pageFound = page;
+            }
+        })
 
         return pageFound;
     }

@@ -86,6 +86,18 @@ export class PageGridController {
     }
 
     /**
+     * Request a print quality update
+     * @param newValue is the new print quality value
+     */
+    updatePrintQuality(newValue: number): void {
+        if (this.selectedPages_.length > 0) {
+            this.dataService.updatePrintQuality(this.selectedPages_, newValue).then(success => {
+                this.updatePages(success);
+            });
+        }
+    }
+
+    /**
      * Page selection
      * @param event is the event generating the click
      * @param page is the selected page

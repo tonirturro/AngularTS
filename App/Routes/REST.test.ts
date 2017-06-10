@@ -8,6 +8,7 @@ describe('REST Route', () => {
 
     const ExpectedPageId = 1;
     const ExpectedPageSize = 0;
+    const ExpectedPrintQuality = 1;
 
     chai.use(chaiHttp);
 
@@ -94,6 +95,34 @@ describe('REST Route', () => {
             .then(res => {
                 expect(spy.calledOnce).true;
                 expect(spy.calledWith(ExpectedPageId,ExpectedPageSize)).true;
+                done();
+            });
+    });
+
+    it("Update print quality responds oK", (done) => {
+        chai.request(app.application)
+            .put('/REST/pages/printQuality')
+            .then(res => {
+                expect(res.status).to.equal(200);
+                done();
+            });
+    });
+
+    it("Update print quality calls update size with the right parameters", (done) => {
+        var spy = sinon.spy(app.dependencies.dataLayer, 'updatePrintQuality');
+        
+        var data = {
+            pages : [ExpectedPageId],
+            newValue : ExpectedPrintQuality
+        };
+
+        chai.request(app.application)
+            .put('/REST/pages/printQuality')
+            .set('content-type', 'application/json')
+            .send(JSON.stringify(data))
+            .then(res => {
+                expect(spy.calledOnce).true;
+                expect(spy.calledWith(ExpectedPageId,ExpectedPrintQuality)).true;
                 done();
             });
     });

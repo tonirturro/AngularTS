@@ -20,10 +20,10 @@
                     </select>
                 </td>
                 <td>
-                    <select ng-model="page.printQuality">
-                        <option value="0">Fast</option>
-                        <option value="1">Normal</option>
-                        <option value="2">Best</option>
+                    <select ng-model="page.printQuality" ng-change="$ctrl.updatePrintQuality(page.printQuality)">
+                        <option id="option" value="0">Fast</option>
+                        <option id="option" value="1">Normal</option>
+                        <option id="option" value="2">Best</option>
                     </select>
                 </td>
                 <td>

@@ -75,4 +75,32 @@ describe("Data test repository", () => {
 
         expect(result).to.be.false;
     });
+
+    it("Can update print quality for an existing page", () => {
+        var addedPages = addPages();
+        var currentPage = objectToTest.getPages()[1];
+        var newValue = currentPage.pageSize + 1;
+
+        var result = objectToTest.updatePrintQuality(currentPage.id, newValue);
+        var updatedPage = objectToTest.getPages()[1];
+
+        expect(result).to.be.true;
+        expect(updatedPage.printQuality).to.equal(newValue);
+    });
+
+    it("Can't update print quality if the page does not exist", () => {
+        addPages();
+        var invalidId = 0;
+        objectToTest.getPages().forEach(page => {
+            if (page.id > invalidId) {
+                invalidId = page.id;
+            }
+        });
+
+        invalidId++;
+
+        var result = objectToTest.updatePrintQuality(invalidId, 0);
+
+        expect(result).to.be.false;
+    });
 });

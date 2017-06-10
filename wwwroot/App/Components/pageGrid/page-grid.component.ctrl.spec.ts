@@ -320,4 +320,34 @@ describe("Page grid controller", () => {
         expect(controller.pages.length).toEqual(pagesReported.length);
         expect(controller.pages[0].pageSize).toEqual(newPageSize.toString());
     });
+
+     it("Can update print quality", () => {
+        const idToUpdate = 3;
+        const newPrintQuality = 0;
+
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(promiseService.defer().promise);
+
+        controller.selectedPages = [idToUpdate];
+        controller.updatePrintQuality(newPrintQuality);
+
+        expect(dataServiceToMock.updatePrintQuality).toHaveBeenCalledWith([idToUpdate], newPrintQuality);
+    });
+
+    it("Update page size refresh page list", () => {
+        const idToUpdate = 3;
+        const newPrintQuality = 1;
+        const pagesReported = [ new Page(idToUpdate, newPrintQuality.toString(), "0", "0", "0")];
+        var deferredUpdatePrintQuality = promiseService.defer();
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(deferredUpdatePrintQuality.promise);
+
+        controller.selectedPages = [idToUpdate];
+        controller.updatePrintQuality(newPrintQuality);
+        deferredUpdatePrintQuality.resolve(true);
+        deferredGetPages.resolve(pagesReported);
+        rootScopeService.$apply();
+
+        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
+        expect(controller.pages.length).toEqual(pagesReported.length);
+        expect(controller.pages[0].pageSize).toEqual(newPrintQuality.toString());
+    });
 });

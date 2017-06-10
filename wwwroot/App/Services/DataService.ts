@@ -108,4 +108,28 @@ export class DataService {
 
         return deferred.promise;       
     }
+
+    /**
+     * Updates the print quality for an existing page
+     * @param idToUpdate is the id for the page to be updated
+     * @param newValueToSet is the new print quality value
+     */
+    updatePrintQuality(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        var data = {
+            pages : pages,
+            newValue : newValueToSet
+        };
+
+        this.$http.put<{ success: boolean }>('REST/pages/printQuality', JSON.stringify(data)).then(response => {
+            deferred.resolve(response.data.success);
+        },
+        errors => {
+            this.$log.error('Failure to put REST/pages/printQuality');
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;       
+    }
 }

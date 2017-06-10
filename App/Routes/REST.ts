@@ -57,6 +57,27 @@ export class RestRouter {
                 });                                
             }
         });
+
+        // Update print quality
+        this._router.put('/pages/printQuality', (req: express.Request, res: express.Response) => {
+            var pages = req.body.pages;
+            if (pages) {
+                var newValue = req.body.newValue;
+                var result = true;
+
+                pages.forEach(page => {
+                    result = result && this._data.updatePrintQuality(page, newValue);
+                })
+
+                res.json({
+                    success: result
+                });                
+            } else {
+                res.json({
+                    success: false
+                });                                
+            }
+        });
     }
 
     /**

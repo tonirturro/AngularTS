@@ -38,10 +38,20 @@ export class PageGridController {
     }
 
     /**
+     * Gets the selected pages for testing purposes
+     */
+    get selectedPages():number[] {
+        return this.selectedPages_;
+    }
+    
+    /**
     * Sets the selected pages for testing purposes, todo: review alternative
     */
     set selectedPages(selectedPages: number[]) {
-        this.selectedPages_ = selectedPages;
+        this.selectedPages_ = [];
+        selectedPages.forEach(page => {
+            this.selectedPages.push(page);
+        });
     }
 
     /**
@@ -93,7 +103,6 @@ export class PageGridController {
         var isButton = event.srcElement.attributes.getNamedItem("ng-click");
         if (isSelector || isButton) {
             if (this.selectedPages_.indexOf(selectedPage.id) < 0) {
-                this.selectedPages_.push(selectedPage.id);
                 if (this.selectedPages_.length > 1) {
                     this.selectedPages_.push(selectedPage.id);
                 } else {

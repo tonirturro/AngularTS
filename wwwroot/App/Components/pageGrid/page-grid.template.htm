@@ -27,17 +27,17 @@
                     </select>
                 </td>
                 <td>
-                    <select ng-model="page.mediaType">
-                        <option value="0">Plain</option>
-                        <option value="1">Coated</option>
-                        <option value="2">Photo</option>
+                    <select ng-model="page.mediaType" ng-change="$ctrl.updateMediaType(page.mediaType)">
+                        <option id="option" value="0">Plain</option>
+                        <option id="option" value="1">Coated</option>
+                        <option id="option" value="2">Photo</option>
                     </select>
                 </td>
                 <td>
-                    <select ng-model="page.destination">
-                        <option value="0">Basket</option>
-                        <option value="1">Stacker</option>
-                        <option value="2">Folder</option>
+                    <select ng-model="page.destination" ng-change="$ctrl.updateDestination(page.destination)">
+                        <option id="option" value="0">Basket</option>
+                        <option id="option" value="1">Stacker</option>
+                        <option id="option" value="2">Folder</option>
                     </select>
                 </td>
                 <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>

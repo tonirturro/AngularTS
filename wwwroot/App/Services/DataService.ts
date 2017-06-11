@@ -1,10 +1,30 @@
 import * as angular from "angular"
 import { Page } from "../Model/Page";
 
+/**
+ * Encapsulates the parameters to perform one field update
+ */
+class UpdateParams {
+    pages : number[];
+    newValue : number;
+    constructor(pages: number[], newValue: number) {
+        this.pages = pages;
+        this.newValue = newValue;
+    }
+}
+
 /*
 ** Service to access data from the backend
 */
 export class DataService {
+
+    /**
+     * Field tags
+    */
+    readonly PageSizeField = "pageSize";
+    readonly PrintQualityField = "printQuality";
+    readonly MediaTypeField = "mediaType";
+    readonly DestinationField = "destination";
 
     /**
      * Initializes a new instance of the DataService class.
@@ -91,22 +111,7 @@ export class DataService {
      * @param newValueToSet is the new page size value
      */
     updatePageSize(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
-
-        var data = {
-            pages : pages,
-            newValue : newValueToSet
-        };
-
-        this.$http.put<{ success: boolean }>('REST/pages/pageSize', JSON.stringify(data)).then(response => {
-            deferred.resolve(response.data.success);
-        },
-        errors => {
-            this.$log.error('Failure to put REST/pages/pageSize');
-            deferred.reject(errors.data);
-        });
-
-        return deferred.promise;       
+        return this.performUpdate(this.PageSizeField, new UpdateParams(pages, newValueToSet));      
     }
 
     /**
@@ -115,21 +120,43 @@ export class DataService {
      * @param newValueToSet is the new print quality value
      */
     updatePrintQuality(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
+        return this.performUpdate(this.PrintQualityField, new UpdateParams(pages, newValueToSet));      
+    }
+
+    /**
+     * Updates the media type for an existing page
+     * @param idToUpdate is the id for the page to be updated
+     * @param newValueToSet is the new media type value
+     */
+    updateMediaType(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
+        return this.performUpdate(this.MediaTypeField, new UpdateParams(pages, newValueToSet));      
+    }
+
+    /**
+     * Updates the media type for an existing page
+     * @param idToUpdate is the id for the page to be updated
+     * @param newValueToSet is the new media type value
+     */
+    updateDestination(pages:number[], newValueToSet:number):angular.IPromise<boolean> {
+        return this.performUpdate(this.DestinationField, new UpdateParams(pages, newValueToSet));      
+    }
+
+    /**
+     * Executes the update for the designated field and with the corresponding parameters
+     * @param field is the field to be updated
+     * @param params are the params for the update
+     */
+    private performUpdate(field: string, params: UpdateParams):angular.IPromise<boolean> {
         var deferred = this.$q.defer();
 
-        var data = {
-            pages : pages,
-            newValue : newValueToSet
-        };
-
-        this.$http.put<{ success: boolean }>('REST/pages/printQuality', JSON.stringify(data)).then(response => {
+        this.$http.put<{ success: boolean }>(`REST/pages/${field}`, JSON.stringify(params)).then(response => {
             deferred.resolve(response.data.success);
         },
         errors => {
-            this.$log.error('Failure to put REST/pages/printQuality');
+            this.$log.error(`Failure to put REST/pages/${field}`);
             deferred.reject(errors.data);
         });
 
-        return deferred.promise;       
+        return deferred.promise;    
     }
 }

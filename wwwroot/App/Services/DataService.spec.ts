@@ -2,12 +2,57 @@ import * as angular from "angular";
 import "angular-mocks";
 import { DataService } from "./DataService"
 
-describe("Data Service Test",
-    () => {
+describe("Data Service Test", () => {
 
+        /**
+         * Data driven test case for the updates
+         * @param field is the field to be updated
+         * @param pageId is the id for the page to be updated
+         * @param newValue is the new value to be set
+         * @param done is the Mocha completion callback
+         */
+        var executeAndVerifyUpdate = (field: string, pageId:number, newValue: number, done:() => void) => {
+            httpBackend.whenPUT(`REST/pages/${field}`).respond(200, { success: true });
+
+            switch (field) {
+                case service.PageSizeField:
+                    service.updatePageSize([pageId], newValue).then(success => {
+                        expect(success).toBeTruthy();
+                        done();
+                    });
+                    break;
+                case service.PrintQualityField:
+                    service.updatePrintQuality([pageId], newValue).then(success => {
+                        expect(success).toBeTruthy();
+                        done();
+                    });
+                    break;
+                case service.MediaTypeField:
+                    service.updateMediaType([pageId], newValue).then(success => {
+                        expect(success).toBeTruthy();
+                        done();
+                    });
+                    break;
+                case service.DestinationField:
+                    service.updateDestination([pageId], newValue).then(success => {
+                        expect(success).toBeTruthy();
+                        done();
+                    });
+                    break;
+            }
+            
+            httpBackend.flush();
+        };
+
+        /**
+         * Common test resources
+         */
         let service: DataService;
         let httpBackend: angular.IHttpBackendService;
 
+        /**
+         * Initialize test environment
+         */
         beforeEach(angular.mock.module("myApp"));
 
         beforeEach(inject((_dataService_, _$httpBackend_) => {
@@ -15,8 +60,12 @@ describe("Data Service Test",
             httpBackend = _$httpBackend_;
         }));
     
-        it("Reads Pages",
-            (done) => {
+        /**
+         * 
+         * The test cases
+         * 
+         */
+        it("Reads Pages", (done) => {
                 httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
                 service.getPages().then( pages => {
@@ -77,30 +126,18 @@ describe("Data Service Test",
         })
 
         it("Can update page size", (done) => {
-            const idToUpdate = 2;
-            const newPageSize = 0;
-
-            httpBackend.whenPUT('REST/pages/pageSize').respond(200, { success: true });
-
-            service.updatePageSize([idToUpdate], newPageSize).then(success => {
-                expect(success).toBeTruthy();
-                done();
-            });
-
-            httpBackend.flush();
+            executeAndVerifyUpdate(service.PageSizeField, 10, 0, done);
         });
 
         it("Can update print quality", (done) => {
-            const idToUpdate = 2;
-            const newPrintQuality = 2;
+            executeAndVerifyUpdate(service.PrintQualityField, 20, 1, done);
+        });
 
-            httpBackend.whenPUT('REST/pages/printQuality').respond(200, { success: true });
+        it("Can update media type", (done) => {
+            executeAndVerifyUpdate(service.MediaTypeField, 5, 2, done);
+        });
 
-            service.updatePrintQuality([idToUpdate], newPrintQuality).then(success => {
-                expect(success).toBeTruthy();
-                done();
-            });
-
-            httpBackend.flush();
+        it("Can update destination", (done) => {
+            executeAndVerifyUpdate(service.DestinationField, 30, 0, done);
         });
     });

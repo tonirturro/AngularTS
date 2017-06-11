@@ -6,12 +6,23 @@ import { Page } from "../../Model/Page";
 
 describe("Page grid controller", () => {
 
+    /**
+     * Common test resources
+     */
     let controller: PageGridController;
     let dataServiceToMock: DataService;
     let promiseService: angular.IQService;
     let deferredGetPages: angular.IDeferred<Page[]>;
+    let deferredUpdate: angular.IDeferred<boolean>;
     let rootScopeService: angular.IRootScopeService;
-    let getClick = (srcElementId: string, attribute: string, ctrlPressed: boolean):MouseEvent => {
+
+    /**
+     * Simulates a mouse click
+     * @param srcElementId is the element where the click comes from
+     * @param attribute is the attribute we want to test
+     * @param ctrlPressed if the crtl key is pressed while clicking
+     */
+    var getClick = (srcElementId: string, attribute: string, ctrlPressed: boolean):MouseEvent => {
         var click = {
             altKey: false,
             button: 0,
@@ -73,6 +84,30 @@ describe("Page grid controller", () => {
         return click;
     }
 
+    /**
+     * Sets the deferred execution for any update operationm
+     */
+    var getUpdatePromise = ():angular.IPromise<boolean> => {
+        deferredUpdate = promiseService.defer();
+        return deferredUpdate.promise;
+    }
+
+    /**
+     * Executes the deferred update
+     * @param pagesReported are the pages reported when the update is executed
+     */
+    var executeUpdateAndReturnPages = (pagesReported:Page[]) => {
+        deferredUpdate.resolve(true);
+        deferredGetPages.resolve(pagesReported);
+        rootScopeService.$apply();
+
+        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
+        expect(controller.pages.length).toEqual(pagesReported.length);
+    }
+
+    /**
+     * Initialize the test environment
+     */
     beforeEach(angular.mock.module("myApp"));
 
     beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
@@ -84,12 +119,17 @@ describe("Page grid controller", () => {
         controller = $componentController("pageGrid");
     }));
 
+    /**
+     * 
+     *  The test cases
+     * 
+     */
     it("Has pages when initialized", () => {
         expect(controller.pages.length).toBe(0);
     });
 
     it("Can add pages", () => {
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.defer().promise);
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
 
         controller.addPage();
 
@@ -99,22 +139,17 @@ describe("Page grid controller", () => {
     it("Add pages refresh page list", () => {
         const ExpectedPageID = 10;
         const pagesAfterAdd = [ new Page(ExpectedPageID, "0", "0", "0", "0")];
-        var deferredAddNewPage = promiseService.defer();
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(deferredAddNewPage.promise);
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
 
         controller.addPage();
-        deferredAddNewPage.resolve(true);
-        deferredGetPages.resolve(pagesAfterAdd);
-        rootScopeService.$apply();
 
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.pages.length).toEqual(pagesAfterAdd.length);
+        executeUpdateAndReturnPages(pagesAfterAdd);
         expect(controller.pages[0].id).toEqual(ExpectedPageID);
     });
 
     it("Can delete pages", () => {
         const idTodelete = 5;
-        spyOn(dataServiceToMock, "deletePage").and.returnValue(promiseService.defer().promise);
+        spyOn(dataServiceToMock, "deletePage").and.returnValue(getUpdatePromise());
 
         controller.deletePage(idTodelete);
 
@@ -122,16 +157,11 @@ describe("Page grid controller", () => {
     });
 
     it("Delete page refresh page list", () => {
-        var deferredDeletePage = promiseService.defer();
-        spyOn(dataServiceToMock, "deletePage").and.returnValue(deferredDeletePage.promise);
+        spyOn(dataServiceToMock, "deletePage").and.returnValue(getUpdatePromise());
 
         controller.deletePage(0);
-        deferredDeletePage.resolve(true);
-        deferredGetPages.resolve([]);
-        rootScopeService.$apply();
 
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.pages.length).toEqual(0);
+        executeUpdateAndReturnPages([]);
     });
 
     it("Can select pages", () => {
@@ -295,7 +325,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 2;
         const newPageSize = 0;
 
-        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(promiseService.defer().promise);
+        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
 
         controller.selectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
@@ -307,17 +337,12 @@ describe("Page grid controller", () => {
         const idToUpdate = 2;
         const newPageSize = 2;
         const pagesReported = [ new Page(idToUpdate, newPageSize.toString(), "0", "0", "0")];
-        var deferredUpdatePageSize = promiseService.defer();
-        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(deferredUpdatePageSize.promise);
+        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
 
         controller.selectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
-        deferredUpdatePageSize.resolve(true);
-        deferredGetPages.resolve(pagesReported);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.pages.length).toEqual(pagesReported.length);
+        
+        executeUpdateAndReturnPages(pagesReported);
         expect(controller.pages[0].pageSize).toEqual(newPageSize.toString());
     });
 
@@ -325,7 +350,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 3;
         const newPrintQuality = 0;
 
-        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(promiseService.defer().promise);
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
 
         controller.selectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
@@ -333,21 +358,66 @@ describe("Page grid controller", () => {
         expect(dataServiceToMock.updatePrintQuality).toHaveBeenCalledWith([idToUpdate], newPrintQuality);
     });
 
-    it("Update page size refresh page list", () => {
+    it("Update print quality refresh page list", () => {
         const idToUpdate = 3;
         const newPrintQuality = 1;
-        const pagesReported = [ new Page(idToUpdate, newPrintQuality.toString(), "0", "0", "0")];
-        var deferredUpdatePrintQuality = promiseService.defer();
-        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(deferredUpdatePrintQuality.promise);
+        const pagesReported = [ new Page(idToUpdate, "0", newPrintQuality.toString(), "0", "0")];
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
 
         controller.selectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
-        deferredUpdatePrintQuality.resolve(true);
-        deferredGetPages.resolve(pagesReported);
-        rootScopeService.$apply();
+ 
+        executeUpdateAndReturnPages(pagesReported);
+        expect(controller.pages[0].printQuality).toEqual(newPrintQuality.toString());
+    });
 
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.pages.length).toEqual(pagesReported.length);
-        expect(controller.pages[0].pageSize).toEqual(newPrintQuality.toString());
+    it("Can update media type", () => {
+        const idToUpdate = 6;
+        const newMediaType = 2;
+
+        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
+
+        controller.selectedPages = [idToUpdate];
+        controller.updateMediaType(newMediaType);
+
+        expect(dataServiceToMock.updateMediaType).toHaveBeenCalledWith([idToUpdate], newMediaType);
+    });
+
+    it("Update media type refresh page list", () => {
+        const idToUpdate = 3;
+        const newMediaType = 1;
+        const pagesReported = [ new Page(idToUpdate, "0", "0", newMediaType.toString(), "0")];
+        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
+
+        controller.selectedPages = [idToUpdate];
+        controller.updateMediaType(newMediaType);
+ 
+        executeUpdateAndReturnPages(pagesReported);
+        expect(controller.pages[0].mediaType).toEqual(newMediaType.toString());
+    });
+
+    it("Can update destination", () => {
+        const idToUpdate = 10;
+        const newDestination = 0;
+
+        spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
+
+        controller.selectedPages = [idToUpdate];
+        controller.updateDestination(newDestination);
+
+        expect(dataServiceToMock.updateDestination).toHaveBeenCalledWith([idToUpdate], newDestination);
+    });
+
+    it("Update destination refresh page list", () => {
+        const idToUpdate = 5;
+        const newDestination = 1;
+        const pagesReported = [ new Page(idToUpdate, "0", "0", "0", newDestination.toString())];
+        spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
+
+        controller.selectedPages = [idToUpdate];
+        controller.updateDestination(newDestination);
+ 
+        executeUpdateAndReturnPages(pagesReported);
+        expect(controller.pages[0].destination).toEqual(newDestination.toString());
     });
 });

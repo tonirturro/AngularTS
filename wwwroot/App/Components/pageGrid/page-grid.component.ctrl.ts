@@ -98,6 +98,30 @@ export class PageGridController {
     }
 
     /**
+     * Request a media type update
+     * @param newValue is the new media type value
+     */
+    updateMediaType(newValue: number): void {
+        if (this.selectedPages_.length > 0) {
+            this.dataService.updateMediaType(this.selectedPages_, newValue).then(success => {
+                this.updatePages(success);
+            });
+        }
+    }
+
+    /**
+     * Request a destination update
+     * @param newValue is the new media type destination value
+     */
+    updateDestination(newValue: number): void {
+        if (this.selectedPages_.length > 0) {
+            this.dataService.updateDestination(this.selectedPages_, newValue).then(success => {
+                this.updatePages(success);
+            });
+        }
+    }
+
+    /**
      * Page selection
      * @param event is the event generating the click
      * @param page is the selected page

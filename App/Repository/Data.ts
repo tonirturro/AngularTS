@@ -64,9 +64,9 @@ export class Data {
      * @param newValue is the new page size value
      */
     updatePageSize(pageId: number, newValue: number):boolean {
-        let pageToUpdate:Page = this.getPage(pageId);
+        var pageToUpdate = this.getPage(pageId);
 
-        if (pageToUpdate != null) {
+        if (pageToUpdate!= null) {
             pageToUpdate.pageSize = newValue;
             return true;
         }
@@ -75,12 +75,12 @@ export class Data {
     }
 
     /**
-     * Updates the print qualty  for a page
+     * Updates the print quality for a page
      * @param pageId is the id for the page to be updated
      * @param newValue is the new print quality value
      */
     updatePrintQuality(pageId: number, newValue: number):boolean {
-        let pageToUpdate:Page = this.getPage(pageId);
+        var pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
             pageToUpdate.printQuality = newValue;
@@ -88,6 +88,38 @@ export class Data {
         }
             
         return false;
+    }
+
+    /**
+     * Updates the media type for a page
+     * @param pageId is the id for the page to be updated
+     * @param newValue is the new media type value
+     */
+    updateMediaType(pageId: number, newValue: number):boolean {
+        var pageToUpdate = this.getPage(pageId);
+
+        if (pageToUpdate != null) {
+            pageToUpdate.mediaType = newValue;
+            return true;
+        }       
+        
+        return false;       
+    }
+
+    /**
+     * Updates the destination for a page
+     * @param pageId is the id for the page to be updated
+     * @param newValue is the new destination value
+     */
+    updateDestination(pageId: number, newValue: number):boolean {
+        var pageToUpdate = this.getPage(pageId);
+
+        if (pageToUpdate != null) {
+            pageToUpdate.destination = newValue;
+            return true;
+        }       
+        
+        return false;       
     }
 
     /**

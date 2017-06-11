@@ -10,8 +10,58 @@ describe('REST Route', () => {
     const ExpectedPageSize = 0;
     const ExpectedPrintQuality = 1;
 
+    var checkRESTResponse = (field: string, done:() => void) => {
+        chai.request(app.application)
+            .put(`/REST/pages/${field}`)
+            .then(res => {
+                expect(res.status).to.equal(200);
+                done();
+            });
+    }
+
+    /**
+     * Data driven test case to test uodates
+     * @param dataFuntionToSpy is the function for the data layer that we want to mock
+     * @param field is the REST update field to test
+     * @param pageId is the page id to be updated
+     * @param newValue is the new value to be update
+     * @param done is the test completion callback for Mocha
+     */
+    var executeAndValidateUpdate = (
+        dataFuntionToSpy:string,
+        field:string, 
+        pageId:number, 
+        newValue: number, 
+        done:() => void) => {
+
+        var spy = sinon.spy(app.dependencies.dataLayer, dataFuntionToSpy);
+
+        var data = {
+            pages : [pageId],
+            newValue : newValue
+        };
+
+        chai.request(app.application)
+            .put(`/REST/pages/${field}`)
+            .set('content-type', 'application/json')
+            .send(JSON.stringify(data))
+            .then(res => {
+                expect(spy.calledOnce).true;
+                expect(spy.calledWith(pageId,newValue)).true;
+                done();
+            });
+    };
+
+    /**
+     * Initialize test environment
+     */
     chai.use(chaiHttp);
 
+    /**
+     * 
+     * The test cases
+     * 
+     */
     it("Get pages responds ok", (done) => {
 
         chai.request(app.application)
@@ -71,59 +121,35 @@ describe('REST Route', () => {
             });        
     });
 
-    it("Update page size responds oK", (done) => {
-        chai.request(app.application)
-            .put('/REST/pages/pageSize')
-            .then(res => {
-                expect(res.status).to.equal(200);
-                done();
-            });
+    it("Update page size responds ok", (done) => {
+        checkRESTResponse('pageSize', done);
     });
 
-    it("Update page size calls update size with the right parameters", (done) => {
-        var spy = sinon.spy(app.dependencies.dataLayer, 'updatePageSize');
-        
-        var data = {
-            pages : [ExpectedPageId],
-            newValue : ExpectedPageSize
-        };
-
-        chai.request(app.application)
-            .put('/REST/pages/pageSize')
-            .set('content-type', 'application/json')
-            .send(JSON.stringify(data))
-            .then(res => {
-                expect(spy.calledOnce).true;
-                expect(spy.calledWith(ExpectedPageId,ExpectedPageSize)).true;
-                done();
-            });
+    it("Update page size calls update media size with the right parameters", (done) => {
+        executeAndValidateUpdate('updatePageSize', 'pageSize', 10, 0, done);
     });
 
-    it("Update print quality responds oK", (done) => {
-        chai.request(app.application)
-            .put('/REST/pages/printQuality')
-            .then(res => {
-                expect(res.status).to.equal(200);
-                done();
-            });
+    it("Update print quality responds ok", (done) => {
+        checkRESTResponse('printQuality', done);
     });
 
-    it("Update print quality calls update size with the right parameters", (done) => {
-        var spy = sinon.spy(app.dependencies.dataLayer, 'updatePrintQuality');
-        
-        var data = {
-            pages : [ExpectedPageId],
-            newValue : ExpectedPrintQuality
-        };
+    it("Update print quality calls update print quality with the right parameters", (done) => {
+        executeAndValidateUpdate('updatePrintQuality', 'printQuality', 15, 1, done);
+    });
 
-        chai.request(app.application)
-            .put('/REST/pages/printQuality')
-            .set('content-type', 'application/json')
-            .send(JSON.stringify(data))
-            .then(res => {
-                expect(spy.calledOnce).true;
-                expect(spy.calledWith(ExpectedPageId,ExpectedPrintQuality)).true;
-                done();
-            });
+    it("Update media type responds ok", (done) => {
+        checkRESTResponse('mediaType', done);
+    });
+
+    it("Update media type calls update media type with the right parameters", (done) => {
+        executeAndValidateUpdate('updateMediaType', 'mediaType', 5, 2, done);
+    });
+
+    it("Update destination responds ok", (done) => {
+        checkRESTResponse('destination', done);
+    });
+
+    it("Update destination calls update destination with the right parameters", (done) => {
+        executeAndValidateUpdate('updateDestination', 'destination', 20, 0, done);
     });
 });

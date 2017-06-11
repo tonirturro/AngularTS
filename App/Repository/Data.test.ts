@@ -1,105 +1,152 @@
 ﻿import { expect } from "chai";
 import { Data } from "./Data";
+import { Page } from "../Model/Page";
 
 describe("Data test repository", () => {
 
-    var objectToTest: Data;
+    /**
+     * Test common resources
+     */
+    var dataLayer: Data;
 
     /**
     * Aux method to add pages
     */
     var addPages = ():number => {
-        objectToTest.newPage();
-        objectToTest.newPage();
-        objectToTest.newPage();
+        dataLayer.newPage();
+        dataLayer.newPage();
+        dataLayer.newPage();
         return 3;
     }
 
+    /**
+     * Initializes the model and dets the page to be updated
+     */
+    var getCurrentPage = ():Page => {
+        addPages();
+        return dataLayer.getPages()[1];
+    }
+
+    /**
+     * Initializes the model and gets an invalid id
+     */
+    var getInvalidId = ():number => {
+        addPages();
+        var invalidId = 0;
+        dataLayer.getPages().forEach(page => {
+            if (page.id > invalidId) {
+                invalidId = page.id;
+            }
+        });
+
+        return ++invalidId;
+    }
+
+    /**
+     * Initialize test environment
+     */
     beforeEach(() => {
-        objectToTest = new Data();
+        dataLayer = new Data();
     });
 
+    /**
+     * 
+     * The test cases
+     * 
+     */
     it("Is empty when initialized", () => {
-        var pages = objectToTest.getPages();
+        var pages = dataLayer.getPages();
 
         expect(pages).to.be.empty;
     });
 
     it("Can add pages", () => {
-        objectToTest.newPage();
+        dataLayer.newPage();
 
-        var pages = objectToTest.getPages();
+        var pages = dataLayer.getPages();
         expect(pages).not.to.be.empty;
     });
 
     it("Can delete pages", () => {
         // Add pages and verify them
         var addedPages = addPages();
-        var pages = objectToTest.getPages();
+        var pages = dataLayer.getPages();
         expect(pages.length).to.be.equal(addedPages);
 
         // Delete on page
         var idToDelete = pages[0].id;
-        expect(objectToTest.deletePage(idToDelete)).to.be.true;
+        expect(dataLayer.deletePage(idToDelete)).to.be.true;
 
         // Verify page deletion
-        pages = objectToTest.getPages();
+        pages = dataLayer.getPages();
         expect(pages.length).to.be.equal(addedPages - 1);
         expect(pages[0].id).not.to.be.equal(idToDelete);
     });
 
     it("Can update page size for an existing page", () => {
-        var addedPages = addPages();
-        var currentPage = objectToTest.getPages()[1];
+        var currentPage = getCurrentPage();
         var newValue = currentPage.pageSize + 1;
 
-        var result = objectToTest.updatePageSize(currentPage.id, newValue);
-        var updatedPage = objectToTest.getPages()[1];
+        var result = dataLayer.updatePageSize(currentPage.id, newValue);
+        var updatedPage = dataLayer.getPages()[1];
 
         expect(result).to.be.true;
         expect(updatedPage.pageSize).to.equal(newValue);
     });
 
     it("Can't update page size if the page does not exist", () => {
-        addPages();
-        var invalidId = 0;
-        objectToTest.getPages().forEach(page => {
-            if (page.id > invalidId) {
-                invalidId = page.id;
-            }
-        });
-
-        invalidId++;
-
-        var result = objectToTest.updatePageSize(invalidId, 0);
+        var result = dataLayer.updatePageSize(getInvalidId(), 0);
 
         expect(result).to.be.false;
     });
 
     it("Can update print quality for an existing page", () => {
-        var addedPages = addPages();
-        var currentPage = objectToTest.getPages()[1];
-        var newValue = currentPage.pageSize + 1;
+        var currentPage = getCurrentPage();
+        var newValue = currentPage.printQuality + 1;
 
-        var result = objectToTest.updatePrintQuality(currentPage.id, newValue);
-        var updatedPage = objectToTest.getPages()[1];
+        var result = dataLayer.updatePrintQuality(currentPage.id, newValue);
+        var updatedPage = dataLayer.getPages()[1];
 
         expect(result).to.be.true;
         expect(updatedPage.printQuality).to.equal(newValue);
     });
 
     it("Can't update print quality if the page does not exist", () => {
-        addPages();
-        var invalidId = 0;
-        objectToTest.getPages().forEach(page => {
-            if (page.id > invalidId) {
-                invalidId = page.id;
-            }
-        });
+        var result = dataLayer.updatePrintQuality(getInvalidId(), 0);
 
-        invalidId++;
+        expect(result).to.be.false;
+    });
 
-        var result = objectToTest.updatePrintQuality(invalidId, 0);
+    it("Can update media type for an existing page", () => {
+        var currentPage = getCurrentPage();
+        var newValue = currentPage.mediaType + 1;
+
+        var result = dataLayer.updateMediaType(currentPage.id, newValue);
+        var updatedPage = dataLayer.getPages()[1];
+
+        expect(result).to.be.true;
+        expect(updatedPage.mediaType).to.equal(newValue);
+    });
+
+    it("Can't update media type if the page does not exist", () => {
+        var result = dataLayer.updateMediaType(getInvalidId(), 0);
+
+        expect(result).to.be.false;
+    });
+
+    it("Can update destination for an existing page", () => {
+        var currentPage = getCurrentPage();
+        var newValue = currentPage.destination + 1;
+
+        var result = dataLayer.updateDestination(currentPage.id, newValue);
+        var updatedPage = dataLayer.getPages()[1];
+
+        expect(result).to.be.true;
+        expect(updatedPage.destination).to.equal(newValue);
+    });
+
+    it("Can't update destination if the page does not exist", () => {
+        var result = dataLayer.updateDestination(getInvalidId(), 0);
 
         expect(result).to.be.false;
     });

@@ -15,7 +15,6 @@ export class PageGridController {
 
     /**
      * Initializes a new instance of the PageGridController class.
-     * @param promiseService is the service to generate promises
      * @param logService is the Angular log service
      * @param dataService is the connection to the backend service
      */

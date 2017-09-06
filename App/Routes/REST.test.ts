@@ -7,6 +7,7 @@ let app = require('../app');
 describe('REST Route', () => {
 
     const ExpectedPageId = 1;
+    const ExpectedDeviceId = 2;
     const ExpectedPageSize = 0;
     const ExpectedPrintQuality = 1;
 
@@ -62,8 +63,11 @@ describe('REST Route', () => {
      * The test cases
      * 
      */
-    it("Get pages responds ok", (done) => {
 
+     /************************************************************
+      * Pages 
+      ************************************************************/
+    it("Get pages responds ok", (done) => {
         chai.request(app.application)
             .get("/REST/pages")
             .then(res => {
@@ -151,5 +155,66 @@ describe('REST Route', () => {
 
     it("Update destination calls update destination with the right parameters", (done) => {
         executeAndValidateUpdate('updateDestination', 'destination', 20, 0, done);
+    });
+
+    /**************************************************************************************
+     * Devices
+     **************************************************************************************/
+    it("Get devices responds ok", (done) => {        
+            chai.request(app.application)
+                .get("/REST/devices")
+                .then(res => {
+                    expect(res.status).to.equal(200);
+                    done();
+                });
+    });
+
+    it("Get devices respond calls data", (done) => {
+        var spy = sinon.spy(app.dependencies.dataLayer, 'getDevices');
+        chai.request(app.application)
+            .get("/REST/devices")
+            .then(res => {
+                expect(spy.calledOnce).true;
+                done();
+            });
+    });
+
+    it("Put devices responds ok", (done) => {
+        chai.request(app.application)    
+            .put("/REST/devices")
+            .then(res => {
+                expect(res.status).to.equal(200);
+                done();
+            });
+    });
+    
+    it("Put device calls new device", (done) => {
+        var spy = sinon.spy(app.dependencies.dataLayer, 'newDevice');
+        chai.request(app.application)    
+            .put("/REST/devices")
+            .then(res => {
+                expect(spy.calledOnce).true;
+                done();
+            });
+    });
+
+    it("Delete device responds ok", (done) => {
+        chai.request(app.application)
+            .del(`/REST/devices/${ExpectedDeviceId}`)
+            .then(res => {
+                expect(res.status).to.equal(200);
+                done();
+            });
+    });
+
+    it("Delete device calls delete device with the right device number", (done) => {
+        var spy = sinon.spy(app.dependencies.dataLayer, 'deleteDevice');
+        chai.request(app.application)
+            .del(`/REST/devices/${ExpectedDeviceId}`)
+            .then(res => {
+                expect(spy.calledOnce).true;
+                expect(spy.calledWith(ExpectedDeviceId)).true;
+                done();
+            });        
     });
 });

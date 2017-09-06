@@ -65,6 +65,10 @@ describe("Data Service Test", () => {
          * The test cases
          * 
          */
+
+         /************************************************************************
+          * Pages
+          ************************************************************************/
         it("Reads Pages", (done) => {
                 httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
@@ -140,4 +144,47 @@ describe("Data Service Test", () => {
         it("Can update destination", (done) => {
             executeAndVerifyUpdate(service.DestinationField, 30, 0, done);
         });
+
+        /***********************************************************************************************
+         * Devices
+         ***********************************************************************************************/
+        it("Reads Devices", (done) => {
+            const ExpectedDeviceId = 1;
+            const ExpectedDeviceName = "Device 2";
+
+            httpBackend.whenGET('REST/devices').respond(200, [{ id: ExpectedDeviceId, name: ExpectedDeviceName}]);
+
+            service.getDevices().then( devices => {
+                expect(devices.length).toBe(1);
+                expect(devices[0].id).toBe(ExpectedDeviceId);
+                expect(devices[0].name).toBe(ExpectedDeviceName);
+                done();
+            });
+
+            httpBackend.flush();
+        });
+
+        it("Can add devices", (done) => {
+            httpBackend.whenPUT('REST/devices').respond(200, { success: true });
+
+            service.addNewDevice().then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        });
+
+        it("Can delete devices", (done) => {
+            const idTodelete = 1;
+
+            httpBackend.whenDELETE(`REST/devices/${idTodelete}`).respond(200, { deletedDeviceId: idTodelete, success: true });
+
+            service.deleteDevice(idTodelete).then(success => {
+                expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        })
     });

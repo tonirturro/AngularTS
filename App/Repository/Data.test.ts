@@ -20,6 +20,15 @@ describe("Data test repository", () => {
     }
 
     /**
+     * Aux method to add devices
+     */
+    var addDevices = ():number => {
+        dataLayer.newDevice();
+        dataLayer.newDevice();
+        return 2;
+    }
+
+    /**
      * Initializes the model and dets the page to be updated
      */
     var getCurrentPage = ():Page => {
@@ -54,7 +63,7 @@ describe("Data test repository", () => {
      * The test cases
      * 
      */
-    it("Is empty when initialized", () => {
+    it("Has no pages when initialized", () => {
         var pages = dataLayer.getPages();
 
         expect(pages).to.be.empty;
@@ -149,5 +158,34 @@ describe("Data test repository", () => {
         var result = dataLayer.updateDestination(getInvalidId(), 0);
 
         expect(result).to.be.false;
+    });
+
+    it("Has no devices when initialized", () => {
+        var devices = dataLayer.getDevices();
+        
+        expect(devices).to.be.empty;
+    });
+
+    it("Can add devices", () => {
+        dataLayer.newDevice();
+
+        var pages = dataLayer.getDevices();
+        expect(pages).not.to.be.empty;
+    });
+
+    it("Can delete devices", () => {
+        // Add devices and verify them
+        var addedDevices = addDevices();
+        var devices = dataLayer.getDevices();
+        expect(devices.length).to.be.equal(addedDevices);
+
+        // Delete on page
+        var idToDelete = devices[0].id;
+        expect(dataLayer.deleteDevice(idToDelete)).to.be.true;
+
+        // Verify page deletion
+        devices = dataLayer.getDevices();
+        expect(devices.length).to.be.equal(addedDevices - 1);
+        expect(devices[0].id).not.to.be.equal(idToDelete);
     });
 });

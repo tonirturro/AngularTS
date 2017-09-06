@@ -1,5 +1,6 @@
 ﻿import { Entities } from "../Model/Entities";
 import { Page } from "../Model/Page";
+import { Device } from "../Model/Device";
 
 /**
  * Class definition for the repository
@@ -7,7 +8,10 @@ import { Page } from "../Model/Page";
 export class Data {
 
     // Track page index
-    private _lastIndex;
+    private _lastPageIndex;
+
+    // Track device index
+    private _lastDeviceIndex;
 
     // Reference to the data entities from this repository.
     private _entities: Entities;
@@ -18,7 +22,9 @@ export class Data {
     constructor() {
         this._entities = new Entities();
         this._entities.pages = [];
-        this._lastIndex = 0;
+        this._entities.devices = [];
+        this._lastPageIndex = 0;
+        this._lastDeviceIndex = 0;
     }
 
     /**
@@ -29,10 +35,25 @@ export class Data {
     }
 
     /**
+     * Gets the available devices
+     */
+    getDevices(): Device[] {
+        return this._entities.devices;
+    }
+
+    /**
      * Adds new page
      */
     newPage(): void {
-        this._entities.pages.push(new Page(this._lastIndex++, 0, 0, 0, 0));
+        this._entities.pages.push(new Page(this._lastPageIndex++, 0, 0, 0, 0));
+    }
+
+    /**
+     * Adds a new device
+     */
+    newDevice(): void {
+        var deviceId = this._lastDeviceIndex++;
+        this._entities.devices.push(new Device(deviceId, `Device ${this._lastDeviceIndex}`));
     }
 
     /**
@@ -56,6 +77,29 @@ export class Data {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Deletes an existing device
+     * @param idToDelete is the id for the device to be deleted.
+     */
+    deleteDevice(idToDelete: number): boolean {
+        var indexToDelete = -1;
+        
+        for (var i = 0; i < this._entities.devices.length; i++) {
+            if (this._entities.devices[i].id == idToDelete)
+            {
+                indexToDelete = i;
+                break;
+            }
+        }
+
+        if (indexToDelete >= 0) {
+            this._entities.devices.splice(indexToDelete, 1);
+            return true;
+        } else {
+            return false;
+        }                
     }
 
     /**

@@ -1,5 +1,6 @@
 import * as angular from "angular"
 import { Page } from "../Model/Page";
+import { Device } from "../Model/Device";
 
 /**
  * Encapsulates the parameters to perform one field update
@@ -71,6 +72,24 @@ export class DataService {
     }
 
     /**
+     * Gets devices from backend
+     */
+    getDevices():angular.IPromise<Device[]> {
+        
+        var deferred = this.$q.defer();
+
+        this.$http.get<[Device]>("REST/devices").then(response => {            
+            deferred.resolve(response.data);
+        },
+        errors => {
+            this.$log.error("Failure to get REST/devices");
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
      * Request a new page
      */
     addNewPage(): angular.IPromise<boolean> {
@@ -81,6 +100,23 @@ export class DataService {
         },
         errors => {
             this.$log.error("Failure to put REST/pages");
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
+     * Request a new device
+     */
+    addNewDevice(): angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        this.$http.put<{ success: boolean }>("REST/devices", {}).then(response => {
+            deferred.resolve(response.data.success);
+        },
+        errors => {
+            this.$log.error("Failure to put REST/devices");
             deferred.reject(errors.data);
         });
 
@@ -99,6 +135,24 @@ export class DataService {
         },
         errors => {
             this.$log.error(`Failure to delete REST/pages/${idToDelete}`);
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
+     * Delete an existing device
+     * @param idToDelete is the id for the device to be deleted
+     */
+    deleteDevice(idToDelete: number): angular.IPromise<boolean> {
+        var deferred = this.$q.defer();
+
+        this.$http.delete<{ deletedDeviceId: number, success: boolean }>(`REST/devices/${idToDelete}`).then(response => {
+            deferred.resolve(response.data.success && response.data.deletedDeviceId == idToDelete);
+        },
+        errors => {
+            this.$log.error(`Failure to delete REST/devices/${idToDelete}`);
             deferred.reject(errors.data);
         });
 

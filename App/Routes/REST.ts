@@ -46,11 +46,22 @@ export class RestRouter {
             res.json(this._data.getPages());
         });
 
+        // Access to the devices repository
+        this._router.get('/devices', (req: express.Request, res: express.Response) => {
+            res.json(this._data.getDevices());
+        });
+        
         // Add new page
         this._router.put('/pages', (req: express.Request, res: express.Response) => {
             this._data.newPage();
             res.json({ success: true });
         });
+
+        // Add new device
+        this._router.put('/devices', (req: express.Request, res: express.Response) => {
+            this._data.newDevice();
+            res.json({ success: true });
+        });        
 
         // Delete a page
         this._router.delete('/pages/:pageId', (req: express.Request, res: express.Response) => {
@@ -58,6 +69,16 @@ export class RestRouter {
             var result = this._data.deletePage(pageIdToDelete);
             res.json({
                 deletedPageId: pageIdToDelete,
+                success: result
+            });
+        });
+
+        // Delete a device
+        this._router.delete('/devices/:deviceId', (req: express.Request, res: express.Response) => {
+            var deviceIdToDelete = parseInt(req.params.deviceId);
+            var result = this._data.deleteDevice(deviceIdToDelete);
+            res.json({
+                deletedDeviceId: deviceIdToDelete,
                 success: result
             });
         });

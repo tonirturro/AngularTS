@@ -1,47 +1,45 @@
-<div class="container">
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <td>Page Size</td>
-                <td>Print Quality</td>
-                <td>Media Type</td>
-                <td>Destination</td>
-                <td><button type="button" class="btn btn-info" ng-click="$ctrl.addPage()">Add Page</button></td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages" ng-click="$ctrl.selectPage($event,page)">
-                <td>
-                    <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
-                        <option id="option" value="0">A3</option>
-                        <option id="option" value="1">A2</option>
-                        <option id="option" value="2">A1</option>
-                        <option id="option" value="3">A0</option>
-                    </select>
-                </td>
-                <td>
-                    <select ng-model="page.printQuality" ng-change="$ctrl.updatePrintQuality(page.printQuality)">
-                        <option id="option" value="0">Fast</option>
-                        <option id="option" value="1">Normal</option>
-                        <option id="option" value="2">Best</option>
-                    </select>
-                </td>
-                <td>
-                    <select ng-model="page.mediaType" ng-change="$ctrl.updateMediaType(page.mediaType)">
-                        <option id="option" value="0">Plain</option>
-                        <option id="option" value="1">Coated</option>
-                        <option id="option" value="2">Photo</option>
-                    </select>
-                </td>
-                <td>
-                    <select ng-model="page.destination" ng-change="$ctrl.updateDestination(page.destination)">
-                        <option id="option" value="0">Basket</option>
-                        <option id="option" value="1">Stacker</option>
-                        <option id="option" value="2">Folder</option>
-                    </select>
-                </td>
-                <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td>Page Size</td>
+            <td>Print Quality</td>
+            <td>Media Type</td>
+            <td>Destination</td>
+            <td><button type="button" class="btn btn-info" ng-click="$ctrl.addPage()">Add Page</button></td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages" ng-click="$ctrl.selectPage($event,page)">
+            <td>
+                <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
+                    <option id="option" value="0">A3</option>
+                    <option id="option" value="1">A2</option>
+                    <option id="option" value="2">A1</option>
+                    <option id="option" value="3">A0</option>
+                </select>
+            </td>
+            <td>
+                <select ng-model="page.printQuality" ng-change="$ctrl.updatePrintQuality(page.printQuality)">
+                    <option id="option" value="0">Fast</option>
+                    <option id="option" value="1">Normal</option>
+                    <option id="option" value="2">Best</option>
+                </select>
+            </td>
+            <td>
+                <select ng-model="page.mediaType" ng-change="$ctrl.updateMediaType(page.mediaType)">
+                    <option id="option" value="0">Plain</option>
+                    <option id="option" value="1">Coated</option>
+                    <option id="option" value="2">Photo</option>
+                </select>
+            </td>
+            <td>
+                <select ng-model="page.destination" ng-change="$ctrl.updateDestination(page.destination)">
+                    <option id="option" value="0">Basket</option>
+                    <option id="option" value="1">Stacker</option>
+                    <option id="option" value="2">Folder</option>
+                </select>
+            </td>
+            <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>
+        </tr>
+    </tbody>
+</table>

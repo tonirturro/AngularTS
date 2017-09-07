@@ -16,7 +16,7 @@ describe("Toolbar controller", () => {
     beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
         dataServiceToMock = dataService;
         promiseService = $q;
-        controller = $componentController("toolBar");
+        controller = $componentController("toolbar");
     }));
 
     /**

@@ -13,6 +13,6 @@ export class ToolBar implements angular.IComponentOptions {
      */
     constructor() {
         this.templateUrl = "App/Components/toolBar/toolbar.template.htm";
-        this.controller = ["$log", "dataService", ToolBarController];
+        this.controller = ["$log", "$rootScope", "dataService", ToolBarController];
     }
 }

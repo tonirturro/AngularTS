@@ -57,7 +57,7 @@ export class PageGridController {
      * Request a new page
      */
     addPage(): void {
-        this.dataService.addNewPage().then(success => {
+        this.dataService.addNewPage(0).then(success => {
             this.updatePages(success);
         });
     }

@@ -7,15 +7,16 @@ describe("Data test repository", () => {
     /**
      * Test common resources
      */
+    const DeviceId = 1;
     var dataLayer: Data;
 
     /**
     * Aux method to add pages
     */
     var addPages = ():number => {
-        dataLayer.newPage();
-        dataLayer.newPage();
-        dataLayer.newPage();
+        dataLayer.newPage(DeviceId);
+        dataLayer.newPage(DeviceId);
+        dataLayer.newPage(DeviceId);
         return 3;
     }
 
@@ -70,7 +71,7 @@ describe("Data test repository", () => {
     });
 
     it("Can add pages", () => {
-        dataLayer.newPage();
+        dataLayer.newPage(DeviceId);
 
         var pages = dataLayer.getPages();
         expect(pages).not.to.be.empty;

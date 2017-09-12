@@ -47,6 +47,7 @@ describe("Data Service Test", () => {
         /**
          * Common test resources
          */
+        const SelectedDeviceId = 1;
         let service: DataService;
         let httpBackend: angular.IHttpBackendService;
 
@@ -70,7 +71,7 @@ describe("Data Service Test", () => {
           * Pages
           ************************************************************************/
         it("Reads Pages", (done) => {
-                httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
+                httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, deviceId:1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
                 service.getPages().then( pages => {
                     expect(pages.length).toBe(1);
@@ -88,6 +89,7 @@ describe("Data Service Test", () => {
 
             httpBackend.whenGET('REST/pages').respond(200, [{
                 id: 1,
+                deviceId: 1,
                 pageSize: expectedPageSize,
                 printQuality: expectedPrintQuality,
                 mediaType: expectedMediaType,
@@ -106,9 +108,9 @@ describe("Data Service Test", () => {
         })
 
         it("Can add pages", (done) => {
-            httpBackend.whenPUT('REST/pages').respond(200, { success: true });
+            httpBackend.whenPOST(`REST/pages/${SelectedDeviceId}`).respond(200, { success: true });
 
-            service.addNewPage().then(success => {
+            service.addNewPage(SelectedDeviceId).then(success => {
                 expect(success).toBeTruthy();
                 done();
             });

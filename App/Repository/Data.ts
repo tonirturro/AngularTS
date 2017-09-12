@@ -44,8 +44,8 @@ export class Data {
     /**
      * Adds new page
      */
-    newPage(): void {
-        this._entities.pages.push(new Page(this._lastPageIndex++, 0, 0, 0, 0));
+    newPage(deviceId:number): void {
+        this._entities.pages.push(new Page(this._lastPageIndex++, deviceId, 0, 0, 0, 0));
     }
 
     /**

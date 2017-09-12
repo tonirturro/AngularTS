@@ -44,9 +44,9 @@ export class DataService {
      */
     getPages():angular.IPromise<Page[]> {
 
-        var deferred = this.$q.defer();
+        let deferred:angular.IDeferred<Page[]> = this.$q.defer();
 
-        this.$http.get<[{ id, pageSize:number, printQuality:number, mediaType:number, destination:number}]>("REST/pages").then(response => {
+        this.$http.get<[{ id, deviceId:number, pageSize:number, printQuality:number, mediaType:number, destination:number}]>("REST/pages").then(response => {
             let pages: Page[];
 
             pages = [];
@@ -55,6 +55,7 @@ export class DataService {
             response.data.forEach(newPage => {
                 pages.push(new Page(
                     newPage.id,
+                    newPage.deviceId,
                     newPage.pageSize.toString(),
                     newPage.printQuality.toString(),
                     newPage.mediaType.toString(),
@@ -76,7 +77,7 @@ export class DataService {
      */
     getDevices():angular.IPromise<Device[]> {
         
-        var deferred = this.$q.defer();
+        var deferred:angular.IDeferred<Device[]> = this.$q.defer();
 
         this.$http.get<[Device]>("REST/devices").then(response => {            
             deferred.resolve(response.data);
@@ -92,10 +93,10 @@ export class DataService {
     /**
      * Request a new page
      */
-    addNewPage(): angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
+    addNewPage(deviceId:number): angular.IPromise<boolean> {
+        let deferred:angular.IDeferred<boolean> = this.$q.defer();
 
-        this.$http.put<{ success: boolean }>("REST/pages", {}).then(response => {
+        this.$http.post<{ success: boolean }>(`REST/pages/${deviceId}`, {}).then(response => {
             deferred.resolve(response.data.success);
         },
         errors => {
@@ -110,7 +111,7 @@ export class DataService {
      * Request a new device
      */
     addNewDevice(): angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
+        var deferred:angular.IDeferred<boolean> = this.$q.defer();
 
         this.$http.put<{ success: boolean }>("REST/devices", {}).then(response => {
             deferred.resolve(response.data.success);
@@ -128,7 +129,7 @@ export class DataService {
      * @param idToDelete is the id for the page to be deleted
      */
     deletePage(idToDelete: number): angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
+        var deferred:angular.IDeferred<boolean> = this.$q.defer();
 
         this.$http.delete<{ deletedPageId: number, success: boolean }>(`REST/pages/${idToDelete}`).then(response => {
             deferred.resolve(response.data.success && response.data.deletedPageId == idToDelete);
@@ -146,7 +147,7 @@ export class DataService {
      * @param idToDelete is the id for the device to be deleted
      */
     deleteDevice(idToDelete: number): angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
+        var deferred:angular.IDeferred<boolean> = this.$q.defer();
 
         this.$http.delete<{ deletedDeviceId: number, success: boolean }>(`REST/devices/${idToDelete}`).then(response => {
             deferred.resolve(response.data.success && response.data.deletedDeviceId == idToDelete);
@@ -201,7 +202,7 @@ export class DataService {
      * @param params are the params for the update
      */
     private performUpdate(field: string, params: UpdateParams):angular.IPromise<boolean> {
-        var deferred = this.$q.defer();
+        var deferred:angular.IDeferred<boolean> = this.$q.defer();
 
         this.$http.put<{ success: boolean }>(`REST/pages/${field}`, JSON.stringify(params)).then(response => {
             deferred.resolve(response.data.success);

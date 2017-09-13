@@ -13,6 +13,6 @@ export class DevicePanel implements angular.IComponentOptions {
      */
     constructor() {
         this.templateUrl = "App/Components/devicePanel/device-panel.template.htm";
-        this.controller = ["$log", "$rootScope", "dataService", DevicePanelController];
+        this.controller = ["$log", "$rootScope", "appService", "dataService", DevicePanelController];
     }
 }

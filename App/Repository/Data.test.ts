@@ -180,13 +180,30 @@ describe("Data test repository", () => {
         var devices = dataLayer.getDevices();
         expect(devices.length).to.be.equal(addedDevices);
 
-        // Delete on page
+        // Delete on device
         var idToDelete = devices[0].id;
         expect(dataLayer.deleteDevice(idToDelete)).to.be.true;
 
-        // Verify page deletion
+        // Verify device deletion
         devices = dataLayer.getDevices();
         expect(devices.length).to.be.equal(addedDevices - 1);
         expect(devices[0].id).not.to.be.equal(idToDelete);
+    });
+
+    it("Delete device deletes its pages", () => {
+        expect(addDevices()).to.be.greaterThan(1);
+        dataLayer.getDevices().forEach(device => {
+            dataLayer.newPage(device.id);
+            dataLayer.newPage(device.id);
+        });
+        var deviceIdToDelete = dataLayer.getDevices()[0].id;
+
+        dataLayer.deleteDevice(deviceIdToDelete);
+
+        // verify no pages for this device
+        expect(dataLayer.getPages()).not.to.be.empty;
+        dataLayer.getPages().forEach(page =>{
+            expect(page.deviceId).not.to.be.equal(deviceIdToDelete);
+        });
     });
 });

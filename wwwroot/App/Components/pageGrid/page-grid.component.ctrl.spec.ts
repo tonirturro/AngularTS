@@ -1,6 +1,7 @@
 import * as angular from "angular";
 import "angular-mocks";
 import { PageGridController } from "./page-grid.component.ctrl";
+import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 import { Page } from "../../Model/Page";
 
@@ -15,6 +16,7 @@ describe("Page grid controller", () => {
      * Common test resources
      */
     let controller: PageGridController;
+    let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
     let promiseService: angular.IQService;
     let deferredGetPages: angular.IDeferred<Page[]>;
@@ -115,13 +117,15 @@ describe("Page grid controller", () => {
      */
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
+    beforeEach(inject(($componentController, $q, $rootScope, appService, dataService) => {
+        appServiceToMock = appService;
         dataServiceToMock = dataService;
         promiseService = $q;
         rootScopeService = $rootScope;
         deferredGetPages = promiseService.defer();
         spyOn(dataServiceToMock, "getPages").and.returnValue(deferredGetPages.promise);
         controller = $componentController("pageGrid");
+        appServiceToMock.selectedDeviceId = 0;
     }));
 
     /**
@@ -133,12 +137,27 @@ describe("Page grid controller", () => {
         expect(controller.pages.length).toBe(0);
     });
 
+    it("Returns the selected device id", () => {
+        appServiceToMock.selectedDeviceId = ExpectedDeviceId;
+
+        expect(controller.selectedDeviceId).toBe(ExpectedDeviceId);
+    });
+
     it("Can add pages", () => {
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
 
         controller.addPage();
 
         expect(dataServiceToMock.addNewPage).toHaveBeenCalledTimes(1);
+    });
+
+    it("The page is added to the selected device Id", () => {
+        appServiceToMock.selectedDeviceId = ExpectedDeviceId;
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
+        
+        controller.addPage();
+        
+        expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(ExpectedDeviceId);
     });
 
     it("Add pages refresh page list", () => {

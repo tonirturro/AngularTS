@@ -10,5 +10,8 @@ wwwroot/App/**/*.js
 App/**/*.js.map
 wwwroot/App/**/*.js.map
 
+#npm stuff
+npm-debug.log
+
 #karma coverage
 coverage/

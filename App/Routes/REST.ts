@@ -52,8 +52,9 @@ export class RestRouter {
         });
         
         // Add new page
-        this._router.put('/pages', (req: express.Request, res: express.Response) => {
-            this._data.newPage();
+        this._router.post('/pages/:deviceId', (req: express.Request, res: express.Response) => {
+            var selectedDeviceId = parseInt(req.params.deviceId);
+            this._data.newPage(selectedDeviceId);
             res.json({ success: true });
         });
 
@@ -63,7 +64,7 @@ export class RestRouter {
             res.json({ success: true });
         });        
 
-        // Delete a page
+        // Delete a pagedeviceId
         this._router.delete('/pages/:pageId', (req: express.Request, res: express.Response) => {
             var pageIdToDelete = parseInt(req.params.pageId);
             var result = this._data.deletePage(pageIdToDelete);

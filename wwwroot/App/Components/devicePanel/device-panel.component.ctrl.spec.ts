@@ -1,6 +1,7 @@
 import * as angular from "angular";
 import "angular-mocks";
 import { DevicePanelController } from "./device-panel.component.ctrl";
+import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 import { Device } from "../../Model/Device";
 import { ModelUpdate } from  "../../Model/ModelEvents";
@@ -10,7 +11,9 @@ describe("Device panel controller", () => {
     /**
      * Common test resources
      */
+    const SelectedDeviceId = 5;
     let controller: DevicePanelController;
+    let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
     let promiseService: angular.IQService;
     let rootScopeService: angular.IRootScopeService;
@@ -20,7 +23,8 @@ describe("Device panel controller", () => {
      */
     beforeEach(angular.mock.module("myApp"));
     
-    beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
+    beforeEach(inject(($componentController, $q, $rootScope, appService, dataService) => {
+        appServiceToMock = appService;
         dataServiceToMock = dataService;
         promiseService = $q;
         rootScopeService = $rootScope;
@@ -44,6 +48,19 @@ describe("Device panel controller", () => {
         expect(dataServiceToMock.deleteDevice).toHaveBeenCalledWith(idToDelete);
     });
 
+    it("Delete selected device changes selection", () => {
+        let defer:angular.IDeferred<boolean> = promiseService.defer();
+        let promise:angular.IPromise<boolean> = defer.promise;
+        spyOn(dataServiceToMock, "deleteDevice").and.returnValue(promise);     
+        appServiceToMock.selectedDeviceId = SelectedDeviceId;
+
+        controller.deleteDevice(SelectedDeviceId);
+        defer.resolve(true);
+        rootScopeService.$apply();
+
+        expect(appServiceToMock.selectedDeviceId).not.toBe(SelectedDeviceId);
+    });
+
     it("Delete device updates the device list",() => {
         let defer:angular.IDeferred<boolean> = promiseService.defer();
         let promise:angular.IPromise<boolean> = defer.promise;
@@ -60,5 +77,13 @@ describe("Device panel controller", () => {
         rootScopeService.$broadcast(ModelUpdate.Devices.toString());
 
         expect(dataServiceToMock.getDevices).toHaveBeenCalledTimes(2);
+    });
+
+    it("Device Selection sets the app services", () => {
+        expect(appServiceToMock.selectedDeviceId).not.toBe(SelectedDeviceId);
+
+        controller.selectDevice(SelectedDeviceId);
+
+        expect(appServiceToMock.selectedDeviceId).toBe(SelectedDeviceId);
     });
 });

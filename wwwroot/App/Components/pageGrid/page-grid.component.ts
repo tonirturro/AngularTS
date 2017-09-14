@@ -13,6 +13,6 @@ export class PageGrid implements angular.IComponentOptions {
      */
     constructor() {
         this.templateUrl = "App/Components/pageGrid/page-grid.template.htm";
-        this.controller = ["$log", "dataService", PageGridController];
+        this.controller = ["$log", "appService", "dataService", PageGridController];
     }
 }

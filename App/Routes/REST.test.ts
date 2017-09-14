@@ -86,21 +86,22 @@ describe('REST Route', () => {
             });
     });
 
-    it("Put pages responds ok", (done) => {
+    it("Post pages responds ok", (done) => {
         chai.request(app.application)    
-            .put("/REST/pages")
+            .post(`/REST/pages/${ExpectedDeviceId}`)
             .then(res => {
                 expect(res.status).to.equal(200);
                 done();
             });
     });
 
-    it("Put pages calls new page", (done) => {
+    it("Post pages calls new page", (done) => {
         var spy = sinon.spy(app.dependencies.dataLayer, 'newPage');
         chai.request(app.application)    
-            .put("/REST/pages")
+            .post(`/REST/pages/${ExpectedDeviceId}`)
             .then(res => {
                 expect(spy.calledOnce).true;
+                expect(spy.calledWith(ExpectedDeviceId)).true;
                 done();
             });
     });

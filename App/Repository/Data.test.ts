@@ -7,15 +7,16 @@ describe("Data test repository", () => {
     /**
      * Test common resources
      */
+    const DeviceId = 1;
     var dataLayer: Data;
 
     /**
     * Aux method to add pages
     */
     var addPages = ():number => {
-        dataLayer.newPage();
-        dataLayer.newPage();
-        dataLayer.newPage();
+        dataLayer.newPage(DeviceId);
+        dataLayer.newPage(DeviceId);
+        dataLayer.newPage(DeviceId);
         return 3;
     }
 
@@ -70,7 +71,7 @@ describe("Data test repository", () => {
     });
 
     it("Can add pages", () => {
-        dataLayer.newPage();
+        dataLayer.newPage(DeviceId);
 
         var pages = dataLayer.getPages();
         expect(pages).not.to.be.empty;
@@ -179,13 +180,30 @@ describe("Data test repository", () => {
         var devices = dataLayer.getDevices();
         expect(devices.length).to.be.equal(addedDevices);
 
-        // Delete on page
+        // Delete on device
         var idToDelete = devices[0].id;
         expect(dataLayer.deleteDevice(idToDelete)).to.be.true;
 
-        // Verify page deletion
+        // Verify device deletion
         devices = dataLayer.getDevices();
         expect(devices.length).to.be.equal(addedDevices - 1);
         expect(devices[0].id).not.to.be.equal(idToDelete);
+    });
+
+    it("Delete device deletes its pages", () => {
+        expect(addDevices()).to.be.greaterThan(1);
+        dataLayer.getDevices().forEach(device => {
+            dataLayer.newPage(device.id);
+            dataLayer.newPage(device.id);
+        });
+        var deviceIdToDelete = dataLayer.getDevices()[0].id;
+
+        dataLayer.deleteDevice(deviceIdToDelete);
+
+        // verify no pages for this device
+        expect(dataLayer.getPages()).not.to.be.empty;
+        dataLayer.getPages().forEach(page =>{
+            expect(page.deviceId).not.to.be.equal(deviceIdToDelete);
+        });
     });
 });

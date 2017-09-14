@@ -1,5 +1,6 @@
 import * as angular from "angular";
 import { Page } from "../../Model/Page";
+import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
 /**
@@ -16,10 +17,12 @@ export class PageGridController {
     /**
      * Initializes a new instance of the PageGridController class.
      * @param logService is the Angular log service
-     * @param dataService is the connection to the backend service
+     * @param appService the bussiness rules for this application
+     * @param dataService the connection to the backend service
      */
     constructor(
         private logService: angular.ILogService,
+        private appService: AppService,        
         private dataService: DataService)
     {
         this.pages_ = [];
@@ -42,24 +45,34 @@ export class PageGridController {
     get selectedPages():number[] {
         return this.selectedPages_;
     }
-    
+
     /**
-    * Sets the selected pages for testing purposes, todo: review alternative
+    * Sets the selected pages for testing purposes
     */
     set selectedPages(selectedPages: number[]) {
-        this.selectedPages_ = [];
-        selectedPages.forEach(page => {
-            this.selectedPages.push(page);
-        });
+        this.selectedPages_ = selectedPages.slice();
+    }
+
+    /**
+     * Returns the selected device id
+     */
+    get selectedDeviceId():number {
+        return this.appService.selectedDeviceId;
+    }
+
+    checkFilterOptions(value:Page, index:number):boolean {
+        return value.deviceId === 1;
     }
 
     /**
      * Request a new page
      */
     addPage(): void {
-        this.dataService.addNewPage().then(success => {
-            this.updatePages(success);
-        });
+        if (this.appService.selectedDeviceId >= 0) {
+            this.dataService.addNewPage(this.appService.selectedDeviceId).then(success => {
+                this.updatePages(success);
+            });    
+        }
     }
 
     /**
@@ -192,5 +205,5 @@ export class PageGridController {
                 page.class = "item-selected"
             }
         });
-    }
+    }  
 }

@@ -44,8 +44,8 @@ export class Data {
     /**
      * Adds new page
      */
-    newPage(): void {
-        this._entities.pages.push(new Page(this._lastPageIndex++, 0, 0, 0, 0));
+    newPage(deviceId:number): void {
+        this._entities.pages.push(new Page(this._lastPageIndex++, deviceId, 0, 0, 0, 0));
     }
 
     /**
@@ -87,7 +87,7 @@ export class Data {
         var indexToDelete = -1;
         
         for (var i = 0; i < this._entities.devices.length; i++) {
-            if (this._entities.devices[i].id == idToDelete)
+            if (this._entities.devices[i].id === idToDelete)
             {
                 indexToDelete = i;
                 break;
@@ -95,6 +95,14 @@ export class Data {
         }
 
         if (indexToDelete >= 0) {
+            // Delete the pages
+            var originalPages = this._entities.pages.slice();
+            originalPages.forEach(page => {
+                if (page.deviceId === idToDelete) {
+                    this.deletePage(page.id);
+                }
+            });
+            // Delete the device
             this._entities.devices.splice(indexToDelete, 1);
             return true;
         } else {

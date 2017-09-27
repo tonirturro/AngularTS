@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
+    "build": "webpack",
     "test": "mocha --reporter progress App/**/*.test.js",
     "ui:watch": "karma start"
   },

@@ -15,3 +15,6 @@ npm-debug.log
 
 #karma coverage
 coverage/
+
+#webpack stuff
+dist/bundle/bundle.js

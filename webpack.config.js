@@ -6,16 +6,32 @@ module.exports = {
         filename: "bundle.js",
         path: path.resolve(__dirname, 'dist/bundle')
     },
-    resolve: {
-        extensions: ['.ts' ]
-    },
     module: {
-        loaders: [
+        rules: [
+            {
+                test: /\.htm$/,
+                use: ["html-loader"]
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            },
+            {
+                test: /\.(eot|ttf|woff|woff2|svg)$/,
+                use: 'file-loader'
+            },
             {
                 test: /\.ts$/,
-                exclude: path.resolve(__dirname, 'node_modules'),
-                loader: 'ts-loader?configFileName=tsconfig.webpack.json'
+                use: 'ts-loader',
+                exclude: /node_modules/
             }
         ]
-    }
-};
+    },
+    resolve: {
+        extensions: ['.js', '.ts']
+    },
+    devtool: 'inline-source-map'
+}

@@ -6,7 +6,7 @@ import * as path from "path";
 
 class IndexRouter {
 
-    private readonly root = "wwwroot";
+    private readonly root = "dist";
     private readonly defaultAnswer = "index.htm";
 
     private _router: express.Router;

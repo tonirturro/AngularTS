@@ -8,7 +8,7 @@ import { Data } from "./Repository/Data";
 
 var app = express();
 
-const root = "wwwroot";
+const root = "dist";
 
 // Resolve dependencies
 var data = new Data();

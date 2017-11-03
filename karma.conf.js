@@ -17,7 +17,7 @@ module.exports = function (config) {
         },
 
         karmaTypescriptConfig: {
-            tsconfig: "./tsconfig.json"    
+            tsconfig: "./tsconfig.karma.json"    
         },
 
         // test results reporter to use

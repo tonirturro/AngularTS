@@ -17,4 +17,4 @@ npm-debug.log
 coverage/
 
 #webpack stuff
-dist/bundle/bundle.js
+dist/bundle/*.*

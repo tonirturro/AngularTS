@@ -29,6 +29,11 @@ export class DevicePanelController {
     private devices_: DeviceDisplay[];
 
     /**
+     * Define dependencies
+     */
+    static $inject =  ["$log", "$rootScope", "appService", "dataService"];
+
+    /**
      * Initializes a new instance of the DevicePanelController class.
      * @param logService the angular ILogService
      * @param rootScopeService the angular IRootScopeService

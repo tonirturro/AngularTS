@@ -15,6 +15,11 @@ export class PageGridController {
     private selectedPages_: number[];
 
     /**
+     * Define dependencies
+     */
+    static $inject = ["$log", "appService", "dataService"];
+
+    /**
      * Initializes a new instance of the PageGridController class.
      * @param logService is the Angular log service
      * @param appService the bussiness rules for this application

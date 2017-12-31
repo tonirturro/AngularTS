@@ -8,6 +8,11 @@ import { ModelUpdate } from  "../../Model/ModelEvents";
 export class ToolBarController {
 
     /**
+     * Define dependencies
+     */
+    static $inject =  ["$log", "$rootScope", "dataService"];
+
+    /**
      * Initializes a new instance of the ToolBarController class.
      * @param logService the angular ILogService
      * @param rootScopeService the angular IRootScopeService

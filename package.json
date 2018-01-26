@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "build": "tsc && webpack",
+    "build": "gulp views & tsc & webpack & gulp tslint",
     "build:frontend": "webpack",
     "build:backend": "tsc",
     "test": "mocha --reporter progress App/**/*.test.js",
@@ -37,6 +37,9 @@
     "chai-http": "^3.0.0",
     "css-loader": "^0.28.7",
     "file-loader": "^1.1.5",
+    "gulp": "^3.9.1",
+    "gulp-angular-templatecache": "^2.2.0",
+    "gulp-tslint": "^8.1.2",
     "html-loader": "^0.5.1",
     "jasmine-core": "^2.6.1",
     "karma": "^1.6.0",
@@ -50,6 +53,7 @@
     "style-loader": "^0.19.0",
     "traceur": "0.0.111",
     "ts-loader": "^2.3.7",
+    "tslint": "^5.9.1",
     "typescript": "^2.3.2",
     "webpack": "^3.6.0"
   }

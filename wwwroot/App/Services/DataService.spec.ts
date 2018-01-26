@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import "angular-mocks";
-import { DataService } from "./DataService"
+import { DataService } from "./DataService";
 
 describe("Data Service Test", () => {
 
@@ -11,36 +11,36 @@ describe("Data Service Test", () => {
          * @param newValue is the new value to be set
          * @param done is the Mocha completion callback
          */
-        var executeAndVerifyUpdate = (field: string, pageId:number, newValue: number, done:() => void) => {
+        const executeAndVerifyUpdate = (field: string, pageId: number, newValue: number, done: () => void) => {
             httpBackend.whenPUT(`REST/pages/${field}`).respond(200, { success: true });
 
             switch (field) {
                 case service.PageSizeField:
-                    service.updatePageSize([pageId], newValue).then(success => {
+                    service.updatePageSize([pageId], newValue).then((success) => {
                         expect(success).toBeTruthy();
                         done();
                     });
                     break;
                 case service.PrintQualityField:
-                    service.updatePrintQuality([pageId], newValue).then(success => {
+                    service.updatePrintQuality([pageId], newValue).then((success) => {
                         expect(success).toBeTruthy();
                         done();
                     });
                     break;
                 case service.MediaTypeField:
-                    service.updateMediaType([pageId], newValue).then(success => {
+                    service.updateMediaType([pageId], newValue).then((success) => {
                         expect(success).toBeTruthy();
                         done();
                     });
                     break;
                 case service.DestinationField:
-                    service.updateDestination([pageId], newValue).then(success => {
+                    service.updateDestination([pageId], newValue).then((success) => {
                         expect(success).toBeTruthy();
                         done();
                     });
                     break;
             }
-            
+
             httpBackend.flush();
         };
 
@@ -56,24 +56,26 @@ describe("Data Service Test", () => {
          */
         beforeEach(angular.mock.module("myApp"));
 
+        // tslint:disable-next-line:variable-name
         beforeEach(inject((_dataService_, _$httpBackend_) => {
             service = _dataService_;
             httpBackend = _$httpBackend_;
         }));
-    
+
         /**
-         * 
+         *
          * The test cases
-         * 
+         *
          */
 
          /************************************************************************
           * Pages
           ************************************************************************/
         it("Reads Pages", (done) => {
-                httpBackend.whenGET('REST/pages').respond(200, [{ id: 1, deviceId:1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
+                httpBackend.whenGET("REST/pages")
+                    .respond(200, [{ id: 1, deviceId: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
-                service.getPages().then( pages => {
+                service.getPages().then( (pages) => {
                     expect(pages.length).toBe(1);
                     done();
                 });
@@ -87,8 +89,9 @@ describe("Data Service Test", () => {
             const expectedMediaType = 1;
             const expectedDestination = 2;
 
-            httpBackend.whenGET('REST/pages').respond(200, [{
+            httpBackend.whenGET("REST/pages").respond(200, [{
                 id: 1,
+                // tslint:disable-next-line:object-literal-sort-keys
                 deviceId: 1,
                 pageSize: expectedPageSize,
                 printQuality: expectedPrintQuality,
@@ -96,7 +99,7 @@ describe("Data Service Test", () => {
                 destination: expectedDestination
             }]);
 
-            service.getPages().then(pages => {
+            service.getPages().then((pages) => {
                 expect(pages[0].pageSize).toBe(expectedPageSize.toString());
                 expect(pages[0].printQuality).toBe(expectedPrintQuality.toString());
                 expect(pages[0].mediaType).toBe(expectedMediaType.toString());
@@ -105,12 +108,12 @@ describe("Data Service Test", () => {
             });
 
             httpBackend.flush();
-        })
+        });
 
         it("Can add pages", (done) => {
             httpBackend.whenPOST(`REST/pages/${SelectedDeviceId}`).respond(200, { success: true });
 
-            service.addNewPage(SelectedDeviceId).then(success => {
+            service.addNewPage(SelectedDeviceId).then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
@@ -121,15 +124,16 @@ describe("Data Service Test", () => {
         it("Can delete pages", (done) => {
             const idTodelete = 1;
 
-            httpBackend.whenDELETE(`REST/pages/${idTodelete}`).respond(200, { deletedPageId: idTodelete, success: true });
+            httpBackend.whenDELETE(`REST/pages/${idTodelete}`)
+                .respond(200, { deletedPageId: idTodelete, success: true });
 
-            service.deletePage(idTodelete).then(success => {
+            service.deletePage(idTodelete).then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
 
             httpBackend.flush();
-        })
+        });
 
         it("Can update page size", (done) => {
             executeAndVerifyUpdate(service.PageSizeField, 10, 0, done);
@@ -154,9 +158,9 @@ describe("Data Service Test", () => {
             const ExpectedDeviceId = 1;
             const ExpectedDeviceName = "Device 2";
 
-            httpBackend.whenGET('REST/devices').respond(200, [{ id: ExpectedDeviceId, name: ExpectedDeviceName}]);
+            httpBackend.whenGET("REST/devices").respond(200, [{ id: ExpectedDeviceId, name: ExpectedDeviceName}]);
 
-            service.getDevices().then( devices => {
+            service.getDevices().then( (devices) => {
                 expect(devices.length).toBe(1);
                 expect(devices[0].id).toBe(ExpectedDeviceId);
                 expect(devices[0].name).toBe(ExpectedDeviceName);
@@ -167,9 +171,9 @@ describe("Data Service Test", () => {
         });
 
         it("Can add devices", (done) => {
-            httpBackend.whenPUT('REST/devices').respond(200, { success: true });
+            httpBackend.whenPUT("REST/devices").respond(200, { success: true });
 
-            service.addNewDevice().then(success => {
+            service.addNewDevice().then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
@@ -180,13 +184,14 @@ describe("Data Service Test", () => {
         it("Can delete devices", (done) => {
             const idTodelete = 1;
 
-            httpBackend.whenDELETE(`REST/devices/${idTodelete}`).respond(200, { deletedDeviceId: idTodelete, success: true });
+            httpBackend
+                .whenDELETE(`REST/devices/${idTodelete}`).respond(200, { deletedDeviceId: idTodelete, success: true });
 
-            service.deleteDevice(idTodelete).then(success => {
+            service.deleteDevice(idTodelete).then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
 
             httpBackend.flush();
-        })
+        });
     });

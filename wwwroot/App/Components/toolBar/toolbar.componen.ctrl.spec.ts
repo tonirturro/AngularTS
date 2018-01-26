@@ -1,8 +1,9 @@
 import * as angular from "angular";
 import "angular-mocks";
 import { ToolBarController } from "./toolbar.component.ctrl";
+
+import { ModelUpdate } from "../../Model/ModelEvents";
 import { DataService } from "../../Services/DataService";
-import { ModelUpdate } from  "../../Model/ModelEvents";
 
 describe("Toolbar controller", () => {
     let controller: ToolBarController;
@@ -14,7 +15,7 @@ describe("Toolbar controller", () => {
      * Initialize the test environment
      */
     beforeEach(angular.mock.module("myApp"));
-    
+
     beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
         dataServiceToMock = dataService;
         rootScopeService = $rootScope;
@@ -31,11 +32,11 @@ describe("Toolbar controller", () => {
         controller.addDevice();
 
         expect(dataServiceToMock.addNewDevice).toHaveBeenCalledTimes(1);
-    })
+    });
 
     it("Add device broadcast model change event", () => {
-        let defer:angular.IDeferred<boolean> = promiseService.defer();
-        let promise:angular.IPromise<boolean> = defer.promise;
+        const defer: angular.IDeferred<boolean> = promiseService.defer();
+        const promise: angular.IPromise<boolean> = defer.promise;
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(promise);
         spyOn(rootScopeService, "$broadcast");
 
@@ -45,5 +46,5 @@ describe("Toolbar controller", () => {
 
         expect(rootScopeService.$broadcast).toHaveBeenCalledTimes(1);
     });
-    
+
 });

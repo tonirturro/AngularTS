@@ -1,18 +1,24 @@
 /*
 ** Defines the Page entity
-*/ 
+*/
 
 export class Page {
-    id: number;
-    deviceId: number;
-    class: string;
-    pageSize: string;
-    printQuality: string;
-    mediaType: string;
-    destination: string;
+    public id: number;
+    public deviceId: number;
+    public class: string;
+    public pageSize: string;
+    public printQuality: string;
+    public mediaType: string;
+    public destination: string;
 
     // Constructor
-    constructor(id: number, deviceId:number, pageSize: string, printQuality: string, mediaType:string, destination:string) {
+    constructor(
+        id: number,
+        deviceId: number,
+        pageSize: string,
+        printQuality: string,
+        mediaType: string,
+        destination: string) {
         this.id = id;
         this.deviceId = deviceId;
         this.class = "";

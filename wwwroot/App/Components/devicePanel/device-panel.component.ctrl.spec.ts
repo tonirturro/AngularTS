@@ -1,10 +1,12 @@
 import * as angular from "angular";
 import "angular-mocks";
 import { DevicePanelController } from "./device-panel.component.ctrl";
+
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
+
 import { Device } from "../../Model/Device";
-import { ModelUpdate } from  "../../Model/ModelEvents";
+import { ModelUpdate } from "../../Model/ModelEvents";
 
 describe("Device panel controller", () => {
 
@@ -22,7 +24,7 @@ describe("Device panel controller", () => {
      * Initialize the test environment
      */
     beforeEach(angular.mock.module("myApp"));
-    
+
     beforeEach(inject(($componentController, $q, $rootScope, appService, dataService) => {
         appServiceToMock = appService;
         dataServiceToMock = dataService;
@@ -31,12 +33,12 @@ describe("Device panel controller", () => {
         spyOn(dataServiceToMock, "getDevices").and.returnValue(promiseService.defer().promise);
         controller = $componentController("devicePanel");
     }));
-    
+
     /**
      * The test cases
      */
     it("Has devices when initialized", () => {
-        expect(controller.devices.length).toBe(0);
+        expect(controller.Devices.length).toBe(0);
     });
 
     it("Can delete device", () => {
@@ -49,21 +51,21 @@ describe("Device panel controller", () => {
     });
 
     it("Delete selected device changes selection", () => {
-        let defer:angular.IDeferred<boolean> = promiseService.defer();
-        let promise:angular.IPromise<boolean> = defer.promise;
-        spyOn(dataServiceToMock, "deleteDevice").and.returnValue(promise);     
-        appServiceToMock.selectedDeviceId = SelectedDeviceId;
+        const defer: angular.IDeferred<boolean> = promiseService.defer();
+        const promise: angular.IPromise<boolean> = defer.promise;
+        spyOn(dataServiceToMock, "deleteDevice").and.returnValue(promise);
+        appServiceToMock.SelectedDeviceId = SelectedDeviceId;
 
         controller.deleteDevice(SelectedDeviceId);
         defer.resolve(true);
         rootScopeService.$apply();
 
-        expect(appServiceToMock.selectedDeviceId).not.toBe(SelectedDeviceId);
+        expect(appServiceToMock.SelectedDeviceId).not.toBe(SelectedDeviceId);
     });
 
-    it("Delete device updates the device list",() => {
-        let defer:angular.IDeferred<boolean> = promiseService.defer();
-        let promise:angular.IPromise<boolean> = defer.promise;
+    it("Delete device updates the device list", () => {
+        const defer: angular.IDeferred<boolean> = promiseService.defer();
+        const promise: angular.IPromise<boolean> = defer.promise;
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(promise);
 
         controller.deleteDevice(0);
@@ -80,10 +82,10 @@ describe("Device panel controller", () => {
     });
 
     it("Device Selection sets the app services", () => {
-        expect(appServiceToMock.selectedDeviceId).not.toBe(SelectedDeviceId);
+        expect(appServiceToMock.SelectedDeviceId).not.toBe(SelectedDeviceId);
 
         controller.selectDevice(SelectedDeviceId);
 
-        expect(appServiceToMock.selectedDeviceId).toBe(SelectedDeviceId);
+        expect(appServiceToMock.SelectedDeviceId).toBe(SelectedDeviceId);
     });
 });

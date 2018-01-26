@@ -6,26 +6,26 @@ export class AppService {
     /**
      * Internal Repository
      */
-    private selectedDeviceId_:number;
+    private selectedDeviceId: number;
 
     /**
      * Initializes a new instance of the AppService class
      */
     constructor() {
-        this.selectedDeviceId_ = -1;
+        this.selectedDeviceId = -1;
     }
 
     /**
      * Device Id getter
      */
-    get selectedDeviceId():number {
-        return this.selectedDeviceId_;
+    get SelectedDeviceId(): number {
+        return this.selectedDeviceId;
     }
 
     /**
      * Device Id setter
      */
-    set selectedDeviceId(newSelectedId:number) {
-        this.selectedDeviceId_ = newSelectedId;
+    set SelectedDeviceId(newSelectedId: number) {
+        this.selectedDeviceId = newSelectedId;
     }
 }

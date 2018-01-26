@@ -1,8 +1,11 @@
 import * as angular from "angular";
 import "angular-mocks";
+
 import { PageGridController } from "./page-grid.component.ctrl";
+
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
+
 import { Page } from "../../Model/Page";
 
 describe("Page grid controller", () => {
@@ -29,8 +32,8 @@ describe("Page grid controller", () => {
      * @param attribute is the attribute we want to test
      * @param ctrlPressed if the crtl key is pressed while clicking
      */
-    var getClick = (srcElementId: string, attribute: string, ctrlPressed: boolean):MouseEvent => {
-        var click = {
+    const getClick = (srcElementId: string, attribute: string, ctrlPressed: boolean): MouseEvent => {
+        const click = {
             altKey: false,
             button: 0,
             buttons: 0,
@@ -40,7 +43,7 @@ describe("Page grid controller", () => {
             fromElement: null,
             layerX: 0,
             layerY: 0,
-            metaKey:false,
+            metaKey: false,
             movementX: 0,
             movementY: 0,
             offsetX: 0,
@@ -55,6 +58,7 @@ describe("Page grid controller", () => {
             which: null,
             x: 0,
             y: 0,
+            // tslint:disable-next-line:object-literal-sort-keys
             getModifierState: null,
             initMouseEvent: null,
             detail: 0,
@@ -70,17 +74,17 @@ describe("Page grid controller", () => {
             returnValue: false,
             srcElement: document.createElement("tr"),
             target: null,
-            timeStamp:null,
-            type:null,
-            scoped:null,
-            initEvent:null,
-            preventDefault:null,
-            stopImmediatePropagation:null,
-            stopPropagation:null,
-            deepPath:null,
-            AT_TARGET:null,
-            BUBBLING_PHASE:null,
-            CAPTURING_PHASE:null
+            timeStamp: null,
+            type: null,
+            scoped: null,
+            initEvent: null,
+            preventDefault: null,
+            stopImmediatePropagation: null,
+            stopPropagation: null,
+            deepPath: null,
+            AT_TARGET: null,
+            BUBBLING_PHASE: null,
+            CAPTURING_PHASE: null
         };
 
         click.srcElement.id = srcElementId;
@@ -89,28 +93,28 @@ describe("Page grid controller", () => {
         }
 
         return click;
-    }
+    };
 
     /**
      * Sets the deferred execution for any update operationm
      */
-    var getUpdatePromise = ():angular.IPromise<boolean> => {
+    const getUpdatePromise = (): angular.IPromise<boolean> => {
         deferredUpdate = promiseService.defer();
         return deferredUpdate.promise;
-    }
+    };
 
     /**
      * Executes the deferred update
      * @param pagesReported are the pages reported when the update is executed
      */
-    var executeUpdateAndReturnPages = (pagesReported:Page[]) => {
+    const executeUpdateAndReturnPages = (pagesReported: Page[]) => {
         deferredUpdate.resolve(true);
         deferredGetPages.resolve(pagesReported);
         rootScopeService.$apply();
 
         expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.pages.length).toEqual(pagesReported.length);
-    }
+        expect(controller.Pages.length).toEqual(pagesReported.length);
+    };
 
     /**
      * Initialize the test environment
@@ -125,20 +129,20 @@ describe("Page grid controller", () => {
         deferredGetPages = promiseService.defer();
         spyOn(dataServiceToMock, "getPages").and.returnValue(deferredGetPages.promise);
         controller = $componentController("pageGrid");
-        appServiceToMock.selectedDeviceId = 0;
+        appServiceToMock.SelectedDeviceId = 0;
     }));
 
     /**
-     * 
+     *
      *  The test cases
-     * 
+     *
      */
     it("Has pages when initialized", () => {
-        expect(controller.pages.length).toBe(0);
+        expect(controller.Pages.length).toBe(0);
     });
 
     it("Returns the selected device id", () => {
-        appServiceToMock.selectedDeviceId = ExpectedDeviceId;
+        appServiceToMock.SelectedDeviceId = ExpectedDeviceId;
 
         expect(controller.selectedDeviceId).toBe(ExpectedDeviceId);
     });
@@ -152,11 +156,11 @@ describe("Page grid controller", () => {
     });
 
     it("The page is added to the selected device Id", () => {
-        appServiceToMock.selectedDeviceId = ExpectedDeviceId;
+        appServiceToMock.SelectedDeviceId = ExpectedDeviceId;
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
-        
+
         controller.addPage();
-        
+
         expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(ExpectedDeviceId);
     });
 
@@ -168,7 +172,7 @@ describe("Page grid controller", () => {
         controller.addPage();
 
         executeUpdateAndReturnPages(pagesAfterAdd);
-        expect(controller.pages[0].id).toEqual(ExpectedPageID);
+        expect(controller.Pages[0].id).toEqual(ExpectedPageID);
     });
 
     it("Can delete pages", () => {
@@ -190,62 +194,62 @@ describe("Page grid controller", () => {
 
     it("Can select pages", () => {
         const ExpectedSelectedPageId = 5;
-        var click = getClick("", "", false);
-        var clickedPage = new Page(ExpectedSelectedPageId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [];
+        const click = getClick("", "", false);
+        const clickedPage = new Page(ExpectedSelectedPageId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(ExpectedSelectedPageId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(ExpectedSelectedPageId);
     });
 
     it("Click on option does not alter selection", () => {
-        var click = getClick("option", "", false);
-        var clickedPage = new Page(0, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [];
+        const click = getClick("option", "", false);
+        const clickedPage = new Page(0, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(0);
+        expect(controller.SelectedPages.length).toEqual(0);
     });
 
     it("Click changes selection", () => {
         const currentSelectedId = 5;
         const newSelectedId = 10;
-        var click = getClick("", "", false);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [currentSelectedId];
+        const click = getClick("", "", false);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(newSelectedId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
     });
 
     it("Click on option selector changes selection if only one item selected", () => {
         const currentSelectedId = 6;
         const newSelectedId = 11;
-        var click = getClick("", "ng-model", false);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [currentSelectedId];
+        const click = getClick("", "ng-model", false);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(newSelectedId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
     });
 
     it("Click on option selector does not change selection if clicked on selected", () => {
         const currentSelectedId = 6;
-        var click = getClick("", "ng-model", false);
-        var clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [currentSelectedId];
+        const click = getClick("", "ng-model", false);
+        const clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(currentSelectedId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(currentSelectedId);
     });
 
     it("Click on option selector adds to selection if more than one item selected", () => {
@@ -253,42 +257,42 @@ describe("Page grid controller", () => {
         const currentSelectedId2 = 8;
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 11;
-        var click = getClick("", "ng-model", false);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = currentSelection;
+        const click = getClick("", "ng-model", false);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach(selection => {
-            expect(controller.selectedPages).toContain(selection);
+        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
+        currentSelection.forEach((selection) => {
+            expect(controller.SelectedPages).toContain(selection);
         });
-        expect(controller.selectedPages).toContain(newSelectedId);
+        expect(controller.SelectedPages).toContain(newSelectedId);
     });
 
     it("Click on button changes selection if only one item selected", () => {
         const currentSelectedId = 9;
         const newSelectedId = 15;
-        var click = getClick("","ng-click", false);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [currentSelectedId];
+        const click = getClick("", "ng-click", false);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(newSelectedId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
     });
 
     it("Click on button does not change selection if clicked on item selected", () => {
         const currentSelectedId = 9;
-        var click = getClick("","ng-click", false);
-        var clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = [currentSelectedId];
+        const click = getClick("", "ng-click", false);
+        const clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(1);
-        expect(controller.selectedPages[0]).toEqual(currentSelectedId);
+        expect(controller.SelectedPages.length).toEqual(1);
+        expect(controller.SelectedPages[0]).toEqual(currentSelectedId);
     });
 
     it("Click on button adds to selection if more than one item selected", () => {
@@ -296,17 +300,17 @@ describe("Page grid controller", () => {
         const currentSelectedId2 = 11;
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 20;
-        var click = getClick("", "ng-click", false);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = currentSelection;
+        const click = getClick("", "ng-click", false);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach(selection => {
-            expect(controller.selectedPages).toContain(selection);
+        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
+        currentSelection.forEach((selection) => {
+            expect(controller.SelectedPages).toContain(selection);
         });
-       expect(controller.selectedPages).toContain(newSelectedId);
+        expect(controller.SelectedPages).toContain(newSelectedId);
     });
 
     it("Click and crtl key pressed adds new item to selection", () => {
@@ -314,34 +318,34 @@ describe("Page grid controller", () => {
         const currentSelectedId2 = 21;
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 30;
-        var click = getClick("", "", true);
-        var clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = currentSelection;
+        const click = getClick("", "", true);
+        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach(selection => {
-            expect(controller.selectedPages).toContain(selection);
+        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
+        currentSelection.forEach((selection) => {
+            expect(controller.SelectedPages).toContain(selection);
         });
-        expect(controller.selectedPages).toContain(newSelectedId);
+        expect(controller.SelectedPages).toContain(newSelectedId);
     });
 
     it("Click and crtl key pressed deletes item from selection if already selected", () => {
         const currentSelectedId = 20;
         const clickedPageId = 21;
         const currentSelection = [currentSelectedId, clickedPageId];
-        var click = getClick("", "", true);
-        var clickedPage = new Page(clickedPageId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.selectedPages = currentSelection;
+        const click = getClick("", "", true);
+        const clickedPage = new Page(clickedPageId, ExpectedDeviceId, "0", "0", "0", "0");
+        controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
 
-        expect(controller.selectedPages.length).toEqual(currentSelection.length - 1);
-        currentSelection.forEach(selection => {
-            if (selection !=clickedPageId ) {
-                expect(controller.selectedPages).toContain(selection);
-            }       
+        expect(controller.SelectedPages.length).toEqual(currentSelection.length - 1);
+        currentSelection.forEach((selection) => {
+            if (selection !== clickedPageId ) {
+                expect(controller.SelectedPages).toContain(selection);
+            }
         });
     });
 
@@ -351,7 +355,7 @@ describe("Page grid controller", () => {
 
         spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
 
         expect(dataServiceToMock.updatePageSize).toHaveBeenCalledWith([idToUpdate], newPageSize);
@@ -363,20 +367,20 @@ describe("Page grid controller", () => {
         const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, newPageSize.toString(), "0", "0", "0")];
         spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
-        
+
         executeUpdateAndReturnPages(pagesReported);
-        expect(controller.pages[0].pageSize).toEqual(newPageSize.toString());
+        expect(controller.Pages[0].pageSize).toEqual(newPageSize.toString());
     });
 
-     it("Can update print quality", () => {
+    it("Can update print quality", () => {
         const idToUpdate = 3;
         const newPrintQuality = 0;
 
         spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
 
         expect(dataServiceToMock.updatePrintQuality).toHaveBeenCalledWith([idToUpdate], newPrintQuality);
@@ -388,11 +392,11 @@ describe("Page grid controller", () => {
         const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", newPrintQuality.toString(), "0", "0")];
         spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
- 
+
         executeUpdateAndReturnPages(pagesReported);
-        expect(controller.pages[0].printQuality).toEqual(newPrintQuality.toString());
+        expect(controller.Pages[0].printQuality).toEqual(newPrintQuality.toString());
     });
 
     it("Can update media type", () => {
@@ -401,7 +405,7 @@ describe("Page grid controller", () => {
 
         spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updateMediaType(newMediaType);
 
         expect(dataServiceToMock.updateMediaType).toHaveBeenCalledWith([idToUpdate], newMediaType);
@@ -413,11 +417,11 @@ describe("Page grid controller", () => {
         const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", "0", newMediaType.toString(), "0")];
         spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updateMediaType(newMediaType);
- 
+
         executeUpdateAndReturnPages(pagesReported);
-        expect(controller.pages[0].mediaType).toEqual(newMediaType.toString());
+        expect(controller.Pages[0].mediaType).toEqual(newMediaType.toString());
     });
 
     it("Can update destination", () => {
@@ -426,7 +430,7 @@ describe("Page grid controller", () => {
 
         spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updateDestination(newDestination);
 
         expect(dataServiceToMock.updateDestination).toHaveBeenCalledWith([idToUpdate], newDestination);
@@ -438,10 +442,10 @@ describe("Page grid controller", () => {
         const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", "0", "0", newDestination.toString())];
         spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
 
-        controller.selectedPages = [idToUpdate];
+        controller.SelectedPages = [idToUpdate];
         controller.updateDestination(newDestination);
- 
+
         executeUpdateAndReturnPages(pagesReported);
-        expect(controller.pages[0].destination).toEqual(newDestination.toString());
+        expect(controller.Pages[0].destination).toEqual(newDestination.toString());
     });
 });

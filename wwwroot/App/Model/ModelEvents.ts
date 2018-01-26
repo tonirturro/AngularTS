@@ -1,4 +1,4 @@
 /**
  * Definitions for the model update events
  */
-export enum ModelUpdate { Devices };
+export enum ModelUpdate { Devices }

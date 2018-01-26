@@ -1,24 +1,25 @@
 /*
 * Styles loader
 */
-
-import "../styles/app.css";
 import "bootstrap/dist/css/bootstrap.css";
+import "../styles/app.css";
 
 /*
 ** Angular loader
 */
 
 import * as angular from "angular";
-import { DataService } from "./Services/DataService";
-import { AppService } from "./Services/AppService";
-import { ToolBar } from "./Components/toolBar/toolbar.component";
+import "./templates";
+
 import { DevicePanel } from "./Components/devicePanel/device-panel.component";
-import { PageGrid } from "./Components/pageGrid/page-grid.component";
 import { MainPage } from "./Components/main-page.component";
+import { PageGrid } from "./Components/pageGrid/page-grid.component";
+import { ToolBar } from "./Components/toolBar/toolbar.component";
+import { AppService } from "./Services/AppService";
+import { DataService } from "./Services/DataService";
 
 export let app = angular
-    .module('myApp', [])
+    .module("myApp", ["templates"])
     .service("dataService", DataService)
     .service("appService", AppService)
     .component("toolbar", new ToolBar())

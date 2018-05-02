@@ -1,28 +1,28 @@
-﻿import * as express from "express";
-import * as bodyParser from "body-parser";
-import path = require('path');
+﻿import * as bodyParser from "body-parser";
+import * as express from "express";
+import path = require("path");
 
-import routes from './Routes/index';
-import { RestRouter } from './Routes/REST';
 import { Data } from "./Repository/Data";
+import routes from "./Routes/index";
+import { RestRouter } from "./Routes/REST";
 
-var app = express();
+const app = express();
 
 const root = "dist";
 
 // Resolve dependencies
-var data = new Data();
-var restApi = new RestRouter(data).router;
+const data = new Data();
+const restApi = new RestRouter(data).Router;
 
 // Initialize app
 app.use(express.static(path.resolve(root)));
 app.use(bodyParser.json());
 
-app.use('/', routes);
-app.use('/REST', restApi);
+app.use("/", routes);
+app.use("/REST", restApi);
 
-export = { 
-    application: app, 
-    dependencies : { 
-        dataLayer :data 
+export const main = {
+    application: app,
+    dependencies : {
+        dataLayer : data
     } };

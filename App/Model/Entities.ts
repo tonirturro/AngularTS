@@ -1,10 +1,10 @@
-﻿import { Page } from "./Page";
-import { Device } from "./Device";
+﻿import { Device } from "./Device";
+import { Page } from "./Page";
 
 /**
  * ORM definition
  */
 export class Entities {
-    devices: Device[];
-    pages: Page[];
+    public devices: Device[];
+    public pages: Page[];
 }

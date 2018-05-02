@@ -1,6 +1,6 @@
-﻿import { Entities } from "../Model/Entities";
+﻿import { Device } from "../Model/Device";
+import { Entities } from "../Model/Entities";
 import { Page } from "../Model/Page";
-import { Device } from "../Model/Device";
 
 /**
  * Class definition for the repository
@@ -8,71 +8,70 @@ import { Device } from "../Model/Device";
 export class Data {
 
     // Track page index
-    private _lastPageIndex;
+    private lastPageIndex;
 
     // Track device index
-    private _lastDeviceIndex;
+    private lastDeviceIndex;
 
     // Reference to the data entities from this repository.
-    private _entities: Entities;
+    private entities: Entities;
 
     /**
      * Initializes a new instance of the Data class
      */
     constructor() {
-        this._entities = new Entities();
-        this._entities.pages = [];
-        this._entities.devices = [];
-        this._lastPageIndex = 0;
-        this._lastDeviceIndex = 0;
+        this.entities = new Entities();
+        this.entities.pages = [];
+        this.entities.devices = [];
+        this.lastPageIndex = 0;
+        this.lastDeviceIndex = 0;
     }
 
     /**
      * Gets the available pages
      */
-    getPages(): Page[] {
-        return this._entities.pages;
+    public getPages(): Page[] {
+        return this.entities.pages;
     }
 
     /**
      * Gets the available devices
      */
-    getDevices(): Device[] {
-        return this._entities.devices;
+    public getDevices(): Device[] {
+        return this.entities.devices;
     }
 
     /**
      * Adds new page
      */
-    newPage(deviceId:number): void {
-        this._entities.pages.push(new Page(this._lastPageIndex++, deviceId, 0, 0, 0, 0));
+    public newPage(deviceId: number): void {
+        this.entities.pages.push(new Page(this.lastPageIndex++, deviceId, 0, 0, 0, 0));
     }
 
     /**
      * Adds a new device
      */
-    newDevice(): void {
-        var deviceId = this._lastDeviceIndex++;
-        this._entities.devices.push(new Device(deviceId, `Device ${this._lastDeviceIndex}`));
+    public newDevice(): void {
+        const deviceId = this.lastDeviceIndex++;
+        this.entities.devices.push(new Device(deviceId, `Device ${this.lastDeviceIndex}`));
     }
 
     /**
      * Deletes an existing page
      * @param idToDelete is the id for the page to be deleted.
      */
-    deletePage(idToDelete: number): boolean {
-        var indexToDelete = -1;
+    public deletePage(idToDelete: number): boolean {
+        let indexToDelete = -1;
 
-        for (var i = 0; i < this._entities.pages.length; i++) {
-            if (this._entities.pages[i].id == idToDelete)
-            {
+        for (let i = 0; i < this.entities.pages.length; i++) {
+            if (this.entities.pages[i].id === idToDelete) {
                 indexToDelete = i;
                 break;
             }
         }
 
         if (indexToDelete >= 0) {
-            this._entities.pages.splice(indexToDelete, 1);
+            this.entities.pages.splice(indexToDelete, 1);
             return true;
         } else {
             return false;
@@ -83,12 +82,11 @@ export class Data {
      * Deletes an existing device
      * @param idToDelete is the id for the device to be deleted.
      */
-    deleteDevice(idToDelete: number): boolean {
-        var indexToDelete = -1;
-        
-        for (var i = 0; i < this._entities.devices.length; i++) {
-            if (this._entities.devices[i].id === idToDelete)
-            {
+    public deleteDevice(idToDelete: number): boolean {
+        let indexToDelete = -1;
+
+        for (let i = 0; i < this.entities.devices.length; i++) {
+            if (this.entities.devices[i].id === idToDelete) {
                 indexToDelete = i;
                 break;
             }
@@ -96,18 +94,18 @@ export class Data {
 
         if (indexToDelete >= 0) {
             // Delete the pages
-            var originalPages = this._entities.pages.slice();
-            originalPages.forEach(page => {
+            const originalPages = this.entities.pages.slice();
+            originalPages.forEach((page) => {
                 if (page.deviceId === idToDelete) {
                     this.deletePage(page.id);
                 }
             });
             // Delete the device
-            this._entities.devices.splice(indexToDelete, 1);
+            this.entities.devices.splice(indexToDelete, 1);
             return true;
         } else {
             return false;
-        }                
+        }
     }
 
     /**
@@ -115,10 +113,10 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new page size value
      */
-    updatePageSize(pageId: number, newValue: number):boolean {
-        var pageToUpdate = this.getPage(pageId);
+    public updatePageSize(pageId: number, newValue: number): boolean {
+        const pageToUpdate = this.getPage(pageId);
 
-        if (pageToUpdate!= null) {
+        if (pageToUpdate != null) {
             pageToUpdate.pageSize = newValue;
             return true;
         }
@@ -131,14 +129,14 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new print quality value
      */
-    updatePrintQuality(pageId: number, newValue: number):boolean {
-        var pageToUpdate = this.getPage(pageId);
+    public updatePrintQuality(pageId: number, newValue: number): boolean {
+        const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
             pageToUpdate.printQuality = newValue;
             return true;
         }
-            
+
         return false;
     }
 
@@ -147,15 +145,15 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new media type value
      */
-    updateMediaType(pageId: number, newValue: number):boolean {
-        var pageToUpdate = this.getPage(pageId);
+    public updateMediaType(pageId: number, newValue: number): boolean {
+        const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
             pageToUpdate.mediaType = newValue;
             return true;
-        }       
-        
-        return false;       
+        }
+
+        return false;
     }
 
     /**
@@ -163,15 +161,15 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new destination value
      */
-    updateDestination(pageId: number, newValue: number):boolean {
-        var pageToUpdate = this.getPage(pageId);
+    public updateDestination(pageId: number, newValue: number): boolean {
+        const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
             pageToUpdate.destination = newValue;
             return true;
-        }       
-        
-        return false;       
+        }
+
+        return false;
     }
 
     /**
@@ -179,12 +177,12 @@ export class Data {
      * @param pageId is the id for the page to be found
      */
     private getPage(pageId: number): Page {
-        let pageFound:Page = null;
-        this._entities.pages.forEach(page => {
+        let pageFound: Page = null;
+        this.entities.pages.forEach((page) => {
             if (page.id === pageId) {
                  pageFound = page;
             }
-        })
+        });
 
         return pageFound;
     }

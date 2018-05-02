@@ -1,10 +1,10 @@
 /*
 ** Defines the Device entity
-*/ 
+*/
 
 export class Device {
-    id: number;
-    name: string;
+    public id: number;
+    public name: string;
 
     // Constructor
     constructor(id: number, name: string) {

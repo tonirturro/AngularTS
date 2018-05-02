@@ -9,19 +9,18 @@ class IndexRouter {
     private readonly root = "dist";
     private readonly defaultAnswer = "index.htm";
 
-    private _router: express.Router;
+    private router: express.Router;
 
     constructor() {
-        this._router = express.Router();
-        this._router.get('/', (req: express.Request, res: express.Response) => {
+        this.router = express.Router();
+        this.router.get("/", (req: express.Request, res: express.Response) => {
             res.sendFile(path.join(path.resolve(this.root), this.defaultAnswer));
         });
     }
 
-    get router(): express.Router {
-        return this._router;
+    get Router(): express.Router {
+        return this.router;
     }
 }
 
-
-export default new IndexRouter().router;
+export default new IndexRouter().Router;

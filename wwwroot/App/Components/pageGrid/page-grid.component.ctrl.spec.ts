@@ -1,5 +1,4 @@
 import * as angular from "angular";
-import "angular-mocks";
 
 import { PageGridController } from "./page-grid.component.ctrl";
 
@@ -84,8 +83,9 @@ describe("Page grid controller", () => {
             deepPath: null,
             AT_TARGET: null,
             BUBBLING_PHASE: null,
-            CAPTURING_PHASE: null
-        };
+            CAPTURING_PHASE: null,
+            NONE: 0
+        } as MouseEvent;
 
         click.srcElement.id = srcElementId;
         if (attribute.length > 0) {

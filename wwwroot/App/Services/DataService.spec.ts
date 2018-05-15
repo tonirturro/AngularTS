@@ -1,5 +1,4 @@
 import * as angular from "angular";
-import "angular-mocks";
 import { DataService } from "./DataService";
 
 describe("Data Service Test", () => {

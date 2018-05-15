@@ -1,5 +1,4 @@
 import * as angular from "angular";
-import "angular-mocks";
 import { ToolBarController } from "./toolbar.component.ctrl";
 
 import { ModelUpdate } from "../../Model/ModelEvents";

@@ -1,5 +1,4 @@
 import * as angular from "angular";
-import "angular-mocks";
 import { DevicePanelController } from "./device-panel.component.ctrl";
 
 import { AppService } from "../../Services/AppService";

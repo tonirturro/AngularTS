@@ -2,7 +2,7 @@
 ** Basic startup
 */
 
-var app = require('./App/app').main;
+var app = require('./app').main;
 var open = require('open');
 
 app.application.set('port', process.env.PORT || 3000);

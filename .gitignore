@@ -4,17 +4,17 @@
 #node stuff
 node_modules/
 
-#ts output
-App/**/*.js
-wwwroot/App/**/*.js
-App/**/*.js.map
-wwwroot/App/**/*.js.map
-
 #npm stuff
 npm-debug.log
 
 #karma coverage
 coverage/
 
-#webpack stuff
+#app dist stuff
 dist/bundle/*.*
+
+#server dist stuff
+server/**/*.*
+
+#templates
+wwwroot/App/templates.js

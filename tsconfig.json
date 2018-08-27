@@ -3,15 +3,8 @@
     "noImplicitAny": false,
     "module": "commonjs",
     "noEmitOnError": true,
-    "removeComments": false,
+    "removeComments": true,
     "sourceMap": true,
-    "lib": [
-      "dom",
-      "es2015"
-    ],
-    "target": "es5"
-  },
-  "include": [
-    "App/**/*.ts"
-  ]
+    "target": "es2015"
+  }
 }

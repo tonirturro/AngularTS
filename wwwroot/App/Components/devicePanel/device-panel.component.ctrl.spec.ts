@@ -4,7 +4,6 @@ import { DevicePanelController } from "./device-panel.component.ctrl";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
-import { Device } from "../../Model/Device";
 import { ModelUpdate } from "../../Model/ModelEvents";
 
 describe("Device panel controller", () => {

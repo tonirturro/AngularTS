@@ -1,5 +1,4 @@
 import * as angular from "angular";
-
 import { PageGridController } from "./page-grid.component.ctrl";
 
 import { AppService } from "../../Services/AppService";

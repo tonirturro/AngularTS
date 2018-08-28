@@ -1,8 +1,6 @@
 import * as angular from "angular";
-import { ToolBarController } from "./toolbar.component.ctrl";
-
-import { ModelUpdate } from "../../Model/ModelEvents";
 import { DataService } from "../../Services/DataService";
+import { ToolBarController } from "./toolbar.component.ctrl";
 
 describe("Toolbar controller", () => {
     let controller: ToolBarController;

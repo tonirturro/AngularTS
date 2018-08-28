@@ -1,10 +1,9 @@
-import * as angular from "angular";
-
 import { Device } from "../../Model/Device";
 import { ModelUpdate } from "../../Model/ModelEvents";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
+import { ILogService, IRootScopeService } from "angular";
 import { DeviceDisplay } from "./DeviceDisplay";
 
 /**
@@ -28,8 +27,8 @@ export class DevicePanelController {
      * @param dataService the data service for this application
      */
     constructor(
-        private logService: angular.ILogService,
-        private rootScopeService: angular.IRootScopeService,
+        private logService: ILogService,
+        private rootScopeService: IRootScopeService,
         private appService: AppService,
         private dataService: DataService) {
             this.loadDevices();

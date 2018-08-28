@@ -7,8 +7,8 @@
     "build": "gulp buildAll",
     "build:frontend": "gulp frontend",
     "build:backend": "gulp backend",
-    "test": "mocha --reporter progress App/**/*.test.js",
-    "ui:watch": "karma start"
+    "test": "gulp test-backend",
+    "ui:watch": "gulp test-frontend"
   },
   "description": "Angular TS spike",
   "author": {
@@ -39,6 +39,7 @@
     "file-loader": "^1.1.5",
     "gulp": "^3.9.1",
     "gulp-angular-templatecache": "^2.2.0",
+    "gulp-mocha": "^6.0.0",
     "gulp-tslint": "^8.1.2",
     "gulp-typescript": "^5.0.0-alpha.3",
     "html-loader": "^0.5.1",

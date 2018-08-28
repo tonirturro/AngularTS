@@ -1,4 +1,3 @@
-import * as angular from "angular";
 import { Page } from "../../Model/Page";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
@@ -11,7 +10,7 @@ export class PageGridController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$log", "appService", "dataService"];
+    public static $inject = ["appService", "dataService"];
 
     // The pages displayed at the grid
     private pages: Page[];
@@ -26,7 +25,6 @@ export class PageGridController {
      * @param dataService the connection to the backend service
      */
     constructor(
-        private logService: angular.ILogService,
         private appService: AppService,
         private dataService: DataService) {
         this.pages = [];

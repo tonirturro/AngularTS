@@ -1,5 +1,4 @@
-import * as angular from "angular";
-
+import { ILogService, IRootScopeService } from "angular";
 import { ModelUpdate } from "../../Model/ModelEvents";
 import { DataService } from "../../Services/DataService";
 
@@ -20,8 +19,8 @@ export class ToolBarController {
      * @param dataService the data service for this application
      */
     constructor(
-        private logService: angular.ILogService,
-        private rootScopeService: angular.IRootScopeService,
+        private logService: ILogService,
+        private rootScopeService: IRootScopeService,
         private dataService: DataService) {}
 
     /**

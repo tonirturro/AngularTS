@@ -1,7 +1,6 @@
-import * as angular from "angular";
-
 import { UpdateParams } from "./UpdateParams";
 
+import { IHttpService, ILogService, IQService } from "angular";
 import { Device } from "../Model/Device";
 import { Page } from "../Model/Page";
 
@@ -25,9 +24,9 @@ export class DataService {
      * @param $q is the Angular promise services.
      */
     constructor(
-        private $http: angular.IHttpService,
-        private $log: angular.ILogService,
-        private $q: angular.IQService) {
+        private $http: IHttpService,
+        private $log: ILogService,
+        private $q: IQService) {
     }
 
     /**

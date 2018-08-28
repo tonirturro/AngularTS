@@ -6,6 +6,8 @@ const ts = require('gulp-typescript');
 const del = require('del');
 const runSequence = require('run-sequence');
 const webpack = require('webpack-stream');
+const mocha = require('gulp-mocha');
+const KarmaServer = require('karma').Server;
 
 const tsconfig = require('./tsconfig.json');
 const webpackConfig = require('./webpack.config');
@@ -78,3 +80,19 @@ gulp.task('backend', (done) => {
  gulp.task('buildAll', (done) => {
    runSequence(['frontend', 'backend'], () => done());
  });
+ 
+ /**
+  * test
+  */
+
+  gulp.task('test-backend', ['backend'], () => {
+    return 	gulp.src('server/**/*.test.js', {read: false})
+		// `gulp-mocha` needs filepaths so you can't have any plugins before it
+		.pipe(mocha({reporter: 'progress'}))
+  });
+
+  gulp.task('test-frontend', ['views'], (done) => {
+    new KarmaServer({
+      configFile: path.resolve(__dirname, 'karma.conf.js')
+    }, done).start();
+  });

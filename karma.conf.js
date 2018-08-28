@@ -1,5 +1,11 @@
 // Karma configuration
 // Generated on Tue Mar 21 2017 21:29:48 GMT+0100 (Romance Standard Time)
+const path = require('path');
+const webpackConfig = require('./webpack.config');
+webpackConfig.resolve.alias = {
+    'angular': path.resolve(path.join(__dirname, 'node_modules', 'angular'))
+};
+
 
 module.exports = function (config) {
     config.set({
@@ -11,10 +17,8 @@ module.exports = function (config) {
         files: [
             // application
             "wwwroot/App/Boot.ts",
-
             // 3rd-party resources
-            "node_modules/angular-mocks/angular-mocks.js",
-
+            'node_modules/angular-mocks/angular-mocks.js',
             // test files
             "wwwroot/App/**/*.spec.ts"
         ],
@@ -23,36 +27,7 @@ module.exports = function (config) {
             "wwwroot/App/**/*.ts": ["webpack"]
         },
 
-        webpack: {
-            mode: 'development',
-            module: {
-                rules: [
-                    {
-                        test: /\.htm$/,
-                        use: ["html-loader"]
-                    },
-                    {
-                        test: /\.css$/,
-                        use: [
-                            'style-loader',
-                            'css-loader'
-                        ]
-                    },
-                    {
-                        test: /\.(eot|ttf|woff|woff2|svg)$/,
-                        use: 'file-loader'
-                    },
-                    {
-                        test: /\.ts$/,
-                        use: 'ts-loader',
-                        exclude: /node_modules/
-                    }
-                ]
-            },
-            resolve: {
-                extensions: ['.js', '.ts']
-            }        
-        },
+        webpack: webpackConfig,
 
         // test results reporter to use
         // possible values: 'dots', 'progress'

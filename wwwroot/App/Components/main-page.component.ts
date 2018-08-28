@@ -1,9 +1,9 @@
-import * as angular from "angular";
+import { IComponentOptions } from "angular";
 
 /**
  * Wraps the components into the Single Page Application
  */
-export class MainPage implements angular.IComponentOptions {
+export class MainPage implements IComponentOptions {
     public templateUrl: string;
 
     constructor() {

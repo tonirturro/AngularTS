@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server/server.js",
+    "develop": "gulp watch-frontend",
     "build": "gulp buildAll",
     "build:frontend": "gulp frontend",
     "build:backend": "gulp backend",

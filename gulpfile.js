@@ -96,3 +96,16 @@ gulp.task('backend', (done) => {
       configFile: path.resolve(__dirname, 'karma.conf.js')
     }, done).start();
   });
+
+  /**
+   * Develop
+   */
+   gulp.task('watch-frontend', () => {
+      webpackConfig.watch = true;
+      webpackConfig.watchOptions = {
+        ignored: [ 'node_modules' ],
+        aggregateTimeout: 500
+      };
+      gulp.watch('wwwroot/App/Components/**/*.htm', ['views']);
+      runSequence(['clean-frontend', 'tslint'], 'views', 'angular-app', () => {});
+   });

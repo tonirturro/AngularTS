@@ -10,17 +10,14 @@ const mocha = require('gulp-mocha');
 const KarmaServer = require('karma').Server;
 
 const tsconfig = require('./tsconfig.json');
-const webpackConfig = require('./webpack.config');
+const webpackConfigDev = require('./webpack.config.dev');
+const webpackConfigProd = require('./webpack.config.prod');
 const serverOutput =  path.resolve(__dirname, 'server');
 const appOutput = path.resolve(__dirname, 'dist/bundle')
 
 /**
  * Front end
  */
-
-webpackConfig.output = { 
-  filename: 'bundle.js' 
-};
 
 gulp.task('clean-frontend', () => del(appOutput));
 
@@ -32,9 +29,15 @@ gulp.task('views', function() {
     .pipe(gulp.dest('./wwwroot/App'));
 });
 
-gulp.task('angular-app', () => {
+gulp.task('angular-app-prod', () => {
   return gulp.src('wwwroot/App/Boot.ts')
-    .pipe(webpack(webpackConfig))
+    .pipe(webpack(webpackConfigProd))
+    .pipe(gulp.dest(appOutput));
+});
+
+gulp.task('angular-app-dev', () => {
+  return gulp.src('wwwroot/App/Boot.ts')
+    .pipe(webpack(webpackConfigDev))
     .pipe(gulp.dest(appOutput));
 });
 
@@ -49,7 +52,11 @@ gulp.task('tslint',  () => {
 });
 
 gulp.task('frontend', (done) => {
-  runSequence(['clean-frontend', 'tslint'], 'views', 'angular-app', () => done());
+  let buildAppTask = 'angular-app-prod';
+  if (process.argv.length > 3 && process.argv[3] === "--dev") {
+    buildAppTask = 'angular-app-dev';
+  }
+  runSequence(['clean-frontend', 'tslint'], 'views', buildAppTask, () => done());
 });
 
 /**
@@ -101,11 +108,11 @@ gulp.task('backend', (done) => {
    * Develop
    */
    gulp.task('watch-frontend', () => {
-      webpackConfig.watch = true;
-      webpackConfig.watchOptions = {
+      webpackConfigDev.watch = true;
+      webpackConfigDev.watchOptions = {
         ignored: [ 'node_modules' ],
         aggregateTimeout: 500
       };
       gulp.watch('wwwroot/App/Components/**/*.htm', ['views']);
-      runSequence(['clean-frontend', 'tslint'], 'views', 'angular-app', () => {});
+      runSequence(['clean-frontend', 'tslint'], 'views', 'angular-app-dev', () => {});
    });

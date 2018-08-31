@@ -1,5 +1,7 @@
 module.exports = {
-    mode: 'development',
+    output: { 
+        filename: 'bundle.js' 
+    },
     module: {
         rules: [
             {
@@ -26,6 +28,5 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.ts']
-    },
-    devtool: 'inline-source-map'
+    }
 }

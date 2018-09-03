@@ -34,7 +34,7 @@ export class DevicePanelController {
             this.loadDevices();
 
             // Capture model events
-            this.rootScopeService.$on(ModelUpdate.Devices.toString(), () => {
+            this.rootScopeService.$on(ModelUpdate.Devices, () => {
                 this.loadDevices();
             });
         }

@@ -11,7 +11,7 @@ npm-debug.log
 coverage/
 
 #app dist stuff
-dist/bundle/*.*
+dist/
 
 #server dist stuff
 server/**/*.*

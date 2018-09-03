@@ -13,7 +13,7 @@ const tsconfig = require('./tsconfig.json');
 const webpackConfigDev = require('./webpack.config.dev');
 const webpackConfigProd = require('./webpack.config.prod');
 const serverOutput =  path.resolve(__dirname, 'server');
-const appOutput = path.resolve(__dirname, 'dist/bundle')
+const appOutput = path.resolve(__dirname, 'dist')
 
 /**
  * Front end
@@ -27,6 +27,16 @@ gulp.task('views', function() {
       standalone: true
     }))
     .pipe(gulp.dest('./wwwroot/App'));
+});
+
+gulp.task('index', function() {
+  return gulp.src('wwwroot/index.htm')
+    .pipe(gulp.dest(appOutput));
+});
+
+gulp.task('icon', function() {
+  return gulp.src('wwwroot/favicon.ico')
+    .pipe(gulp.dest(appOutput));
 });
 
 gulp.task('angular-app-prod', () => {
@@ -56,7 +66,7 @@ gulp.task('frontend', (done) => {
   if (process.argv.length > 3 && process.argv[3] === "--dev") {
     buildAppTask = 'angular-app-dev';
   }
-  runSequence(['clean-frontend', 'tslint'], 'views', buildAppTask, () => done());
+  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views'], buildAppTask, () => done());
 });
 
 /**

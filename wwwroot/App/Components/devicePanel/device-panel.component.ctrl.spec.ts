@@ -1,4 +1,6 @@
 import * as angular from "angular";
+import { IDeferred, IPromise, IQService, IRootScopeService } from "angular";
+
 import { DevicePanelController } from "./device-panel.component.ctrl";
 
 import { AppService } from "../../Services/AppService";
@@ -15,8 +17,8 @@ describe("Device panel controller", () => {
     let controller: DevicePanelController;
     let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
-    let promiseService: angular.IQService;
-    let rootScopeService: angular.IRootScopeService;
+    let promiseService: IQService;
+    let rootScopeService: IRootScopeService;
 
     /**
      * Initialize the test environment
@@ -49,8 +51,8 @@ describe("Device panel controller", () => {
     });
 
     it("Delete selected device changes selection", () => {
-        const defer: angular.IDeferred<boolean> = promiseService.defer();
-        const promise: angular.IPromise<boolean> = defer.promise;
+        const defer: IDeferred<boolean> = promiseService.defer();
+        const promise: IPromise<boolean> = defer.promise;
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(promise);
         appServiceToMock.SelectedDeviceId = SelectedDeviceId;
 
@@ -74,7 +76,7 @@ describe("Device panel controller", () => {
     });
 
     it("Model update for devices updates devices list", () => {
-        rootScopeService.$broadcast(ModelUpdate.Devices.toString());
+        rootScopeService.$broadcast(ModelUpdate.Devices);
 
         expect(dataServiceToMock.getDevices).toHaveBeenCalledTimes(2);
     });

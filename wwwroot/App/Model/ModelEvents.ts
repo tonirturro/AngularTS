@@ -1,4 +1,6 @@
 /**
  * Definitions for the model update events
  */
-export enum ModelUpdate { Devices }
+export const ModelUpdate = {
+  Devices: "Devices"
+};

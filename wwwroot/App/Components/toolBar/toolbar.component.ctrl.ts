@@ -29,7 +29,7 @@ export class ToolBarController {
     public addDevice(): void {
         this.dataService.addNewDevice().then((success) => {
             if (success) {
-                this.rootScopeService.$broadcast(ModelUpdate.Devices.toString());
+                this.rootScopeService.$broadcast(ModelUpdate.Devices);
                 this.logService.log("New device added sucessfully");
             } else {
                 this.logService.log("Failed to add new device");

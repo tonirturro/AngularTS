@@ -6,7 +6,6 @@ webpackConfig.resolve.alias = {
     'angular': path.resolve(path.join(__dirname, 'node_modules', 'angular'))
 };
 
-
 module.exports = function (config) {
     config.set({
 

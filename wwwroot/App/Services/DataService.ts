@@ -10,6 +10,11 @@ import { Page } from "../Model/Page";
 export class DataService {
 
     /**
+     * Define dependencies
+     */
+    public static $inject =  ["$http", "$log", "$q"];
+
+    /**
      * Field tags
      */
     public readonly PageSizeField = "pageSize";

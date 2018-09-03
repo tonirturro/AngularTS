@@ -22,10 +22,10 @@ export let app = angular
     .module("myApp", ["templates"])
     .service("dataService", DataService)
     .service("appService", AppService)
-    .component("toolbar", new ToolBar())
-    .component("devicePanel", new DevicePanel())
-    .component("pageGrid", new PageGrid())
-    .component("mainPage", new MainPage());
+    .component("toolbar", ToolBar)
+    .component("devicePanel", DevicePanel)
+    .component("pageGrid", PageGrid)
+    .component("mainPage", MainPage);
 
 angular.element(document).ready(() => {
     angular.bootstrap(document.body, [app.name]);

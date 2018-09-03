@@ -1,4 +1,5 @@
 import * as angular from "angular";
+import { IDeferred, IQService, IRootScopeService } from "angular";
 import { PageGridController } from "./page-grid.component.ctrl";
 
 import { AppService } from "../../Services/AppService";
@@ -19,10 +20,10 @@ describe("Page grid controller", () => {
     let controller: PageGridController;
     let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
-    let promiseService: angular.IQService;
-    let deferredGetPages: angular.IDeferred<Page[]>;
-    let deferredUpdate: angular.IDeferred<boolean>;
-    let rootScopeService: angular.IRootScopeService;
+    let promiseService: IQService;
+    let deferredGetPages: IDeferred<Page[]>;
+    let deferredUpdate: IDeferred<boolean>;
+    let rootScopeService: IRootScopeService;
 
     /**
      * Simulates a mouse click

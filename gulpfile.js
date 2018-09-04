@@ -30,13 +30,11 @@ gulp.task('views', function() {
 });
 
 gulp.task('index', function() {
-  return gulp.src('wwwroot/index.htm')
-    .pipe(gulp.dest(appOutput));
+  return gulp.src('wwwroot/index.htm').pipe(gulp.dest(appOutput));
 });
 
 gulp.task('icon', function() {
-  return gulp.src('wwwroot/favicon.ico')
-    .pipe(gulp.dest(appOutput));
+  return gulp.src('wwwroot/favicon.ico').pipe(gulp.dest(appOutput));
 });
 
 gulp.task('angular-app-prod', () => {
@@ -66,7 +64,7 @@ gulp.task('frontend', (done) => {
   if (process.argv.length > 3 && process.argv[3] === "--dev") {
     buildAppTask = 'angular-app-dev';
   }
-  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views'], buildAppTask, () => done());
+  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views', 'electron-launch-files'], buildAppTask, () => done());
 });
 
 /**
@@ -88,7 +86,15 @@ gulp.task('server-clean', () => del(serverOutput));
 
 gulp.task('backend', (done) => {
   runSequence('server-clean', ['server-main', 'server-modules'], () => done());
-})
+});
+
+/**
+ * Electron
+ */
+
+ gulp.task('electron-launch-files', () => {
+    return gulp.src('electron-launch/*.*').pipe(gulp.dest(appOutput));
+ });
 
 /**
  * All

@@ -23,6 +23,11 @@ export class DataService {
     public readonly DestinationField = "destination";
 
     /**
+     * Internal constants
+     */
+    private readonly REST_URL = "http://localhost:3000/REST";
+
+    /**
      * Initializes a new instance of the DataService class.
      * @param $http is the Angular http service.
      * @param $log is the Angular log services.
@@ -48,7 +53,7 @@ export class DataService {
                 pageSize: number,
                 printQuality: number,
                 mediaType: number,
-                destination: number}]>("REST/pages").then((response) => {
+                destination: number}]>(this.getUrl("pages")).then((response) => {
             let pages: Page[];
 
             pages = [];
@@ -67,7 +72,7 @@ export class DataService {
             deferred.resolve(pages);
         },
         (errors) => {
-            this.$log.error("Failure to get REST/pages");
+            this.$log.error(`Failure to get ${this.getUrl("pages")}`);
             deferred.reject(errors.data);
         });
 
@@ -81,11 +86,11 @@ export class DataService {
 
         const deferred: angular.IDeferred<Device[]> = this.$q.defer();
 
-        this.$http.get<[Device]>("REST/devices").then((response) => {
+        this.$http.get<[Device]>(this.getUrl("devices")).then((response) => {
             deferred.resolve(response.data);
         },
         (errors) => {
-            this.$log.error("Failure to get REST/devices");
+            this.$log.error(`Failure to get ${this.getUrl("devices")}`);
             deferred.reject(errors.data);
         });
 
@@ -98,11 +103,11 @@ export class DataService {
     public addNewPage(deviceId: number): angular.IPromise<boolean> {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
 
-        this.$http.post<{ success: boolean }>(`REST/pages/${deviceId}`, {}).then((response) => {
+        this.$http.post<{ success: boolean }>(`${this.getUrl("pages")}${deviceId}`, {}).then((response) => {
             deferred.resolve(response.data.success);
         },
         (errors) => {
-            this.$log.error("Failure to put REST/pages");
+            this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
             deferred.reject(errors.data);
         });
 
@@ -115,11 +120,11 @@ export class DataService {
     public addNewDevice(): angular.IPromise<boolean> {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
 
-        this.$http.put<{ success: boolean }>("REST/devices", {}).then((response) => {
+        this.$http.put<{ success: boolean }>(this.getUrl("devices"), {}).then((response) => {
             deferred.resolve(response.data.success);
         },
         (errors) => {
-            this.$log.error("Failure to put REST/devices");
+            this.$log.error(`Failure to put ${this.getUrl("devices")}`);
             deferred.reject(errors.data);
         });
 
@@ -133,13 +138,14 @@ export class DataService {
     public deletePage(idToDelete: number): angular.IPromise<boolean> {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
 
-        this.$http.delete<{ deletedPageId: number, success: boolean }>(`REST/pages/${idToDelete}`).then((response) => {
-            deferred.resolve(response.data.success && response.data.deletedPageId === idToDelete);
-        },
-        (errors) => {
-            this.$log.error(`Failure to delete REST/pages/${idToDelete}`);
-            deferred.reject(errors.data);
-        });
+        this.$http.delete<{ deletedPageId: number, success: boolean }>(`${this.getUrl("pages")}${idToDelete}`)
+            .then((response) => {
+                deferred.resolve(response.data.success && response.data.deletedPageId === idToDelete);
+            },
+            (errors) => {
+                this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -154,11 +160,11 @@ export class DataService {
         this
             .$http.delete<{
                 deletedDeviceId: number,
-                success: boolean }>(`REST/devices/${idToDelete}`).then((response) => {
+                success: boolean }>(`${this.getUrl("devices")}${idToDelete}`).then((response) => {
             deferred.resolve(response.data.success && response.data.deletedDeviceId === idToDelete);
         },
         (errors) => {
-            this.$log.error(`Failure to delete REST/devices/${idToDelete}`);
+            this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
             deferred.reject(errors.data);
         });
 
@@ -209,14 +215,23 @@ export class DataService {
     private performUpdate(field: string, params: UpdateParams): angular.IPromise<boolean> {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
 
-        this.$http.put<{ success: boolean }>(`REST/pages/${field}`, JSON.stringify(params)).then((response) => {
-            deferred.resolve(response.data.success);
-        },
-        (errors) => {
-            this.$log.error(`Failure to put REST/pages/${field}`);
-            deferred.reject(errors.data);
-        });
+        this.$http.put<{ success: boolean }>(`${this.getUrl("pages")}${field}`, JSON.stringify(params))
+            .then((response) => {
+                deferred.resolve(response.data.success);
+            },
+            (errors) => {
+                this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
+    }
+
+    /**
+     * Composes the url for an api
+     * @param the api to be composed
+     */
+    private getUrl(api: string): string {
+        return `${this.REST_URL}/${api}/`;
     }
 }

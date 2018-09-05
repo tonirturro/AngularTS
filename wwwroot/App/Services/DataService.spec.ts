@@ -2,6 +2,9 @@ import * as angular from "angular";
 import { DataService } from "./DataService";
 
 describe("Data Service Test", () => {
+        const restUrl = "http://localhost:3000/REST";
+        const pagesUrl = `${restUrl}/pages/`;
+        const devicesUrl = `${restUrl}/devices/`;
 
         /**
          * Data driven test case for the updates
@@ -11,7 +14,7 @@ describe("Data Service Test", () => {
          * @param done is the Mocha completion callback
          */
         const executeAndVerifyUpdate = (field: string, pageId: number, newValue: number, done: () => void) => {
-            httpBackend.whenPUT(`REST/pages/${field}`).respond(200, { success: true });
+            httpBackend.whenPUT(`${pagesUrl}${field}`).respond(200, { success: true });
 
             switch (field) {
                 case service.PageSizeField:
@@ -71,7 +74,7 @@ describe("Data Service Test", () => {
           * Pages
           ************************************************************************/
         it("Reads Pages", (done) => {
-                httpBackend.whenGET("REST/pages")
+                httpBackend.whenGET(pagesUrl)
                     .respond(200, [{ id: 1, deviceId: 1, pageSize: 0, printQuality: 0, mediaType: 0, destination: 0 }]);
 
                 service.getPages().then( (pages) => {
@@ -88,7 +91,7 @@ describe("Data Service Test", () => {
             const expectedMediaType = 1;
             const expectedDestination = 2;
 
-            httpBackend.whenGET("REST/pages").respond(200, [{
+            httpBackend.whenGET(pagesUrl).respond(200, [{
                 id: 1,
                 // tslint:disable-next-line:object-literal-sort-keys
                 deviceId: 1,
@@ -110,7 +113,7 @@ describe("Data Service Test", () => {
         });
 
         it("Can add pages", (done) => {
-            httpBackend.whenPOST(`REST/pages/${SelectedDeviceId}`).respond(200, { success: true });
+            httpBackend.whenPOST(`${pagesUrl}${SelectedDeviceId}`).respond(200, { success: true });
 
             service.addNewPage(SelectedDeviceId).then((success) => {
                 expect(success).toBeTruthy();
@@ -123,7 +126,7 @@ describe("Data Service Test", () => {
         it("Can delete pages", (done) => {
             const idTodelete = 1;
 
-            httpBackend.whenDELETE(`REST/pages/${idTodelete}`)
+            httpBackend.whenDELETE(`${pagesUrl}${idTodelete}`)
                 .respond(200, { deletedPageId: idTodelete, success: true });
 
             service.deletePage(idTodelete).then((success) => {
@@ -157,7 +160,7 @@ describe("Data Service Test", () => {
             const ExpectedDeviceId = 1;
             const ExpectedDeviceName = "Device 2";
 
-            httpBackend.whenGET("REST/devices").respond(200, [{ id: ExpectedDeviceId, name: ExpectedDeviceName}]);
+            httpBackend.whenGET(devicesUrl).respond(200, [{ id: ExpectedDeviceId, name: ExpectedDeviceName}]);
 
             service.getDevices().then( (devices) => {
                 expect(devices.length).toBe(1);
@@ -170,7 +173,7 @@ describe("Data Service Test", () => {
         });
 
         it("Can add devices", (done) => {
-            httpBackend.whenPUT("REST/devices").respond(200, { success: true });
+            httpBackend.whenPUT(devicesUrl).respond(200, { success: true });
 
             service.addNewDevice().then((success) => {
                 expect(success).toBeTruthy();
@@ -184,7 +187,7 @@ describe("Data Service Test", () => {
             const idTodelete = 1;
 
             httpBackend
-                .whenDELETE(`REST/devices/${idTodelete}`).respond(200, { deletedDeviceId: idTodelete, success: true });
+                .whenDELETE(`${devicesUrl}${idTodelete}`).respond(200, { deletedDeviceId: idTodelete, success: true });
 
             service.deleteDevice(idTodelete).then((success) => {
                 expect(success).toBeTruthy();

@@ -8,6 +8,9 @@ const runSequence = require('run-sequence');
 const webpack = require('webpack-stream');
 const mocha = require('gulp-mocha');
 const KarmaServer = require('karma').Server;
+const electron = require('electron-connect').server.create({
+  path: 'dist'
+});
 
 const tsconfig = require('./tsconfig.json');
 const webpackConfigDev = require('./webpack.config.dev');
@@ -30,13 +33,11 @@ gulp.task('views', function() {
 });
 
 gulp.task('index', function() {
-  return gulp.src('wwwroot/index.htm')
-    .pipe(gulp.dest(appOutput));
+  return gulp.src('wwwroot/index.htm').pipe(gulp.dest(appOutput));
 });
 
 gulp.task('icon', function() {
-  return gulp.src('wwwroot/favicon.ico')
-    .pipe(gulp.dest(appOutput));
+  return gulp.src('wwwroot/favicon.ico').pipe(gulp.dest(appOutput));
 });
 
 gulp.task('angular-app-prod', () => {
@@ -66,7 +67,7 @@ gulp.task('frontend', (done) => {
   if (process.argv.length > 3 && process.argv[3] === "--dev") {
     buildAppTask = 'angular-app-dev';
   }
-  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views'], buildAppTask, () => done());
+  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views', 'electron-launch-files'], buildAppTask, () => done());
 });
 
 /**
@@ -88,7 +89,20 @@ gulp.task('server-clean', () => del(serverOutput));
 
 gulp.task('backend', (done) => {
   runSequence('server-clean', ['server-main', 'server-modules'], () => done());
-})
+});
+
+/**
+ * Electron
+ */
+
+ gulp.task('electron-launch-files', () => {
+    return gulp.src('electron-launch/*.*').pipe(gulp.dest(appOutput));
+ });
+
+ gulp.task('electron-watch' ,function () {
+    gulp.watch(path.resolve(__dirname, 'dist/bundle.js'), electron.reload);
+    electron.start('--remote-debugging-port=9222');
+ });
 
 /**
  * All
@@ -117,12 +131,12 @@ gulp.task('backend', (done) => {
   /**
    * Develop
    */
-   gulp.task('watch-frontend', () => {
+   gulp.task('watch-frontend', (done) => {
       webpackConfigDev.watch = true;
       webpackConfigDev.watchOptions = {
         ignored: [ 'node_modules' ],
         aggregateTimeout: 500
       };
       gulp.watch('wwwroot/App/Components/**/*.htm', ['views']);
-      runSequence(['clean-frontend', 'tslint'], 'views', 'angular-app-dev', () => {});
+      runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], ['angular-app-dev', 'electron-watch'], done);
    });

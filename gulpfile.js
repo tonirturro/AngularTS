@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require("fs");
 const gulp = require('gulp');
 const templateCache = require('gulp-angular-templatecache');
 const tslint = require('gulp-tslint');
@@ -16,7 +17,8 @@ const tsconfig = require('./tsconfig.json');
 const webpackConfigDev = require('./webpack.config.dev');
 const webpackConfigProd = require('./webpack.config.prod');
 const serverOutput =  path.resolve(__dirname, 'server');
-const appOutput = path.resolve(__dirname, 'dist')
+const appOutput = path.resolve(__dirname, 'dist');
+const frontEndBundle = path.resolve(appOutput, 'bundle.js');
 
 /**
  * Front end
@@ -38,6 +40,10 @@ gulp.task('index', function() {
 
 gulp.task('icon', function() {
   return gulp.src('wwwroot/favicon.ico').pipe(gulp.dest(appOutput));
+});
+
+gulp.task('empty-bundle', (done) => {
+  fs.writeFile(frontEndBundle, "(empty)", done);
 });
 
 gulp.task('angular-app-prod', () => {
@@ -100,8 +106,8 @@ gulp.task('backend', (done) => {
  });
 
  gulp.task('electron-watch' ,function () {
-    gulp.watch(path.resolve(__dirname, 'dist/bundle.js'), electron.reload);
     electron.start('--remote-debugging-port=9222');
+    gulp.watch(frontEndBundle, electron.restart);
  });
 
 /**
@@ -138,5 +144,5 @@ gulp.task('backend', (done) => {
         aggregateTimeout: 500
       };
       gulp.watch('wwwroot/App/Components/**/*.htm', ['views']);
-      runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], ['angular-app-dev', 'electron-watch'], done);
+      runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], 'empty-bundle', ['angular-app-dev', 'electron-watch'], done);
    });

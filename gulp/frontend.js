@@ -10,12 +10,12 @@ const runSequence = require('run-sequence');
 const webpackConfigDev = require('../webpack/webpack.config.dev');
 const webpackConfigProd = require('../webpack/webpack.config.prod');
 
-const frontendFolder =  path.resolve(__dirname, '../wwwroot');
+const frontendFolder =  path.resolve(__dirname, '../src/frontend');
 const frontEndSources = path.resolve(frontendFolder, 'App');
 const templates = path.resolve(frontEndSources, 'Components/**/*.htm');
 const boot = path.resolve(frontEndSources, 'Boot.ts');
 const frontEndTSFiles = path.resolve(frontEndSources, '**/*.ts');
-const appOutput = path.resolve(__dirname, 'dist');
+const appOutput = path.resolve(__dirname, '../dist');
 const frontEndBundle = path.resolve(appOutput, 'bundle.js');
 
 gulp.task('clean-frontend', () => del(appOutput));

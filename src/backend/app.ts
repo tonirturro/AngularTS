@@ -3,7 +3,6 @@ import * as express from "express";
 import path = require("path");
 
 import { Data } from "./Repository/Data";
-import routes from "./Routes/index";
 import { RestRouter } from "./Routes/REST";
 
 const app = express();
@@ -18,7 +17,6 @@ const restApi = new RestRouter(data).Router;
 app.use(express.static(path.resolve(root)));
 app.use(bodyParser.json());
 
-app.use("/", routes);
 app.use("/REST", restApi);
 
 export const main = {

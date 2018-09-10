@@ -4,7 +4,7 @@ const electron = require('electron-connect').server.create({
     path: 'dist'
 });
   
-const electronLaunchFiles = path.resolve(__dirname, '../electron-launch/*.*');
+const electronLaunchFiles = path.resolve(__dirname, '../src/electron-launch/*.*');
 const appOutput = path.resolve(__dirname, '../dist');
 const frontEndBundle = path.resolve(appOutput, 'bundle.js');
 

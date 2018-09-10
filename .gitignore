@@ -17,4 +17,4 @@ dist/
 server/**/*.*
 
 #templates
-wwwroot/App/templates.js
+src/frontend/App/templates.js

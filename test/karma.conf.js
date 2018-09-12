@@ -14,16 +14,12 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         files: [
-            // application
-            "../src/frontend/App/Boot.ts",
-            // 3rd-party resources
-            '../node_modules/angular-mocks/angular-mocks.js',
-            // test files
-            "../src/frontend/App/**/*.spec.ts"
+            // loader
+            "unitFrontend.ts"
         ],
 
         preprocessors: {
-            "../src/frontend/**/*.ts": ["webpack"]
+            "**/*.ts": ["webpack"]
         },
 
         webpack: webpackConfig,

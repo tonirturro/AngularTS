@@ -3,8 +3,9 @@ const webpackBaseConfig = require('./webpack.config.base');
 
 module.exports = merge(webpackBaseConfig, {
     output: {
-        filename: 'bundle.js' 
+        filename: 'server.js' 
     },
+    target: 'node',
     mode: 'development',
     devtool: 'inline-source-map'
 });

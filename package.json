@@ -11,8 +11,10 @@
     "build:frontend:dev": "gulp frontend --dev",
     "build:frontend": "gulp frontend --prod",
     "build:backend": "gulp backend",
-    "test": "gulp test-backend",
-    "ui:watch": "gulp test-frontend"
+    "test": "gulp test-all",
+    "test:frontend": "gulp test-frontend-single",
+    "test:frontend:watch": "gulp test-frontend",
+    "test:backend": "gulp test-backend"
   },
   "description": "Angular TS spike",
   "author": {
@@ -46,7 +48,6 @@
     "gulp-angular-templatecache": "^2.2.0",
     "gulp-mocha": "^6.0.0",
     "gulp-tslint": "^8.1.2",
-    "gulp-typescript": "^5.0.0-alpha.3",
     "html-loader": "^0.5.1",
     "jasmine-core": "^2.6.1",
     "karma": "^1.6.0",
@@ -62,6 +63,7 @@
     "style-loader": "0.19.0",
     "traceur": "0.0.111",
     "ts-loader": "4.1.0",
+    "ts-node": "^7.0.1",
     "tslint": "^5.9.1",
     "typescript": "^2.3.2",
     "webpack": "4.0.0",

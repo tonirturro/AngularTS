@@ -58,7 +58,7 @@ gulp.task('tslint',  () => {
       formatter: 'stylish'
     }))
     .pipe(tslint.report({
-      emitError: false
+      emitError: true
     }))
 });
 

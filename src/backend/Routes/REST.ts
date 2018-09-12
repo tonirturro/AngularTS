@@ -1,25 +1,12 @@
 ﻿import * as express from "express";
+import { PageFields } from "../../common/model";
+import { IUpdateResponse } from "../../common/rest";
 import { Data } from "../Repository/Data";
-
-/**
- * Report success in REST API
- */
-interface IRESTResult {
-    success: boolean;
-}
 
 /**
  * Handles the routes to the REST api
  */
 export class RestRouter {
-
-    /**
-     * Field supported for update
-     */
-    private readonly PageSize = "pageSize";
-    private readonly PrintQuality = "printQuality";
-    private readonly MediaType = "mediaType";
-    private readonly Destination = "destination";
 
     /**
      * The REST api router
@@ -82,16 +69,16 @@ export class RestRouter {
         });
 
         // Update page sizes
-        this.defineUpdateApi(this.PageSize);
+        this.defineUpdateApi(PageFields.PageSize);
 
         // Update print quality
-        this.defineUpdateApi(this.PrintQuality);
+        this.defineUpdateApi(PageFields.PrintQuality);
 
         // Update media type
-        this.defineUpdateApi(this.MediaType);
+        this.defineUpdateApi(PageFields.MediaType);
 
         // Update destination
-        this.defineUpdateApi(this.Destination);
+        this.defineUpdateApi(PageFields.Destination);
     }
 
     /**
@@ -117,7 +104,7 @@ export class RestRouter {
      * @param updateFunction is the tag for the update function to be used
      * @param req is the REST request
      */
-    private processUpdate(updateFunction: string, req: express.Request): IRESTResult {
+    private processUpdate(updateFunction: string, req: express.Request): IUpdateResponse {
         let result = true;
         const pages = req.body.pages;
 
@@ -125,16 +112,16 @@ export class RestRouter {
             const newValue = req.body.newValue;
             pages.forEach((page) => {
                     switch (updateFunction) {
-                        case this.PageSize:
+                        case PageFields.PageSize:
                             result = result && this.data.updatePageSize(page, newValue);
                             break;
-                        case this.PrintQuality:
+                        case PageFields.PrintQuality:
                             result = result && this.data.updatePrintQuality(page, newValue);
                             break;
-                        case this.MediaType:
+                        case PageFields.MediaType:
                             result = result && this.data.updateMediaType(page, newValue);
                             break;
-                        case this.Destination:
+                        case PageFields.Destination:
                             result = result && this.data.updateDestination(page, newValue);
                             break;
                     }

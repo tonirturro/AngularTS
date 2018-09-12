@@ -1,19 +1,35 @@
 const path = require('path');
 const gulp = require('gulp');
 const mocha = require('gulp-mocha');
+const runSequence = require('run-sequence');
 const KarmaServer = require('karma').Server;
 
-const testBackend = path.resolve(__dirname, '../server/**/*.test.js');
-const karmaConfig = path.resolve(__dirname, '../karma.conf.js');
+const testBackend = path.resolve(__dirname, '../src/backend/**/*.test.ts');
+const karmaConfig = path.resolve(__dirname, '../test/karma.conf.js');
 
-gulp.task('test-backend', ['backend'], () => {
-    return gulp.src(testBackend, { read: false })
-        // `gulp-mocha` needs filepaths so you can't have any plugins before it
-        .pipe(mocha({ reporter: 'progress' }))
+gulp.task('test-backend', () => {
+    return gulp.src(testBackend)
+        .pipe(mocha({ 
+            require: ['ts-node/register']
+         }))
 });
 
 gulp.task('test-frontend', ['views'], (done) => {
     new KarmaServer({
-        configFile: path.resolve(__dirname, karmaConfig)
+        configFile: karmaConfig
     }, done).start();
 });
+
+gulp.task('test-frontend-single', ['views'], (done) => {
+    new KarmaServer({
+        configFile: karmaConfig,
+        singleRun: true
+    }, done).start();
+});
+
+gulp.task('test-all', () => {
+    return runSequence('test-frontend-single', 'test-backend');
+});
+
+
+

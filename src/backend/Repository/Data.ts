@@ -1,6 +1,5 @@
-﻿import { Device } from "../Model/Device";
+﻿import { IDevice, IPage } from "../../common/rest";
 import { Entities } from "../Model/Entities";
-import { Page } from "../Model/Page";
 
 /**
  * Class definition for the repository
@@ -30,14 +29,14 @@ export class Data {
     /**
      * Gets the available pages
      */
-    public getPages(): Page[] {
+    public getPages(): IPage[] {
         return this.entities.pages;
     }
 
     /**
      * Gets the available devices
      */
-    public getDevices(): Device[] {
+    public getDevices(): IDevice[] {
         return this.entities.devices;
     }
 
@@ -45,15 +44,26 @@ export class Data {
      * Adds new page
      */
     public newPage(deviceId: number): void {
-        this.entities.pages.push(new Page(this.lastPageIndex++, deviceId, 0, 0, 0, 0));
+        const newPage: IPage = {
+            destination: 0,
+            deviceId,
+            id: this.lastPageIndex++,
+            mediaType: 0,
+            pageSize: 0,
+            printQuality: 0,
+        };
+        this.entities.pages.push(newPage);
     }
 
     /**
      * Adds a new device
      */
     public newDevice(): void {
-        const deviceId = this.lastDeviceIndex++;
-        this.entities.devices.push(new Device(deviceId, `Device ${this.lastDeviceIndex}`));
+        const newDevice: IDevice = {
+            id: this.lastDeviceIndex++,
+            name: `Device ${this.lastDeviceIndex}`
+        };
+        this.entities.devices.push(newDevice);
     }
 
     /**
@@ -176,8 +186,8 @@ export class Data {
      * Finds a page from its id
      * @param pageId is the id for the page to be found
      */
-    private getPage(pageId: number): Page {
-        let pageFound: Page = null;
+    private getPage(pageId: number): IPage {
+        let pageFound: IPage = null;
         this.entities.pages.forEach((page) => {
             if (page.id === pageId) {
                  pageFound = page;

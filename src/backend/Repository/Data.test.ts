@@ -1,5 +1,5 @@
 ﻿import { expect } from "chai";
-import { Page } from "../Model/Page";
+import { IPage } from "../../common/rest";
 import { Data } from "./Data";
 
 describe("Data test repository", () => {
@@ -32,7 +32,7 @@ describe("Data test repository", () => {
     /**
      * Initializes the model and dets the page to be updated
      */
-    const getCurrentPage = (): Page => {
+    const getCurrentPage = (): IPage => {
         addPages();
         return dataLayer.getPages()[1];
     };

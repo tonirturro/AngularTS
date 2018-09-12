@@ -1,9 +1,10 @@
-import { Device } from "../../Model/Device";
+
+import { ILogService, IRootScopeService } from "angular";
+
+import { IDevice } from "../../../../common/rest";
 import { ModelUpdate } from "../../Model/ModelEvents";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
-
-import { ILogService, IRootScopeService } from "angular";
 import { DeviceDisplay } from "./DeviceDisplay";
 
 /**
@@ -42,7 +43,7 @@ export class DevicePanelController {
     /**
      * Gets the available devices
      */
-    get Devices(): Device[] {
+    get Devices(): IDevice[] {
         return this.devices;
     }
 
@@ -78,8 +79,6 @@ export class DevicePanelController {
     private loadDevices(): void {
         this.devices = [];
         this.dataService.getDevices().then((devices) => {
-            this.devices = [];
-
             devices.forEach((device) => {
                 this.devices.push(new DeviceDisplay(device.id, device.name));
             });
@@ -91,7 +90,7 @@ export class DevicePanelController {
             this.displaySelection();
         })
         .catch((reason) => {
-            this.logService.error("Failed to load devices");
+            this.logService.error(`Failed to load devices because : ${reason}`);
         });
     }
 

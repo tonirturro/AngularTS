@@ -1,10 +1,9 @@
-﻿import { Device } from "./Device";
-import { Page } from "./Page";
+﻿import { IDevice, IPage } from "../../common/rest";
 
 /**
  * ORM definition
  */
 export class Entities {
-    public devices: Device[];
-    public pages: Page[];
+    public devices: IDevice[];
+    public pages: IPage[];
 }

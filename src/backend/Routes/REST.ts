@@ -26,12 +26,14 @@ export class RestRouter {
         this.router = express.Router();
 
         // Access to the pages repository
-        this.router.get("/pages", (req: express.Request, res: express.Response) => {
+        // tslint:disable-next-line:variable-name
+        this.router.get("/pages", (_req: express.Request, res: express.Response) => {
             res.json(this.data.getPages());
         });
 
         // Access to the devices repository
-        this.router.get("/devices", (req: express.Request, res: express.Response) => {
+        // tslint:disable-next-line:variable-name
+        this.router.get("/devices", (_req: express.Request, res: express.Response) => {
             res.json(this.data.getDevices());
         });
 
@@ -43,7 +45,8 @@ export class RestRouter {
         });
 
         // Add new device
-        this.router.put("/devices", (req: express.Request, res: express.Response) => {
+        // tslint:disable-next-line:variable-name
+        this.router.put("/devices", (_req: express.Request, res: express.Response) => {
             this.data.newDevice();
             res.json({ success: true });
         });

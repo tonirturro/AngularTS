@@ -10,8 +10,6 @@ describe("REST Route", () => {
 
     const ExpectedPageId = 1;
     const ExpectedDeviceId = 2;
-    const ExpectedPageSize = 0;
-    const ExpectedPrintQuality = 1;
 
     const checkRESTResponse = (field: string, done: () => void) => {
         chai.request(main.application)
@@ -48,11 +46,11 @@ describe("REST Route", () => {
             .put(`/REST/pages/${field}`)
             .set("content-type", "application/json")
             .send(JSON.stringify(data))
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(pageId, newValue)).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    expect(spy.calledWith(pageId, newValue)).to.equal(true);
+                    done();
+                });
     };
 
     /**
@@ -82,10 +80,10 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "getPages");
         chai.request(main.application)
             .get("/REST/pages")
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    done();
+                });
     });
 
     it("Post pages responds ok", (done) => {
@@ -101,11 +99,11 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "newPage");
         chai.request(main.application)
             .post(`/REST/pages/${ExpectedDeviceId}`)
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(ExpectedDeviceId)).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    expect(spy.calledWith(ExpectedDeviceId)).to.equal(true);
+                    done();
+                });
     });
 
     it("Delete page responds ok", (done) => {
@@ -121,11 +119,11 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "deletePage");
         chai.request(main.application)
             .del(`/REST/pages/${ExpectedPageId}`)
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(ExpectedPageId)).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    expect(spy.calledWith(ExpectedPageId)).to.equal(true);
+                    done();
+                });
     });
 
     it("Update page size responds ok", (done) => {
@@ -176,10 +174,10 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "getDevices");
         chai.request(main.application)
             .get("/REST/devices")
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    done();
+                });
     });
 
     it("Put devices responds ok", (done) => {
@@ -195,10 +193,10 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "newDevice");
         chai.request(main.application)
             .put("/REST/devices")
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    done();
+                });
     });
 
     it("Delete device responds ok", (done) => {
@@ -214,10 +212,10 @@ describe("REST Route", () => {
         const spy = sinon.spy(main.dependencies.dataLayer, "deleteDevice");
         chai.request(main.application)
             .del(`/REST/devices/${ExpectedDeviceId}`)
-            .then((res) => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(ExpectedDeviceId)).to.equal(true);
-                done();
-            });
+            .then(() => {
+                    expect(spy.calledOnce).to.equal(true);
+                    expect(spy.calledWith(ExpectedDeviceId)).to.equal(true);
+                    done();
+                });
     });
 });

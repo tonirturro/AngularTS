@@ -87,7 +87,6 @@ describe("Data Service Test", () => {
           * Pages
           ************************************************************************/
         it("Reads Pages", (done) => {
-                const page  = { id: 1 } as IPage;
                 httpBackend.whenGET(pagesUrl)
                     .respond(200, [ expectedPage ]);
 

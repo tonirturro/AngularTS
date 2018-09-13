@@ -62,7 +62,7 @@ export class PageGridController {
         return this.appService.SelectedDeviceId;
     }
 
-    public checkFilterOptions(value: Page, index: number): boolean {
+    public checkFilterOptions(value: Page): boolean {
         return value.deviceId === 1;
     }
 

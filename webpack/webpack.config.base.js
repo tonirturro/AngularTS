@@ -1,3 +1,5 @@
+const WebpackBar = require('webpackbar');
+
 module.exports = {
     module: {
         rules: [
@@ -24,5 +26,8 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.ts']
-    }
+    },
+    plugins: [
+        new WebpackBar()
+    ]
 }

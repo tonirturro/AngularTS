@@ -14,11 +14,11 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         files: [
-            "unitFrontend.ts"
+            "unitFrontend.js"
         ],
 
         preprocessors: {
-            "unitFrontend.ts": ["webpack", "sourcemap"]
+            "unitFrontend.js": ["webpack", "sourcemap"]
         },
 
         webpack: webpackConfig,

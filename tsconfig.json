@@ -9,7 +9,10 @@
     "noUnusedParameters": true,
     "target": "es2015"
   },
-  "exclude": [
+  "include": [
     "src"
-  ]
+  ],
+  "exclude": [
+    "node_modules"
+   ]
 }

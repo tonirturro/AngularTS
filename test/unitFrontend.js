@@ -1,10 +1,8 @@
-declare const require: any;
-
 // load the code
-import "../src/frontend/App/Boot";
+require("../src/frontend/App/Boot");
 
 // load the mocks
-import "angular-mocks";
+require("angular-mocks");
 
 // load the tests
 const contextTS = require.context("../src/frontend/App", true, /\.spec.ts$/);

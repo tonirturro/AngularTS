@@ -2,7 +2,7 @@ import { IComponentOptions } from "angular";
 import { PageGridController } from "./page-grid.component.ctrl";
 
 /**
- * Defines the grid to add and delete people
+ * Defines the grid containing the page settings
  */
 export const PageGrid: IComponentOptions = {
     controller: PageGridController,

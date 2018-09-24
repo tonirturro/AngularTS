@@ -20,7 +20,13 @@ module.exports = {
             },
             {
                 test: /\.ts$/,
-                use: 'ts-loader'
+                use: [{
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                        experimentalWatchApi: true
+                    }
+                }]
             }
         ]
     },
@@ -29,5 +35,10 @@ module.exports = {
     },
     plugins: [
         new WebpackBar()
-    ]
+    ],
+    optimization: {
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false,
+    }
 }

@@ -20,7 +20,7 @@ gulp.task('test-frontend', ['views', 'watch-templates'], (done) => {
     }, done).start();
 });
 
-gulp.task('test-frontend-single', ['views', 'watch-templates'], (done) => {
+gulp.task('test-frontend-single', ['views'], (done) => {
     new KarmaServer({
         configFile: karmaConfig,
         singleRun: true

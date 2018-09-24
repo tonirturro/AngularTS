@@ -2,6 +2,11 @@ import { Page } from "../../Model/Page";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
+interface ISelectableOption {
+    label: string;
+    value: string;
+}
+
 /**
  * Handles the bindings inside the component
  */
@@ -64,6 +69,15 @@ export class PageGridController {
 
     public checkFilterOptions(value: Page): boolean {
         return value.deviceId === 1;
+    }
+
+    get selectablePageSizes(): ISelectableOption[] {
+        return [
+            { value: "0", label: "A3"},
+            { value: "1", label: "A2"},
+            { value: "2", label: "A1"},
+            { value: "3", label: "A0"}
+        ];
     }
 
     /**

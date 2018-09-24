@@ -70,12 +70,15 @@ gulp.task('frontend', (done) => {
   runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views', 'electron-launch-files'], buildAppTask, () => done());
 });
 
+gulp.task('watch-templates', () => {
+  gulp.watch(templates, ['views']);
+});
+
 gulp.task('watch-frontend', (done) => {
     webpackConfigDev.watch = true;
     webpackConfigDev.watchOptions = {
       ignored: [ 'node_modules' ],
       aggregateTimeout: 500
     };
-    gulp.watch(templates, ['views']);
-    runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], 'empty-bundle', ['angular-app-dev', 'electron-watch'], done);
+    runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], 'empty-bundle', ['angular-app-dev', 'electron-watch', 'watch-templates'], done);
  });

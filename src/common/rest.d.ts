@@ -11,6 +11,11 @@ export interface IPage {
     destination: number
 }
 
+export interface ISelectableOption {
+    value: string;
+    label: string;
+}
+
 export interface IDeletePageResponse {
     deletedPageId: number;
     success: boolean;

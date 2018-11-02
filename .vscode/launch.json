@@ -31,7 +31,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch BackEnd",
-            "program": "${workspaceRoot}/server.js"
+            "program": "${workspaceRoot}/server/server.js"
         }
     ]
 }

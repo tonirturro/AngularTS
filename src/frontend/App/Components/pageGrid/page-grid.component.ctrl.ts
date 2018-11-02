@@ -71,15 +71,6 @@ export class PageGridController {
         return value.deviceId === 1;
     }
 
-    get selectablePageSizes(): ISelectableOption[] {
-        return [
-            { value: "0", label: "A3"},
-            { value: "1", label: "A2"},
-            { value: "2", label: "A1"},
-            { value: "3", label: "A0"}
-        ];
-    }
-
     /**
      * Request a new page
      */

@@ -1,16 +1,23 @@
-import { Page } from "../../Model/Page";
+import { IComponentController } from "angular";
+import { PageFields } from "../../../../common/model";
+import { ISelectableOption } from "../../../../common/rest";
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
-interface ISelectableOption {
-    label: string;
-    value: string;
+export interface IVisualPage {
+    id: number;
+    deviceId: number;
+    class: string;
+    pageSize: string;
+    printQuality: string;
+    mediaType: string;
+    destination: string;
 }
 
 /**
  * Handles the bindings inside the component
  */
-export class PageGridController {
+export class PageGridController implements IComponentController {
 
     /**
      * Define dependencies
@@ -18,10 +25,11 @@ export class PageGridController {
     public static $inject = ["appService", "dataService"];
 
     // The pages displayed at the grid
-    private pages: Page[];
+    private pages: IVisualPage[] = [];
+    private pageSizeOptions: ISelectableOption[] = [];
 
     // The pages elected at the grid
-    private selectedPages: number[];
+    private selectedPages: number[] = [];
 
     /**
      * Initializes a new instance of the PageGridController class.
@@ -32,42 +40,53 @@ export class PageGridController {
     constructor(
         private appService: AppService,
         private dataService: DataService) {
-        this.pages = [];
-        this.selectedPages = [];
+    }
+
+    public $onInit() {
         this.dataService.getPages().then((pages) => {
             this.pages = pages;
         });
+        this.dataService.getCapabilities(PageFields.PageSize).then((options) => {
+            this.pageSizeOptions = options;
+        });
+    }
+
+    /**
+     * Get the available page options
+     */
+    public get PageSizeOptions(): ISelectableOption[] {
+        return this.pageSizeOptions;
     }
 
     /**
      * Gets the available pages
      */
-    get Pages(): Page[] {
+    public get Pages(): IVisualPage[] {
         return this.pages;
     }
 
     /**
      * Gets the selected pages for testing purposes
      */
-    get SelectedPages(): number[] {
+    public get SelectedPages(): number[] {
         return this.selectedPages;
     }
 
     /**
      * Sets the selected pages for testing purposes
      */
-    set SelectedPages(selectedPages: number[]) {
+    public set SelectedPages(selectedPages: number[]) {
         this.selectedPages = selectedPages.slice();
     }
 
     /**
      * Returns the selected device id
      */
-    get selectedDeviceId(): number {
+    public get selectedDeviceId(): number {
         return this.appService.SelectedDeviceId;
     }
 
-    public checkFilterOptions(value: Page): boolean {
+    public checkFilterOptions(value: IVisualPage): boolean {
         return value.deviceId === 1;
     }
 
@@ -145,7 +164,7 @@ export class PageGridController {
      * @param event is the event generating the click
      * @param page is the selected page
      */
-    public selectPage(event: MouseEvent, selectedPage: Page): void {
+    public selectPage(event: MouseEvent, selectedPage: IVisualPage): void {
         // ignore click on selector
         if (event.srcElement.id === "option") {
             return;

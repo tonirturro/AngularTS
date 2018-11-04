@@ -1,14 +1,21 @@
 import * as angular from "angular";
 import { IHttpBackendService } from "angular";
 import { PageFields } from "../../../common/model";
-import { IDeleteDeviceResponse, IDeletePageResponse, IDevice, IPage, IUpdateResponse } from "../../../common/rest";
-import { Page } from "../Model/Page";
+import {
+    IDeleteDeviceResponse,
+    IDeletePageResponse,
+    IDevice,
+    IPage,
+    ISelectableOption,
+    IUpdateResponse
+} from "../../../common/rest";
 import { DataService } from "./DataService";
 
 describe("Data Service Test", () => {
         const restUrl = "http://localhost:3000/REST";
         const pagesUrl = `${restUrl}/pages/`;
         const devicesUrl = `${restUrl}/devices/`;
+        const deviceOptionsUrl = `${restUrl}/deviceOptions/`;
         const expectedPage: IPage = {
             destination: 5,
             deviceId: 1,
@@ -90,7 +97,7 @@ describe("Data Service Test", () => {
                 httpBackend.whenGET(pagesUrl)
                     .respond(200, [ expectedPage ]);
 
-                service.getPages().then( (pages: Page[] ) => {
+                service.getPages().then((pages) => {
                     expect(pages.length).toBe(1);
                     done();
                 });
@@ -101,7 +108,7 @@ describe("Data Service Test", () => {
         it("Translate from the model", (done) => {
             httpBackend.whenGET(pagesUrl).respond(200, [ expectedPage ]);
 
-            service.getPages().then((pages: Page[]) => {
+            service.getPages().then((pages) => {
                 expect(pages[0].pageSize).toBe(expectedPage.pageSize.toString());
                 expect(pages[0].printQuality).toBe(expectedPage.printQuality.toString());
                 expect(pages[0].mediaType).toBe(expectedPage.mediaType.toString());
@@ -197,6 +204,21 @@ describe("Data Service Test", () => {
 
             service.deleteDevice(deleteResponse.deletedDeviceId).then((success) => {
                 expect(success).toBeTruthy();
+                done();
+            });
+
+            httpBackend.flush();
+        });
+
+        it("Can read device page options", (done) => {
+            const devicePageOptionsResponse: ISelectableOption[] = [
+                { value: "0", label: "label0 "}
+            ];
+
+            httpBackend.whenGET(`${deviceOptionsUrl}${PageFields.PageSize}`).respond(200, devicePageOptionsResponse);
+
+            service.getCapabilities(PageFields.PageSize).then((options) => {
+                expect(options).toEqual(devicePageOptionsResponse);
                 done();
             });
 

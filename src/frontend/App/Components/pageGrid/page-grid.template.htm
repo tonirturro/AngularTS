@@ -11,11 +11,8 @@
     <tbody>
         <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages | filter:{ deviceId : $ctrl.selectedDeviceId }" ng-click="$ctrl.selectPage($event,page)">
             <td>
-                <select ng-model="page.pageSize">
-                    <option id="option" value="0">A3</option>
-                    <option id="option" value="1">A2</option>
-                    <option id="option" value="2">A1</option>
-                    <option id="option" value="3">A0</option>
+                <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
+                    <option ng-repeat="size in $ctrl.PageSizeOptions" id="option" value="{{ size.value }}">{{ size.label }}</option>
                 </select>
             </td>
             <td>

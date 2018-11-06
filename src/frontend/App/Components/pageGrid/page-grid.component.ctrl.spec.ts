@@ -1,6 +1,6 @@
 import * as angular from "angular";
 import { IQService, IRootScopeService } from "angular";
-import { IVisualPage, PageGridController, IVisualPage } from "./page-grid.component.ctrl";
+import { IVisualPage, PageGridController } from "./page-grid.component.ctrl";
 
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";

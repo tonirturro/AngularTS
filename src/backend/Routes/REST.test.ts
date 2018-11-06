@@ -58,6 +58,7 @@ describe("REST Route", () => {
      * Initialize test environment
      */
     chai.use(chaiHttp);
+    const getCapabilitiesSpy = sinon.spy(main.dependencies.capabilitiesLayer, "getCapabilities");
 
     /**
      *
@@ -230,12 +231,45 @@ describe("REST Route", () => {
     });
 
     it("Getting the page options calls the appropiated capabilities", (done) => {
-        const spy = sinon.spy(main.dependencies.capabilitiesLayer, "getCapabilities");
+        getCapabilitiesSpy.reset();
         chai.request(main.application)
             .get(`/REST/deviceOptions/${PageFields.PageSize}`)
             .then(() => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(PageFields.PageSize)).to.equal(true);
+                expect(getCapabilitiesSpy.calledOnce).to.equal(true);
+                expect(getCapabilitiesSpy.calledWith(PageFields.PageSize)).to.equal(true);
+                done();
+            });
+    });
+
+    it("Getting the qualities options calls the appropiated capabilities", (done) => {
+        getCapabilitiesSpy.reset();
+        chai.request(main.application)
+            .get(`/REST/deviceOptions/${PageFields.PrintQuality}`)
+            .then(() => {
+                expect(getCapabilitiesSpy.calledOnce).to.equal(true);
+                expect(getCapabilitiesSpy.calledWith(PageFields.PrintQuality)).to.equal(true);
+                done();
+            });
+    });
+
+    it("Getting the media options calls the appropiated capabilities", (done) => {
+        getCapabilitiesSpy.reset();
+        chai.request(main.application)
+            .get(`/REST/deviceOptions/${PageFields.MediaType}`)
+            .then(() => {
+                expect(getCapabilitiesSpy.calledOnce).to.equal(true);
+                expect(getCapabilitiesSpy.calledWith(PageFields.MediaType)).to.equal(true);
+                done();
+            });
+    });
+
+    it("Getting the destination options calls the appropiated capabilities", (done) => {
+        getCapabilitiesSpy.reset();
+        chai.request(main.application)
+            .get(`/REST/deviceOptions/${PageFields.Destination}`)
+            .then(() => {
+                expect(getCapabilitiesSpy.calledOnce).to.equal(true);
+                expect(getCapabilitiesSpy.calledWith(PageFields.Destination)).to.equal(true);
                 done();
             });
     });

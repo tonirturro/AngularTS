@@ -27,6 +27,10 @@ export class PageGridController implements IComponentController {
     // The pages displayed at the grid
     private pages: IVisualPage[] = [];
     private pageSizeOptions: ISelectableOption[] = [];
+    private printQualityOptions: ISelectableOption[] = [];
+    private mediaTypeOptions: ISelectableOption[] = [];
+    private destinationOptions: ISelectableOption[] = [];
+
 
     // The pages elected at the grid
     private selectedPages: number[] = [];
@@ -49,6 +53,15 @@ export class PageGridController implements IComponentController {
         this.dataService.getCapabilities(PageFields.PageSize).then((options) => {
             this.pageSizeOptions = options;
         });
+        this.dataService.getCapabilities(PageFields.PrintQuality).then((options) => {
+            this.printQualityOptions = options;
+        });
+        this.dataService.getCapabilities(PageFields.MediaType).then((options) => {
+            this.mediaTypeOptions = options;
+        });
+        this.dataService.getCapabilities(PageFields.Destination).then((options) => {
+            this.destinationOptions = options;
+        });
     }
 
     /**
@@ -56,6 +69,27 @@ export class PageGridController implements IComponentController {
      */
     public get PageSizeOptions(): ISelectableOption[] {
         return this.pageSizeOptions;
+    }
+
+    /**
+     * Get the available print quality options
+     */
+    public get PrintQualityOptions(): ISelectableOption[] {
+        return this.printQualityOptions;
+    }
+
+    /**
+     * Get the available madia type options
+     */
+    public get MediaTypeOptions(): ISelectableOption[] {
+        return this.mediaTypeOptions;
+    }
+
+    /**
+     * Get the available destination options
+     */
+    public get DestinationOptions(): ISelectableOption[] {
+        return this.destinationOptions;
     }
 
     /**

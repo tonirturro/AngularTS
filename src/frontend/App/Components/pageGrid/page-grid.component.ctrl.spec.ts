@@ -8,6 +8,7 @@ import { DataService } from "../../Services/DataService";
 import { ISelectableOption } from "../../../../common/rest";
 
 describe("Page grid controller", () => {
+    let getCapabilitiesSpy: jasmine.Spy;
 
     /**
      * Constants
@@ -16,6 +17,21 @@ describe("Page grid controller", () => {
     const InitialPages: IVisualPage[] = [];
     const InitialPageOptions: ISelectableOption[] = [
         { value: "0", label: "label0" }
+    ];
+    const InitialQualityOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" }
+    ];
+    const InitialMediaOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" },
+        { value: "2", label: "label2" }
+    ];
+    const InitialDestinationOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" },
+        { value: "2", label: "label2" },
+        { value: "3", label: "label3" }
     ];
 
     /**
@@ -118,11 +134,9 @@ describe("Page grid controller", () => {
         promiseService = $q;
         rootScopeService = $rootScope;
         getPagesMock = spyOn(dataServiceToMock, "getPages").and.returnValue(promiseService.resolve(InitialPages));
-        spyOn(dataServiceToMock, "getCapabilities").and.returnValue(promiseService.resolve(InitialPageOptions));
+        getCapabilitiesSpy = spyOn(dataServiceToMock, "getCapabilities");
         controller = $componentController("pageGrid");
         appServiceToMock.SelectedDeviceId = 0;
-        controller.$onInit();
-        rootScopeService.$apply();
     }));
 
     /**
@@ -131,11 +145,43 @@ describe("Page grid controller", () => {
      *
      */
     it("Has pages when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialQualityOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
         expect(controller.Pages.length).toBe(0);
     });
 
     it("Has page size options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialPageOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
         expect(controller.PageSizeOptions).toEqual(InitialPageOptions);
+    });
+
+    it("Has quality options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialQualityOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.PrintQualityOptions).toEqual(InitialQualityOptions);
+    });
+
+    it("Has media options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialMediaOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.MediaTypeOptions).toEqual(InitialMediaOptions);
+    });
+
+    it("Has destination options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialDestinationOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.DestinationOptions).toEqual(InitialDestinationOptions);
     });
 
     it("Returns the selected device id", () => {
@@ -188,7 +234,7 @@ describe("Page grid controller", () => {
         controller.deletePage(0);
         rootScopeService.$apply();
 
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2);
+        expect(dataServiceToMock.getPages).toHaveBeenCalled();
     });
 
     it("Can select pages", () => {

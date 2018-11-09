@@ -1,8 +1,8 @@
-import { IHttpService, ILogService, IQService } from "angular";
+import { IDeferred, IHttpService, ILogService, IPromise, IQService } from "angular";
 
 import { PageFields } from "../../../common/model";
-import { IDeleteDeviceResponse, IDevice, IPage, IUpdateResponse } from "../../../common/rest";
-import { Page } from "../Model/Page";
+import { IDeleteDeviceResponse, IDevice, IPage, ISelectableOption, IUpdateResponse } from "../../../common/rest";
+import { IVisualPage } from "../Components/pageGrid/page-grid.component.ctrl";
 import { UpdateParams } from "./UpdateParams";
 
 /*
@@ -35,25 +35,26 @@ export class DataService {
     /**
      * Gets pages from backend
      */
-    public getPages(): angular.IPromise<Page[]> {
+    public getPages(): IPromise<IVisualPage[]> {
 
-        const deferred: angular.IDeferred<Page[]> = this.$q.defer();
+        const deferred: IDeferred<IVisualPage[]> = this.$q.defer();
 
         this.$http
             .get<IPage[]>(this.getUrl("pages")).then((response) => {
-            let pages: Page[];
+            let pages: IVisualPage[];
 
             pages = [];
 
             // Translate from the model
             response.data.forEach((newPage) => {
-                pages.push(new Page(
-                    newPage.id,
-                    newPage.deviceId,
-                    newPage.pageSize.toString(),
-                    newPage.printQuality.toString(),
-                    newPage.mediaType.toString(),
-                    newPage.destination.toString()));
+                const translatedPage: IVisualPage = {} as IVisualPage;
+                translatedPage.id = newPage.id;
+                translatedPage.deviceId = newPage.deviceId;
+                translatedPage.pageSize = newPage.pageSize.toString();
+                translatedPage.printQuality = newPage.printQuality.toString();
+                translatedPage.mediaType = newPage.mediaType.toString();
+                translatedPage.destination = newPage.destination.toString();
+                pages.push(translatedPage);
             });
 
             deferred.resolve(pages);
@@ -69,9 +70,9 @@ export class DataService {
     /**
      * Gets devices from backend
      */
-    public getDevices(): angular.IPromise<IDevice[]> {
+    public getDevices(): IPromise<IDevice[]> {
 
-        const deferred: angular.IDeferred<IDevice[]> = this.$q.defer();
+        const deferred: IDeferred<IDevice[]> = this.$q.defer();
 
         this.$http.get<IDevice[]>(this.getUrl("devices")).then((response) => {
             deferred.resolve(response.data);
@@ -87,8 +88,8 @@ export class DataService {
     /**
      * Request a new page
      */
-    public addNewPage(deviceId: number): angular.IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer();
+    public addNewPage(deviceId: number): IPromise<boolean> {
+        const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.post<IUpdateResponse>(`${this.getUrl("pages")}${deviceId}`, {}).then((response) => {
             deferred.resolve(response.data.success);
@@ -104,8 +105,8 @@ export class DataService {
     /**
      * Request a new device
      */
-    public addNewDevice(): angular.IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer();
+    public addNewDevice(): IPromise<boolean> {
+        const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.put<IUpdateResponse>(this.getUrl("devices"), {}).then((response) => {
             deferred.resolve(response.data.success);
@@ -122,8 +123,8 @@ export class DataService {
      * Delete an existing page
      * @param idToDelete is the id for the page to be deleted
      */
-    public deletePage(idToDelete: number): angular.IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer();
+    public deletePage(idToDelete: number): IPromise<boolean> {
+        const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.delete<{ deletedPageId: number, success: boolean }>(`${this.getUrl("pages")}${idToDelete}`)
             .then((response) => {
@@ -141,8 +142,8 @@ export class DataService {
      * Delete an existing device
      * @param idToDelete is the id for the device to be deleted
      */
-    public deleteDevice(idToDelete: number): angular.IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer();
+    public deleteDevice(idToDelete: number): IPromise<boolean> {
+        const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.delete<IDeleteDeviceResponse>(`${this.getUrl("devices")}${idToDelete}`).then((response) => {
             deferred.resolve(response.data.success && response.data.deletedDeviceId === idToDelete);
@@ -156,11 +157,29 @@ export class DataService {
     }
 
     /**
+     * Querybthe options available for a particular device capability
+     * @param capability the capability to be queried
+     */
+    public getCapabilities(capability: string): IPromise<ISelectableOption[]> {
+        const deferred: IDeferred<ISelectableOption[]> = this.$q.defer();
+
+        this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
+            deferred.resolve(response.data);
+        },
+        (errors) => {
+            this.$log.error(`Failure to get ${capability} device capability`);
+            deferred.reject(errors.data);
+        });
+
+        return deferred.promise;
+    }
+
+    /**
      * Updates the page size for an existing page
      * @param idToUpdate is the id for the page to be updated
      * @param newValueToSet is the new page size value
      */
-    public updatePageSize(pages: number[], newValueToSet: number): angular.IPromise<boolean> {
+    public updatePageSize(pages: number[], newValueToSet: number): IPromise<boolean> {
         return this.performUpdate(PageFields.PageSize, new UpdateParams(pages, newValueToSet));
     }
 
@@ -169,7 +188,7 @@ export class DataService {
      * @param idToUpdate is the id for the page to be updated
      * @param newValueToSet is the new print quality value
      */
-    public updatePrintQuality(pages: number[], newValueToSet: number): angular.IPromise<boolean> {
+    public updatePrintQuality(pages: number[], newValueToSet: number): IPromise<boolean> {
         return this.performUpdate(PageFields.PrintQuality, new UpdateParams(pages, newValueToSet));
     }
 
@@ -178,7 +197,7 @@ export class DataService {
      * @param idToUpdate is the id for the page to be updated
      * @param newValueToSet is the new media type value
      */
-    public updateMediaType(pages: number[], newValueToSet: number): angular.IPromise<boolean> {
+    public updateMediaType(pages: number[], newValueToSet: number): IPromise<boolean> {
         return this.performUpdate(PageFields.MediaType, new UpdateParams(pages, newValueToSet));
     }
 
@@ -187,7 +206,7 @@ export class DataService {
      * @param idToUpdate is the id for the page to be updated
      * @param newValueToSet is the new media type value
      */
-    public updateDestination(pages: number[], newValueToSet: number): angular.IPromise<boolean> {
+    public updateDestination(pages: number[], newValueToSet: number): IPromise<boolean> {
         return this.performUpdate(PageFields.Destination, new UpdateParams(pages, newValueToSet));
     }
 
@@ -196,7 +215,7 @@ export class DataService {
      * @param field is the field to be updated
      * @param params are the params for the update
      */
-    private performUpdate(field: string, params: UpdateParams): angular.IPromise<boolean> {
+    private performUpdate(field: string, params: UpdateParams): IPromise<boolean> {
         const deferred: angular.IDeferred<boolean> = this.$q.defer();
 
         this.$http.put<IUpdateResponse>(`${this.getUrl("pages")}${field}`, JSON.stringify(params))

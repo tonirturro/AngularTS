@@ -1,6 +1,7 @@
 ﻿import * as express from "express";
 import { PageFields } from "../../common/model";
 import { IUpdateResponse } from "../../common/rest";
+import { Capabilities } from "../Repository/Capabilities";
 import { Data } from "../Repository/Data";
 
 /**
@@ -19,10 +20,16 @@ export class RestRouter {
     private data: Data;
 
     /**
+     * The device capabilities
+     */
+    private capabilities: Capabilities;
+
+    /**
      * Initializes a new instance of the RestRouter class.
      */
-    constructor(data: Data) {
+    constructor(data: Data, capabilities: Capabilities) {
         this.data = data;
+        this.capabilities = capabilities;
         this.router = express.Router();
 
         // Access to the pages repository
@@ -69,6 +76,12 @@ export class RestRouter {
                 deletedDeviceId: deviceIdToDelete,
                 success: result
             });
+        });
+
+        // Getting device capabilities
+        this.router.get("/deviceOptions/:capability", (req: express.Request, res: express.Response) => {
+            const capabilityToQuery = req.params.capability;
+            res.json(this.capabilities.getCapabilities(capabilityToQuery));
         });
 
         // Update page sizes

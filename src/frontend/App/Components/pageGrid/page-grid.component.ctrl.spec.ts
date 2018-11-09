@@ -1,18 +1,38 @@
 import * as angular from "angular";
-import { IDeferred, IQService, IRootScopeService } from "angular";
-import { PageGridController } from "./page-grid.component.ctrl";
+import { IQService, IRootScopeService } from "angular";
+import { IVisualPage, PageGridController } from "./page-grid.component.ctrl";
 
 import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
-import { Page } from "../../Model/Page";
+import { ISelectableOption } from "../../../../common/rest";
 
 describe("Page grid controller", () => {
+    let getCapabilitiesSpy: jasmine.Spy;
 
     /**
      * Constants
      */
     const ExpectedDeviceId = 1;
+    const InitialPages: IVisualPage[] = [];
+    const InitialPageOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" }
+    ];
+    const InitialQualityOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" }
+    ];
+    const InitialMediaOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" },
+        { value: "2", label: "label2" }
+    ];
+    const InitialDestinationOptions: ISelectableOption[] = [
+        { value: "0", label: "label0" },
+        { value: "1", label: "label1" },
+        { value: "2", label: "label2" },
+        { value: "3", label: "label3" }
+    ];
 
     /**
      * Common test resources
@@ -21,9 +41,17 @@ describe("Page grid controller", () => {
     let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
     let promiseService: IQService;
-    let deferredGetPages: IDeferred<Page[]>;
-    let deferredUpdate: IDeferred<boolean>;
     let rootScopeService: IRootScopeService;
+    let getPagesMock: jasmine.Spy;
+    const getVisualPage = (
+        id: number,
+        deviceId: number,
+        pageSize: string,
+        printQuality: string,
+        mediaType: string,
+        destination: string) => {
+        return {  deviceId, id, pageSize, printQuality, mediaType,  class: "",  destination } as IVisualPage;
+    };
 
     /**
      * Simulates a mouse click
@@ -96,27 +124,6 @@ describe("Page grid controller", () => {
     };
 
     /**
-     * Sets the deferred execution for any update operationm
-     */
-    const getUpdatePromise = (): angular.IPromise<boolean> => {
-        deferredUpdate = promiseService.defer();
-        return deferredUpdate.promise;
-    };
-
-    /**
-     * Executes the deferred update
-     * @param pagesReported are the pages reported when the update is executed
-     */
-    const executeUpdateAndReturnPages = (pagesReported: Page[]) => {
-        deferredUpdate.resolve(true);
-        deferredGetPages.resolve(pagesReported);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalledTimes(2); // one is the initial call at the constructor
-        expect(controller.Pages.length).toEqual(pagesReported.length);
-    };
-
-    /**
      * Initialize the test environment
      */
     beforeEach(angular.mock.module("myApp"));
@@ -126,8 +133,8 @@ describe("Page grid controller", () => {
         dataServiceToMock = dataService;
         promiseService = $q;
         rootScopeService = $rootScope;
-        deferredGetPages = promiseService.defer();
-        spyOn(dataServiceToMock, "getPages").and.returnValue(deferredGetPages.promise);
+        getPagesMock = spyOn(dataServiceToMock, "getPages").and.returnValue(promiseService.resolve(InitialPages));
+        getCapabilitiesSpy = spyOn(dataServiceToMock, "getCapabilities");
         controller = $componentController("pageGrid");
         appServiceToMock.SelectedDeviceId = 0;
     }));
@@ -138,7 +145,43 @@ describe("Page grid controller", () => {
      *
      */
     it("Has pages when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialQualityOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
         expect(controller.Pages.length).toBe(0);
+    });
+
+    it("Has page size options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialPageOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.PageSizeOptions).toEqual(InitialPageOptions);
+    });
+
+    it("Has quality options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialQualityOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.PrintQualityOptions).toEqual(InitialQualityOptions);
+    });
+
+    it("Has media options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialMediaOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.MediaTypeOptions).toEqual(InitialMediaOptions);
+    });
+
+    it("Has destination options when initialized", () => {
+        getCapabilitiesSpy.and.returnValue(promiseService.resolve(InitialDestinationOptions));
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.DestinationOptions).toEqual(InitialDestinationOptions);
     });
 
     it("Returns the selected device id", () => {
@@ -148,7 +191,7 @@ describe("Page grid controller", () => {
     });
 
     it("Can add pages", () => {
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.resolve(true));
 
         controller.addPage();
 
@@ -157,7 +200,7 @@ describe("Page grid controller", () => {
 
     it("The page is added to the selected device Id", () => {
         appServiceToMock.SelectedDeviceId = ExpectedDeviceId;
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.resolve(true));
 
         controller.addPage();
 
@@ -166,18 +209,19 @@ describe("Page grid controller", () => {
 
     it("Add pages refresh page list", () => {
         const ExpectedPageID = 10;
-        const pagesAfterAdd = [ new Page(ExpectedPageID, ExpectedDeviceId, "0", "0", "0", "0")];
-        spyOn(dataServiceToMock, "addNewPage").and.returnValue(getUpdatePromise());
+        const pagesAfterAdd = [ getVisualPage(ExpectedPageID, ExpectedDeviceId, "0", "0", "0", "0")];
+        spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.resolve(true));
+        getPagesMock.and.returnValue(promiseService.resolve(pagesAfterAdd));
 
         controller.addPage();
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages(pagesAfterAdd);
         expect(controller.Pages[0].id).toEqual(ExpectedPageID);
     });
 
     it("Can delete pages", () => {
         const idTodelete = 5;
-        spyOn(dataServiceToMock, "deletePage").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "deletePage").and.returnValue(promiseService.resolve(true));
 
         controller.deletePage(idTodelete);
 
@@ -185,17 +229,18 @@ describe("Page grid controller", () => {
     });
 
     it("Delete page refresh page list", () => {
-        spyOn(dataServiceToMock, "deletePage").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "deletePage").and.returnValue(promiseService.resolve(true));
 
         controller.deletePage(0);
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages([]);
+        expect(dataServiceToMock.getPages).toHaveBeenCalled();
     });
 
     it("Can select pages", () => {
         const ExpectedSelectedPageId = 5;
         const click = getClick("", "", false);
-        const clickedPage = new Page(ExpectedSelectedPageId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(ExpectedSelectedPageId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [];
 
         controller.selectPage(click, clickedPage);
@@ -206,7 +251,7 @@ describe("Page grid controller", () => {
 
     it("Click on option does not alter selection", () => {
         const click = getClick("option", "", false);
-        const clickedPage = new Page(0, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(0, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [];
 
         controller.selectPage(click, clickedPage);
@@ -218,7 +263,7 @@ describe("Page grid controller", () => {
         const currentSelectedId = 5;
         const newSelectedId = 10;
         const click = getClick("", "", false);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
@@ -231,7 +276,7 @@ describe("Page grid controller", () => {
         const currentSelectedId = 6;
         const newSelectedId = 11;
         const click = getClick("", "ng-model", false);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
@@ -243,7 +288,7 @@ describe("Page grid controller", () => {
     it("Click on option selector does not change selection if clicked on selected", () => {
         const currentSelectedId = 6;
         const click = getClick("", "ng-model", false);
-        const clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
@@ -258,7 +303,7 @@ describe("Page grid controller", () => {
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 11;
         const click = getClick("", "ng-model", false);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
@@ -274,7 +319,7 @@ describe("Page grid controller", () => {
         const currentSelectedId = 9;
         const newSelectedId = 15;
         const click = getClick("", "ng-click", false);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
@@ -286,7 +331,7 @@ describe("Page grid controller", () => {
     it("Click on button does not change selection if clicked on item selected", () => {
         const currentSelectedId = 9;
         const click = getClick("", "ng-click", false);
-        const clickedPage = new Page(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = [currentSelectedId];
 
         controller.selectPage(click, clickedPage);
@@ -301,7 +346,7 @@ describe("Page grid controller", () => {
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 20;
         const click = getClick("", "ng-click", false);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
@@ -319,7 +364,7 @@ describe("Page grid controller", () => {
         const currentSelection = [currentSelectedId1, currentSelectedId2];
         const newSelectedId = 30;
         const click = getClick("", "", true);
-        const clickedPage = new Page(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
@@ -336,7 +381,7 @@ describe("Page grid controller", () => {
         const clickedPageId = 21;
         const currentSelection = [currentSelectedId, clickedPageId];
         const click = getClick("", "", true);
-        const clickedPage = new Page(clickedPageId, ExpectedDeviceId, "0", "0", "0", "0");
+        const clickedPage = getVisualPage(clickedPageId, ExpectedDeviceId, "0", "0", "0", "0");
         controller.SelectedPages = currentSelection;
 
         controller.selectPage(click, clickedPage);
@@ -353,7 +398,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 2;
         const newPageSize = 0;
 
-        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(promiseService.resolve(true));
 
         controller.SelectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
@@ -364,13 +409,14 @@ describe("Page grid controller", () => {
     it("Update page size refresh page list", () => {
         const idToUpdate = 2;
         const newPageSize = 2;
-        const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, newPageSize.toString(), "0", "0", "0")];
-        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(getUpdatePromise());
+        const pagesReported = [ getVisualPage(idToUpdate, ExpectedDeviceId, newPageSize.toString(), "0", "0", "0")];
+        spyOn(dataServiceToMock, "updatePageSize").and.returnValue(promiseService.resolve(true));
+        getPagesMock.and.returnValue(promiseService.resolve(pagesReported));
 
         controller.SelectedPages = [idToUpdate];
         controller.updatePageSize(newPageSize);
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages(pagesReported);
         expect(controller.Pages[0].pageSize).toEqual(newPageSize.toString());
     });
 
@@ -378,7 +424,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 3;
         const newPrintQuality = 0;
 
-        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(promiseService.resolve(true));
 
         controller.SelectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
@@ -389,13 +435,14 @@ describe("Page grid controller", () => {
     it("Update print quality refresh page list", () => {
         const idToUpdate = 3;
         const newPrintQuality = 1;
-        const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", newPrintQuality.toString(), "0", "0")];
-        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(getUpdatePromise());
+        const pagesReported = [ getVisualPage(idToUpdate, ExpectedDeviceId, "0", newPrintQuality.toString(), "0", "0")];
+        spyOn(dataServiceToMock, "updatePrintQuality").and.returnValue(promiseService.resolve(true));
+        getPagesMock.and.returnValue(promiseService.resolve(pagesReported));
 
         controller.SelectedPages = [idToUpdate];
         controller.updatePrintQuality(newPrintQuality);
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages(pagesReported);
         expect(controller.Pages[0].printQuality).toEqual(newPrintQuality.toString());
     });
 
@@ -403,7 +450,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 6;
         const newMediaType = 2;
 
-        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(promiseService.resolve(true));
 
         controller.SelectedPages = [idToUpdate];
         controller.updateMediaType(newMediaType);
@@ -414,13 +461,14 @@ describe("Page grid controller", () => {
     it("Update media type refresh page list", () => {
         const idToUpdate = 3;
         const newMediaType = 1;
-        const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", "0", newMediaType.toString(), "0")];
-        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(getUpdatePromise());
+        const pagesReported = [ getVisualPage(idToUpdate, ExpectedDeviceId, "0", "0", newMediaType.toString(), "0")];
+        spyOn(dataServiceToMock, "updateMediaType").and.returnValue(promiseService.resolve(true));
+        getPagesMock.and.returnValue(promiseService.resolve(pagesReported));
 
         controller.SelectedPages = [idToUpdate];
         controller.updateMediaType(newMediaType);
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages(pagesReported);
         expect(controller.Pages[0].mediaType).toEqual(newMediaType.toString());
     });
 
@@ -428,7 +476,7 @@ describe("Page grid controller", () => {
         const idToUpdate = 10;
         const newDestination = 0;
 
-        spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
+        spyOn(dataServiceToMock, "updateDestination").and.returnValue(promiseService.resolve(true));
 
         controller.SelectedPages = [idToUpdate];
         controller.updateDestination(newDestination);
@@ -439,13 +487,14 @@ describe("Page grid controller", () => {
     it("Update destination refresh page list", () => {
         const idToUpdate = 5;
         const newDestination = 1;
-        const pagesReported = [ new Page(idToUpdate, ExpectedDeviceId, "0", "0", "0", newDestination.toString())];
-        spyOn(dataServiceToMock, "updateDestination").and.returnValue(getUpdatePromise());
+        const pagesReported = [ getVisualPage(idToUpdate, ExpectedDeviceId, "0", "0", "0", newDestination.toString())];
+        spyOn(dataServiceToMock, "updateDestination").and.returnValue(promiseService.resolve(true));
+        getPagesMock.and.returnValue(promiseService.resolve(pagesReported));
 
         controller.SelectedPages = [idToUpdate];
         controller.updateDestination(newDestination);
+        rootScopeService.$apply();
 
-        executeUpdateAndReturnPages(pagesReported);
         expect(controller.Pages[0].destination).toEqual(newDestination.toString());
     });
 });

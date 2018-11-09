@@ -11,32 +11,23 @@
     <tbody>
         <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages | filter:{ deviceId : $ctrl.selectedDeviceId }" ng-click="$ctrl.selectPage($event,page)">
             <td>
-                <select ng-model="page.pageSize">
-                    <option id="option" value="0">A3</option>
-                    <option id="option" value="1">A2</option>
-                    <option id="option" value="2">A1</option>
-                    <option id="option" value="3">A0</option>
+                <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
+                    <option ng-repeat="size in $ctrl.PageSizeOptions" value="{{ size.value }}">{{ size.label }}</option>
                 </select>
             </td>
             <td>
                 <select ng-model="page.printQuality" ng-change="$ctrl.updatePrintQuality(page.printQuality)">
-                    <option id="option" value="0">Fast</option>
-                    <option id="option" value="1">Normal</option>
-                    <option id="option" value="2">Best</option>
+                    <option ng-repeat="quality in $ctrl.PrintQualityOptions" value="{{ quality.value }}">{{ quality.label }}</option>
                 </select>
             </td>
             <td>
                 <select ng-model="page.mediaType" ng-change="$ctrl.updateMediaType(page.mediaType)">
-                    <option id="option" value="0">Plain</option>
-                    <option id="option" value="1">Coated</option>
-                    <option id="option" value="2">Photo</option>
+                    <option ng-repeat="medium in $ctrl.MediaTypeOptions" value="{{ medium.value }}">{{ medium.label }}</option>
                 </select>
             </td>
             <td>
                 <select ng-model="page.destination" ng-change="$ctrl.updateDestination(page.destination)">
-                    <option id="option" value="0">Basket</option>
-                    <option id="option" value="1">Stacker</option>
-                    <option id="option" value="2">Folder</option>
+                    <option ng-repeat="destination in $ctrl.DestinationOptions" value="{{ destination.value }}">{{ destination.label }}</option>
                 </select>
             </td>
             <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>

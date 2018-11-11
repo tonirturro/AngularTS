@@ -31,7 +31,6 @@ export class PageGridController implements IComponentController {
     private mediaTypeOptions: ISelectableOption[] = [];
     private destinationOptions: ISelectableOption[] = [];
 
-
     // The pages elected at the grid
     private selectedPages: number[] = [];
 
@@ -46,6 +45,9 @@ export class PageGridController implements IComponentController {
         private dataService: DataService) {
     }
 
+    /**
+     * Initializes the component data
+     */
     public $onInit() {
         this.dataService.getPages().then((pages) => {
             this.pages = pages;
@@ -199,11 +201,6 @@ export class PageGridController implements IComponentController {
      * @param page is the selected page
      */
     public selectPage(event: MouseEvent, selectedPage: IVisualPage): void {
-        // ignore click on selector
-        if (event.srcElement.id === "option") {
-            return;
-        }
-
         // Do dot break multiselection if clicked on control
         const isSelector = event.srcElement.attributes.getNamedItem("ng-model");
         const isButton = event.srcElement.attributes.getNamedItem("ng-click");

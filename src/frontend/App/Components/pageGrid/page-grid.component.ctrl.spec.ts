@@ -14,7 +14,11 @@ describe("Page grid controller", () => {
      * Constants
      */
     const ExpectedDeviceId = 1;
-    const InitialPages: IVisualPage[] = [];
+    const InitialPages: IVisualPage[] = [
+        { id: 0, deviceId: 1 } as IVisualPage,
+        { id: 1, deviceId: 1 } as IVisualPage,
+        { id: 2, deviceId: 1 } as IVisualPage
+    ];
     const InitialPageOptions: ISelectableOption[] = [
         { value: "0", label: "label0" }
     ];
@@ -54,76 +58,6 @@ describe("Page grid controller", () => {
     };
 
     /**
-     * Simulates a mouse click
-     * @param srcElementId is the element where the click comes from
-     * @param attribute is the attribute we want to test
-     * @param ctrlPressed if the crtl key is pressed while clicking
-     */
-    const getClick = (srcElementId: string, attribute: string, ctrlPressed: boolean): MouseEvent => {
-        const click = {
-            altKey: false,
-            button: 0,
-            buttons: 0,
-            clientX: 0,
-            clientY: 0,
-            ctrlKey: ctrlPressed,
-            fromElement: null,
-            layerX: 0,
-            layerY: 0,
-            metaKey: false,
-            movementX: 0,
-            movementY: 0,
-            offsetX: 0,
-            offsetY: 0,
-            pageX: 0,
-            pageY: 0,
-            relatedTarget: null,
-            screenX: 0,
-            screenY: 0,
-            shiftKey: false,
-            toElement: null,
-            which: null,
-            x: 0,
-            y: 0,
-            // tslint:disable-next-line:object-literal-sort-keys
-            getModifierState: null,
-            initMouseEvent: null,
-            detail: 0,
-            view: null,
-            initUIEvent: null,
-            bubbles: false,
-            cancelBubble: false,
-            cancelable: false,
-            currentTarget: null,
-            defaultPrevented: null,
-            eventPhase: 0,
-            isTrusted: false,
-            returnValue: false,
-            srcElement: document.createElement("tr"),
-            target: null,
-            timeStamp: null,
-            type: null,
-            scoped: null,
-            initEvent: null,
-            preventDefault: null,
-            stopImmediatePropagation: null,
-            stopPropagation: null,
-            deepPath: null,
-            AT_TARGET: null,
-            BUBBLING_PHASE: null,
-            CAPTURING_PHASE: null,
-            NONE: 0
-        } as MouseEvent;
-
-        click.srcElement.id = srcElementId;
-        if (attribute.length > 0) {
-            click.srcElement.setAttribute(attribute, "expression");
-        }
-
-        return click;
-    };
-
-    /**
      * Initialize the test environment
      */
     beforeEach(angular.mock.module("myApp"));
@@ -149,7 +83,11 @@ describe("Page grid controller", () => {
         controller.$onInit();
         rootScopeService.$apply();
 
-        expect(controller.Pages.length).toBe(0);
+        expect(controller.Pages.length).toBe(InitialPages.length);
+    });
+
+    it("Has not selected pages when initialized", () => {
+        expect(controller.SelectedPages.length).toBe(0);
     });
 
     it("Has page size options when initialized", () => {
@@ -235,163 +173,6 @@ describe("Page grid controller", () => {
         rootScopeService.$apply();
 
         expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
-    it("Can select pages", () => {
-        const ExpectedSelectedPageId = 5;
-        const click = getClick("", "", false);
-        const clickedPage = getVisualPage(ExpectedSelectedPageId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(ExpectedSelectedPageId);
-    });
-
-    it("Click on option does not alter selection", () => {
-        const click = getClick("option", "", false);
-        const clickedPage = getVisualPage(0, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(0);
-    });
-
-    it("Click changes selection", () => {
-        const currentSelectedId = 5;
-        const newSelectedId = 10;
-        const click = getClick("", "", false);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [currentSelectedId];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
-    });
-
-    it("Click on option selector changes selection if only one item selected", () => {
-        const currentSelectedId = 6;
-        const newSelectedId = 11;
-        const click = getClick("", "ng-model", false);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [currentSelectedId];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
-    });
-
-    it("Click on option selector does not change selection if clicked on selected", () => {
-        const currentSelectedId = 6;
-        const click = getClick("", "ng-model", false);
-        const clickedPage = getVisualPage(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [currentSelectedId];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(currentSelectedId);
-    });
-
-    it("Click on option selector adds to selection if more than one item selected", () => {
-        const currentSelectedId1 = 7;
-        const currentSelectedId2 = 8;
-        const currentSelection = [currentSelectedId1, currentSelectedId2];
-        const newSelectedId = 11;
-        const click = getClick("", "ng-model", false);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = currentSelection;
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach((selection) => {
-            expect(controller.SelectedPages).toContain(selection);
-        });
-        expect(controller.SelectedPages).toContain(newSelectedId);
-    });
-
-    it("Click on button changes selection if only one item selected", () => {
-        const currentSelectedId = 9;
-        const newSelectedId = 15;
-        const click = getClick("", "ng-click", false);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [currentSelectedId];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(newSelectedId);
-    });
-
-    it("Click on button does not change selection if clicked on item selected", () => {
-        const currentSelectedId = 9;
-        const click = getClick("", "ng-click", false);
-        const clickedPage = getVisualPage(currentSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = [currentSelectedId];
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(1);
-        expect(controller.SelectedPages[0]).toEqual(currentSelectedId);
-    });
-
-    it("Click on button adds to selection if more than one item selected", () => {
-        const currentSelectedId1 = 10;
-        const currentSelectedId2 = 11;
-        const currentSelection = [currentSelectedId1, currentSelectedId2];
-        const newSelectedId = 20;
-        const click = getClick("", "ng-click", false);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = currentSelection;
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach((selection) => {
-            expect(controller.SelectedPages).toContain(selection);
-        });
-        expect(controller.SelectedPages).toContain(newSelectedId);
-    });
-
-    it("Click and crtl key pressed adds new item to selection", () => {
-        const currentSelectedId1 = 20;
-        const currentSelectedId2 = 21;
-        const currentSelection = [currentSelectedId1, currentSelectedId2];
-        const newSelectedId = 30;
-        const click = getClick("", "", true);
-        const clickedPage = getVisualPage(newSelectedId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = currentSelection;
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(currentSelection.length + 1);
-        currentSelection.forEach((selection) => {
-            expect(controller.SelectedPages).toContain(selection);
-        });
-        expect(controller.SelectedPages).toContain(newSelectedId);
-    });
-
-    it("Click and crtl key pressed deletes item from selection if already selected", () => {
-        const currentSelectedId = 20;
-        const clickedPageId = 21;
-        const currentSelection = [currentSelectedId, clickedPageId];
-        const click = getClick("", "", true);
-        const clickedPage = getVisualPage(clickedPageId, ExpectedDeviceId, "0", "0", "0", "0");
-        controller.SelectedPages = currentSelection;
-
-        controller.selectPage(click, clickedPage);
-
-        expect(controller.SelectedPages.length).toEqual(currentSelection.length - 1);
-        currentSelection.forEach((selection) => {
-            if (selection !== clickedPageId ) {
-                expect(controller.SelectedPages).toContain(selection);
-            }
-        });
     });
 
     it("Can update page size", () => {

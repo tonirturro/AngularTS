@@ -17,6 +17,11 @@ export class DevicePanelController {
      */
     public static $inject =  ["$log", "$rootScope", "appService", "dataService"];
 
+    /**
+     * Bindings
+     */
+    public selectedDeviceId: number;
+
     // The devices to be displayed at the panel
     private devices: DeviceDisplay[];
 
@@ -70,6 +75,7 @@ export class DevicePanelController {
      */
     public selectDevice(deviceId: number): void {
         this.appService.SelectedDeviceId = deviceId;
+        this.selectedDeviceId = deviceId;
         this.displaySelection();
     }
 
@@ -100,7 +106,7 @@ export class DevicePanelController {
     private displaySelection(): void {
         // Set selected style
         this.devices.forEach((device) => {
-            if (device.id === this.appService.SelectedDeviceId) {
+            if (device.id === this.selectedDeviceId) {
                 device.class = "item-selected";
             } else {
                 device.class = "";

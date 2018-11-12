@@ -39,7 +39,7 @@ describe("Given a page grid component ", () => {
         expect(element.find("tbody").find("tr").length).toBe(InitialPages.length);
     });
 
-    it("When created it has not selected pages", () => {
+    it("When created Then it has not selected pages", () => {
         const pages = element.find("tbody").find("tr");
         // tslint:disable-next-line:prefer-for-of
         for (let index = 0; index < pages.length; index++) {

@@ -15,13 +15,11 @@ import { DevicePanel } from "./Components/devicePanel/device-panel.component";
 import { MainPage } from "./Components/main-page.component";
 import { PageGrid } from "./Components/pageGrid/page-grid.component";
 import { ToolBar } from "./Components/toolBar/toolbar.component";
-import { AppService } from "./Services/AppService";
 import { DataService } from "./Services/DataService";
 
 export let app = angular
     .module("myApp", ["templates"])
     .service("dataService", DataService)
-    .service("appService", AppService)
     .component("toolbar", ToolBar)
     .component("devicePanel", DevicePanel)
     .component("pageGrid", PageGrid)

@@ -14,6 +14,7 @@ describe("Given a device panel component", () => {
         selectedDeviceId: number,
         selectDevice: (id: number) => void
     } | any;
+    let reportedSelectedDeviceId: number;
 
     beforeEach(angular.mock.module("myApp"));
 
@@ -25,10 +26,14 @@ describe("Given a device panel component", () => {
         spyOn(dataService, "getDevices").and.returnValue($q.resolve(InitialDevices));
         scope = $rootScope.$new();
         scope.selectedDeviceId = -1;
-        scope.selectDevice = (id: number) => {
-            scope.selectedDeviceId = id;
+        reportedSelectedDeviceId = -1;
+        scope.selectDevice = (deviceId: number) => {
+            reportedSelectedDeviceId = deviceId;
         };
-        element = angular.element(`<device-panel selected-device-id="selectedDeviceId" />`);
+        element =
+            angular.element(`<device-panel ` +
+                            `selected-device-id="selectedDeviceId" ` +
+                            `on-selected-device="selectDevice(deviceId)" />`);
         element = $compile(element)(scope);
         $rootScope.$apply();
     }));
@@ -50,11 +55,32 @@ describe("Given a device panel component", () => {
     });
 
     it("When clicking on a device Then it is selected", () => {
-        scope.selectedDeviceId = InitialDevices[0].id;
-        scope.$apply();
         const device = element.find("tbody").find("tr").find("td")[0];
         device.click();
 
         expect(device.classList.contains("item-selected")).toBeTruthy();
+    });
+
+    it("When clicking on a device Then only this is selected", () => {
+        const selectedItem = 0;
+        const devices = element.find("tbody").find("tr").find("td");
+        devices[selectedItem].click();
+
+        for (let index = 0; index < devices.length; index++) {
+            if (index === selectedItem) {
+                expect(devices[index].classList.contains("item-selected")).toBeTruthy();
+            } else {
+                expect(devices[index].classList.contains("item-selected")).toBeFalsy();
+            }
+        }
+
+    });
+
+    it("When clicking on a device Then its selection is reported", () => {
+        const selectedItem = 1;
+        const device = element.find("tbody").find("tr").find("td")[selectedItem];
+        device.click();
+
+        expect(reportedSelectedDeviceId).toEqual(InitialDevices[selectedItem].id);
     });
 });

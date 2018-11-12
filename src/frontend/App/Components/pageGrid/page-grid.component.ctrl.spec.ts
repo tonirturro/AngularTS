@@ -2,7 +2,6 @@ import * as angular from "angular";
 import { IQService, IRootScopeService } from "angular";
 import { IVisualPage, PageGridController } from "./page-grid.component.ctrl";
 
-import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
 import { ISelectableOption } from "../../../../common/rest";
@@ -42,7 +41,6 @@ describe("Page grid controller", () => {
      * Common test resources
      */
     let controller: PageGridController;
-    let appServiceToMock: AppService;
     let dataServiceToMock: DataService;
     let promiseService: IQService;
     let rootScopeService: IRootScopeService;
@@ -62,15 +60,14 @@ describe("Page grid controller", () => {
      */
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, appService, dataService) => {
-        appServiceToMock = appService;
+    beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
         dataServiceToMock = dataService;
         promiseService = $q;
         rootScopeService = $rootScope;
         getPagesMock = spyOn(dataServiceToMock, "getPages").and.returnValue(promiseService.resolve(InitialPages));
         getCapabilitiesSpy = spyOn(dataServiceToMock, "getCapabilities");
         controller = $componentController("pageGrid");
-        appServiceToMock.SelectedDeviceId = 0;
+        controller.selectedDeviceId = 0;
     }));
 
     /**
@@ -122,12 +119,6 @@ describe("Page grid controller", () => {
         expect(controller.DestinationOptions).toEqual(InitialDestinationOptions);
     });
 
-    it("Returns the selected device id", () => {
-        appServiceToMock.SelectedDeviceId = ExpectedDeviceId;
-
-        expect(controller.selectedDeviceId).toBe(ExpectedDeviceId);
-    });
-
     it("Can add pages", () => {
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.resolve(true));
 
@@ -137,7 +128,7 @@ describe("Page grid controller", () => {
     });
 
     it("The page is added to the selected device Id", () => {
-        appServiceToMock.SelectedDeviceId = ExpectedDeviceId;
+        controller.selectedDeviceId = ExpectedDeviceId;
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(promiseService.resolve(true));
 
         controller.addPage();

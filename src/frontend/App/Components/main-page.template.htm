@@ -4,10 +4,10 @@
 <div class="container">
     <div class="row">
         <div class="col-md-3 app-printer-panel no-float">
-            <device-panel />
+            <device-panel selected-device-id="mainPageController.selectedDeviceId" on-selected-device="mainPageController.selectDevice(deviceId)" />
         </div>
         <div class="col-md-9 no-float">
-            <page-grid />           
+            <page-grid selected-device-id="mainPageController.selectedDeviceId"/>           
         </div>
     </div>
 </div>

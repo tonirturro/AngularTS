@@ -1,12 +1,13 @@
 import * as angular from "angular";
-import { IAugmentedJQuery, ICompileService, IDocumentService, IQService, IRootScopeService } from "angular";
-import { AppService } from "../../Services/AppService";
+import { IAugmentedJQuery, ICompileService, IQService, IRootScopeService } from "angular";
 import { DataService } from "../../Services/DataService";
 import { IVisualPage } from "./page-grid.component.ctrl";
 
 describe("Given a page grid component ", () => {
     const SelectedDeviceId = 1;
     let element: IAugmentedJQuery;
+    let scope: any;
+    let rootScope: IRootScopeService;
 
     const InitialPages: IVisualPage[] = [
         { id: 0, deviceId: SelectedDeviceId } as IVisualPage,
@@ -20,15 +21,15 @@ describe("Given a page grid component ", () => {
         $compile: ICompileService,
         $rootScope: IRootScopeService,
         dataService: DataService,
-        appService: AppService,
         $q: IQService) => {
-        spyOnProperty(appService, "SelectedDeviceId").and.returnValue(SelectedDeviceId);
+        rootScope = $rootScope;
         spyOn(dataService, "getPages").and.returnValue($q.resolve(InitialPages));
         spyOn(dataService, "getCapabilities").and.returnValue($q.resolve(""));
-        const scope = $rootScope.$new();
-        element = angular.element("<page-grid />");
+        scope = $rootScope.$new();
+        scope.selectedDeviceID = SelectedDeviceId;
+        element = angular.element(`<page-grid selected-device-id="selectedDeviceID" />`);
         element = $compile(element)(scope);
-        $rootScope.$apply();
+        rootScope.$apply();
     }));
 
     it("When created Then it has the html defined", () => {
@@ -37,6 +38,14 @@ describe("Given a page grid component ", () => {
 
     it("When created Then the component has the pages set by the model", () => {
         expect(element.find("tbody").find("tr").length).toBe(InitialPages.length);
+    });
+
+    it("When the selected device id does not match the one from the initiial pages " +
+       "Then the component does not display any page", () => {
+        scope.selectedDeviceID = SelectedDeviceId + 1;
+        rootScope.$apply();
+
+        expect(element.find("tbody").find("tr").length).toBe(0);
     });
 
     it("When created Then it has not selected pages", () => {

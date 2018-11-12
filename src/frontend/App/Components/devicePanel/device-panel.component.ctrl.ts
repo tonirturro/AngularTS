@@ -1,49 +1,43 @@
 
-import { ILogService, IRootScopeService } from "angular";
+import { IComponentController, ILogService, IRootScopeService } from "angular";
 
 import { IDevice } from "../../../../common/rest";
 import { ModelUpdate } from "../../Model/ModelEvents";
-import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 import { DeviceDisplay } from "./DeviceDisplay";
 
 /**
  * handles the bindings inside the component
  */
-export class DevicePanelController {
+export class DevicePanelController implements IComponentController {
 
     /**
      * Define dependencies
      */
-    public static $inject =  ["$log", "$rootScope", "appService", "dataService"];
+    public static $inject =  ["$log", "$rootScope", "dataService"];
 
     /**
      * Bindings
      */
     public selectedDeviceId: number;
+    public onSelectedDevice: (data: { deviceId: number } ) => void;
 
     // The devices to be displayed at the panel
     private devices: DeviceDisplay[];
+
+    // event unsubscription
+    private unsubscribeUpdateEvent: () => void;
 
     /**
      * Initializes a new instance of the DevicePanelController class.
      * @param logService the angular ILogService
      * @param rootScopeService the angular IRootScopeService
-     * @param appService the bussiness rules for this application
      * @param dataService the data service for this application
      */
     constructor(
         private logService: ILogService,
         private rootScopeService: IRootScopeService,
-        private appService: AppService,
-        private dataService: DataService) {
-            this.loadDevices();
-
-            // Capture model events
-            this.rootScopeService.$on(ModelUpdate.Devices, () => {
-                this.loadDevices();
-            });
-        }
+        private dataService: DataService) {}
 
     /**
      * Gets the available devices
@@ -53,14 +47,33 @@ export class DevicePanelController {
     }
 
     /**
+     * Component initialization
+     */
+    public $onInit() {
+        this.loadDevices();
+
+        // Capture model events
+        this.unsubscribeUpdateEvent = this.rootScopeService.$on(ModelUpdate.Devices, () => {
+            this.loadDevices();
+        });
+    }
+
+    /**
+     * Component termination
+     */
+    public $onDestroy() {
+        this.unsubscribeUpdateEvent();
+    }
+
+    /**
      * Delete the requested device
      * @param deviceId the device to be deleted
      */
     public deleteDevice(deviceId: number): void {
         this.dataService.deleteDevice(deviceId).then((sucess) => {
             if (sucess) {
-                if (this.appService.SelectedDeviceId === deviceId) {
-                    this.appService.SelectedDeviceId = -1;
+                if (this.selectedDeviceId === deviceId) {
+                    this.onSelectedDevice({ deviceId: -1 });
                 }
                 this.loadDevices();
             } else {
@@ -74,8 +87,7 @@ export class DevicePanelController {
      * @param deviceId the id for the selected device
      */
     public selectDevice(deviceId: number): void {
-        this.appService.SelectedDeviceId = deviceId;
-        this.selectedDeviceId = deviceId;
+        this.onSelectedDevice({ deviceId });
         this.displaySelection();
     }
 
@@ -89,8 +101,8 @@ export class DevicePanelController {
                 this.devices.push(new DeviceDisplay(device.id, device.name));
             });
 
-            if (this.devices.length > 0 && this.appService.SelectedDeviceId < 0) {
-                this.appService.SelectedDeviceId = this.devices[0].id;
+            if (this.devices.length > 0 && this.selectedDeviceId < 0) {
+                this.selectedDeviceId = this.devices[0].id;
             }
 
             this.displaySelection();

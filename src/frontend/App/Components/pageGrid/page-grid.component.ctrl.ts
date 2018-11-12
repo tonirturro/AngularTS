@@ -1,7 +1,6 @@
 import { IComponentController } from "angular";
 import { PageFields } from "../../../../common/model";
 import { ISelectableOption } from "../../../../common/rest";
-import { AppService } from "../../Services/AppService";
 import { DataService } from "../../Services/DataService";
 
 export interface IVisualPage {
@@ -22,7 +21,12 @@ export class PageGridController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["appService", "dataService"];
+    public static $inject = ["dataService"];
+
+    /**
+     * From Bindings
+     */
+    public selectedDeviceId: number;
 
     // The pages displayed at the grid
     private pages: IVisualPage[] = [];
@@ -36,14 +40,9 @@ export class PageGridController implements IComponentController {
 
     /**
      * Initializes a new instance of the PageGridController class.
-     * @param logService is the Angular log service
-     * @param appService the bussiness rules for this application
      * @param dataService the connection to the backend service
      */
-    constructor(
-        private appService: AppService,
-        private dataService: DataService) {
-    }
+    constructor(private dataService: DataService) {}
 
     /**
      * Initializes the component data
@@ -115,13 +114,6 @@ export class PageGridController implements IComponentController {
         this.selectedPages = selectedPages.slice();
     }
 
-    /**
-     * Returns the selected device id
-     */
-    public get selectedDeviceId(): number {
-        return this.appService.SelectedDeviceId;
-    }
-
     public checkFilterOptions(value: IVisualPage): boolean {
         return value.deviceId === 1;
     }
@@ -130,8 +122,8 @@ export class PageGridController implements IComponentController {
      * Request a new page
      */
     public addPage(): void {
-        if (this.appService.SelectedDeviceId >= 0) {
-            this.dataService.addNewPage(this.appService.SelectedDeviceId).then((success) => {
+        if (this.selectedDeviceId >= 0) {
+            this.dataService.addNewPage(this.selectedDeviceId).then((success) => {
                 this.updatePages(success);
             });
         }

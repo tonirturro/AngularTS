@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Tests",
+            "name": "Launch Backend Tests",
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
                 "-u",
@@ -19,13 +19,6 @@
                 "--recursive"
             ],
             "internalConsoleOptions": "openOnSessionStart"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Launch Front End",
-            "url": "http://localhost:3000",
-            "webRoot": "${workspaceRoot}"
         },
         {
             "type": "node",

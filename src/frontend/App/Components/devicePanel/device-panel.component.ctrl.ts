@@ -23,7 +23,7 @@ export class DevicePanelController implements IComponentController {
     public onSelectedDevice: (data: { deviceId: number } ) => void;
 
     // The devices to be displayed at the panel
-    private devices: DeviceDisplay[];
+    private devices: DeviceDisplay[] = [];
 
     // event unsubscription
     private unsubscribeUpdateEvent: () => void;
@@ -59,6 +59,15 @@ export class DevicePanelController implements IComponentController {
     }
 
     /**
+     * Component update
+     */
+    public $onChanges(changes: any) {
+        if (changes.selectedDeviceId) {
+            this.displaySelection();
+        }
+    }
+
+    /**
      * Component termination
      */
     public $onDestroy() {
@@ -88,7 +97,6 @@ export class DevicePanelController implements IComponentController {
      */
     public selectDevice(deviceId: number): void {
         this.onSelectedDevice({ deviceId });
-        this.displaySelection();
     }
 
     /**

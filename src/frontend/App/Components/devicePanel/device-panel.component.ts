@@ -6,6 +6,8 @@ import { DevicePanelController } from "./device-panel.component.ctrl";
  */
 export const DevicePanel: IComponentOptions = {
     bindings: {
+        devices: "<",
+        onDeleteDevice: "&",
         onSelectedDevice: "&",
         selectedDeviceId: "<"
     },

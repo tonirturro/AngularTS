@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import { IAugmentedJQuery, ICompileService, IQService, IRootScopeService, IScope } from "angular";
+import { IAugmentedJQuery, ICompileService, IQService, IRootScopeService } from "angular";
 import { IDevice } from "../../../../common/rest";
 import { DataService } from "../../Services/DataService";
 
@@ -15,6 +15,8 @@ describe("Given a device panel component", () => {
         selectDevice: (id: number) => void
     } | any;
     let reportedSelectedDeviceId: number;
+    let reportedDeletedDeviceId: number;
+    let rootScope: IRootScopeService;
 
     beforeEach(angular.mock.module("myApp"));
 
@@ -23,19 +25,27 @@ describe("Given a device panel component", () => {
         $rootScope: IRootScopeService,
         $q: IQService,
         dataService: DataService) => {
+        rootScope = $rootScope;
         spyOn(dataService, "getDevices").and.returnValue($q.resolve(InitialDevices));
         scope = $rootScope.$new();
+        scope.devices = InitialDevices;
         scope.selectedDeviceId = -1;
         reportedSelectedDeviceId = -1;
+        reportedDeletedDeviceId = -1;
         scope.selectDevice = (deviceId: number) => {
             reportedSelectedDeviceId = deviceId;
         };
+        scope.deleteDevice = (deviceId: number) => {
+            reportedDeletedDeviceId = deviceId;
+        };
         element =
             angular.element(`<device-panel ` +
+                            `devices="devices" `  +
                             `selected-device-id="selectedDeviceId" ` +
-                            `on-selected-device="selectDevice(deviceId)" />`);
+                            `on-selected-device="selectDevice(deviceId)"` +
+                            `on-delete-device="deleteDevice(deviceId)" />`);
         element = $compile(element)(scope);
-        $rootScope.$apply();
+        rootScope.$apply();
     }));
 
     it("When created Then it has the html defined", () => {
@@ -54,17 +64,11 @@ describe("Given a device panel component", () => {
         }
     });
 
-    it("When clicking on a device Then it is selected", () => {
-        const device = element.find("tbody").find("tr").find("td")[0];
-        device.click();
-
-        expect(device.classList.contains("item-selected")).toBeTruthy();
-    });
-
-    it("When clicking on a device Then only this is selected", () => {
-        const selectedItem = 0;
+    it("When a device is selected Then only this is showed as seleted", () => {
         const devices = element.find("tbody").find("tr").find("td");
-        devices[selectedItem].click();
+        const selectedItem = 0;
+        scope.selectedDeviceId = InitialDevices[selectedItem].id;
+        rootScope.$apply();
 
         for (let index = 0; index < devices.length; index++) {
             if (index === selectedItem) {
@@ -82,5 +86,13 @@ describe("Given a device panel component", () => {
         device.click();
 
         expect(reportedSelectedDeviceId).toEqual(InitialDevices[selectedItem].id);
+    });
+
+    it("When clicking on a device delete button Then its deletion is reported", () => {
+        const selectedItem = 0;
+        const device = element.find("tbody").find("tr").find("td").find("button")[selectedItem];
+        device.click();
+
+        expect(reportedDeletedDeviceId).toEqual(InitialDevices[selectedItem].id);
     });
 });

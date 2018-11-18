@@ -24,47 +24,7 @@ describe("Data Service Test", () => {
             pageSize: 2,
             printQuality: 3,
         };
-
-        /**
-         * Data driven test case for the updates
-         * @param field is the field to be updated
-         * @param pageId is the id for the page to be updated
-         * @param newValue is the new value to be set
-         * @param done is the Mocha completion callback
-         */
-        const executeAndVerifyUpdate = (field: string, pageId: number, newValue: number, done: () => void) => {
-            const response: IUpdateResponse = { success: true };
-            httpBackend.whenPUT(`${pagesUrl}${field}`).respond(200, response);
-
-            switch (field) {
-                case PageFields.PageSize:
-                    service.updatePageSize([pageId], newValue).then((success) => {
-                        expect(success).toBeTruthy();
-                        done();
-                    });
-                    break;
-                case PageFields.PrintQuality:
-                    service.updatePrintQuality([pageId], newValue).then((success) => {
-                        expect(success).toBeTruthy();
-                        done();
-                    });
-                    break;
-                case PageFields.MediaType:
-                    service.updateMediaType([pageId], newValue).then((success) => {
-                        expect(success).toBeTruthy();
-                        done();
-                    });
-                    break;
-                case PageFields.Destination:
-                    service.updateDestination([pageId], newValue).then((success) => {
-                        expect(success).toBeTruthy();
-                        done();
-                    });
-                    break;
-            }
-
-            httpBackend.flush();
-        };
+        const response: IUpdateResponse = { success: true };
 
         /**
          * Common test resources
@@ -120,7 +80,6 @@ describe("Data Service Test", () => {
         });
 
         it("Can add pages", (done) => {
-            const response: IUpdateResponse = { success: true };
             httpBackend.whenPOST(`${pagesUrl}${SelectedDeviceId}`).respond(200, response);
 
             service.addNewPage(SelectedDeviceId).then((success) => {
@@ -147,20 +106,16 @@ describe("Data Service Test", () => {
             httpBackend.flush();
         });
 
-        it("Can update page size", (done) => {
-            executeAndVerifyUpdate(PageFields.PageSize, 10, 0, done);
-        });
+        it("Can update page field", (done) => {
+            const fieldToSet = "anyField";
+            httpBackend.whenPUT(`${pagesUrl}${fieldToSet}`).respond(200, response);
 
-        it("Can update print quality", (done) => {
-            executeAndVerifyUpdate(PageFields.PrintQuality, 20, 1, done);
-        });
+            service.updatePageField(fieldToSet, [ 10 ], 0).then((succes) => {
+                expect(succes).toBeTruthy();
+                done();
+            });
 
-        it("Can update media type", (done) => {
-            executeAndVerifyUpdate(PageFields.MediaType, 5, 2, done);
-        });
-
-        it("Can update destination", (done) => {
-            executeAndVerifyUpdate(PageFields.Destination, 30, 0, done);
+            httpBackend.flush();
         });
 
         /***********************************************************************************************
@@ -185,7 +140,6 @@ describe("Data Service Test", () => {
         });
 
         it("Can add devices", (done) => {
-            const response: IUpdateResponse = { success: true };
             httpBackend.whenPUT(devicesUrl).respond(200, response);
 
             service.addNewDevice().then((success) => {

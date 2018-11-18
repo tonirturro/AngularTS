@@ -9,7 +9,6 @@ import { UpdateParams } from "./UpdateParams";
 ** Service to access data from the backend
 */
 export class DataService {
-
     /**
      * Define dependencies
      */
@@ -157,7 +156,7 @@ export class DataService {
     }
 
     /**
-     * Querybthe options available for a particular device capability
+     * Query the options available for a particular device capability
      * @param capability the capability to be queried
      */
     public getCapabilities(capability: string): IPromise<ISelectableOption[]> {
@@ -175,39 +174,13 @@ export class DataService {
     }
 
     /**
-     * Updates the page size for an existing page
-     * @param idToUpdate is the id for the page to be updated
-     * @param newValueToSet is the new page size value
+     * Updates a particular field for a set of pages
+     * @param field The field to be updated
+     * @param pages The pages to be updated
+     * @param newValueToSet The new value to be set
      */
-    public updatePageSize(pages: number[], newValueToSet: number): IPromise<boolean> {
-        return this.performUpdate(PageFields.PageSize, new UpdateParams(pages, newValueToSet));
-    }
-
-    /**
-     * Updates the print quality for an existing page
-     * @param idToUpdate is the id for the page to be updated
-     * @param newValueToSet is the new print quality value
-     */
-    public updatePrintQuality(pages: number[], newValueToSet: number): IPromise<boolean> {
-        return this.performUpdate(PageFields.PrintQuality, new UpdateParams(pages, newValueToSet));
-    }
-
-    /**
-     * Updates the media type for an existing page
-     * @param idToUpdate is the id for the page to be updated
-     * @param newValueToSet is the new media type value
-     */
-    public updateMediaType(pages: number[], newValueToSet: number): IPromise<boolean> {
-        return this.performUpdate(PageFields.MediaType, new UpdateParams(pages, newValueToSet));
-    }
-
-    /**
-     * Updates the media type for an existing page
-     * @param idToUpdate is the id for the page to be updated
-     * @param newValueToSet is the new media type value
-     */
-    public updateDestination(pages: number[], newValueToSet: number): IPromise<boolean> {
-        return this.performUpdate(PageFields.Destination, new UpdateParams(pages, newValueToSet));
+    public updatePageField(field: string, pages: number[], newValueToSet: number): IPromise<boolean> {
+        return this.performUpdate(field, new UpdateParams(pages, newValueToSet));
     }
 
     /**

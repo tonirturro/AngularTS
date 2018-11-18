@@ -1,7 +1,6 @@
 import { IComponentController } from "angular";
 import { PageFields } from "../../../../common/model";
 import { ISelectableOption } from "../../../../common/rest";
-import { DataService } from "../../Services/DataService";
 
 export interface IVisualPage {
     id: number;
@@ -13,120 +12,84 @@ export interface IVisualPage {
     destination: string;
 }
 
+export interface IPageSelectionData {
+    pageId: number;
+    multiselection: boolean;
+}
+
+export interface IPageUpdateData {
+    field: string;
+    newValue: number;
+}
+
+export interface IPageDeletionData {
+    pageId: number;
+}
+
+export interface ICapabilities {
+    [index: string]: ISelectableOption[];
+}
+
 /**
  * Handles the bindings inside the component
  */
 export class PageGridController implements IComponentController {
 
     /**
-     * Define dependencies
-     */
-    public static $inject = ["dataService"];
-
-    /**
      * From Bindings
      */
+    public capabilities: ICapabilities = {};
     public selectedDeviceId: number;
-
-    // The pages displayed at the grid
-    private pages: IVisualPage[] = [];
-    private pageSizeOptions: ISelectableOption[] = [];
-    private printQualityOptions: ISelectableOption[] = [];
-    private mediaTypeOptions: ISelectableOption[] = [];
-    private destinationOptions: ISelectableOption[] = [];
-
-    // The pages elected at the grid
-    private selectedPages: number[] = [];
+    public selectedPages: number[] = [];
+    public pages: IVisualPage[] = [];
+    public onAddPage: () => void;
+    public onSelectedPage: (data: IPageSelectionData) => void;
+    public onUpdatePages: (data: IPageUpdateData) => void;
+    public onDeletePage: (data: IPageDeletionData) => void;
 
     /**
-     * Initializes a new instance of the PageGridController class.
-     * @param dataService the connection to the backend service
+     * Detects changes on parameters
+     * @param changes the parameters that may change
      */
-    constructor(private dataService: DataService) {}
-
-    /**
-     * Initializes the component data
-     */
-    public $onInit() {
-        this.dataService.getPages().then((pages) => {
-            this.pages = pages;
-        });
-        this.dataService.getCapabilities(PageFields.PageSize).then((options) => {
-            this.pageSizeOptions = options;
-        });
-        this.dataService.getCapabilities(PageFields.PrintQuality).then((options) => {
-            this.printQualityOptions = options;
-        });
-        this.dataService.getCapabilities(PageFields.MediaType).then((options) => {
-            this.mediaTypeOptions = options;
-        });
-        this.dataService.getCapabilities(PageFields.Destination).then((options) => {
-            this.destinationOptions = options;
-        });
+    public $onChanges(changes: any) {
+        if (changes.pages  || changes.selectedPages) {
+            this.displaySelection();
+        }
     }
 
     /**
      * Get the available page options
      */
     public get PageSizeOptions(): ISelectableOption[] {
-        return this.pageSizeOptions;
+        return this.capabilities[PageFields.PageSize];
     }
 
     /**
      * Get the available print quality options
      */
     public get PrintQualityOptions(): ISelectableOption[] {
-        return this.printQualityOptions;
+        return this.capabilities[PageFields.PrintQuality];
     }
 
     /**
      * Get the available madia type options
      */
     public get MediaTypeOptions(): ISelectableOption[] {
-        return this.mediaTypeOptions;
+        return this.capabilities[PageFields.MediaType];
     }
 
     /**
      * Get the available destination options
      */
     public get DestinationOptions(): ISelectableOption[] {
-        return this.destinationOptions;
-    }
-
-    /**
-     * Gets the available pages
-     */
-    public get Pages(): IVisualPage[] {
-        return this.pages;
-    }
-
-    /**
-     * Gets the selected pages for testing purposes
-     */
-    public get SelectedPages(): number[] {
-        return this.selectedPages;
-    }
-
-    /**
-     * Sets the selected pages for testing purposes
-     */
-    public set SelectedPages(selectedPages: number[]) {
-        this.selectedPages = selectedPages.slice();
-    }
-
-    public checkFilterOptions(value: IVisualPage): boolean {
-        return value.deviceId === 1;
+        return this.capabilities[PageFields.Destination];
     }
 
     /**
      * Request a new page
      */
     public addPage(): void {
-        if (this.selectedDeviceId >= 0) {
-            this.dataService.addNewPage(this.selectedDeviceId).then((success) => {
-                this.updatePages(success);
-            });
-        }
+        this.onAddPage();
     }
 
     /**
@@ -134,9 +97,7 @@ export class PageGridController implements IComponentController {
      * @param pageTodelete is the page id to be deletd
      */
     public deletePage(pageTodelete: number): void {
-        this.dataService.deletePage(pageTodelete).then((success) => {
-            this.updatePages(success);
-        });
+        this.onDeletePage({ pageId: pageTodelete });
     }
 
     /**
@@ -144,11 +105,7 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new page size value
      */
     public updatePageSize(newValue: number): void {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updatePageSize(this.selectedPages, newValue).then((success) => {
-                this.updatePages(success);
-            });
-        }
+        this.onUpdatePages({ field: PageFields.PageSize, newValue });
     }
 
     /**
@@ -156,11 +113,7 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new print quality value
      */
     public updatePrintQuality(newValue: number): void {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updatePrintQuality(this.selectedPages, newValue).then((success) => {
-                this.updatePages(success);
-            });
-        }
+        this.onUpdatePages({ field: PageFields.PrintQuality, newValue });
     }
 
     /**
@@ -168,11 +121,7 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new media type value
      */
     public updateMediaType(newValue: number): void {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updateMediaType(this.selectedPages, newValue).then((success) => {
-                this.updatePages(success);
-            });
-        }
+        this.onUpdatePages({ field: PageFields.MediaType, newValue });
     }
 
     /**
@@ -180,11 +129,7 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new media type destination value
      */
     public updateDestination(newValue: number): void {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updateDestination(this.selectedPages, newValue).then((success) => {
-                this.updatePages(success);
-            });
-        }
+        this.onUpdatePages({ field: PageFields.Destination, newValue });
     }
 
     /**
@@ -197,48 +142,13 @@ export class PageGridController implements IComponentController {
         const isSelector = event.srcElement.attributes.getNamedItem("ng-model");
         const isButton = event.srcElement.attributes.getNamedItem("ng-click");
         if (isSelector || isButton) {
-            if (this.selectedPages.indexOf(selectedPage.id) < 0) {
-                if (this.selectedPages.length > 1) {
-                    this.selectedPages.push(selectedPage.id);
-                } else {
-                    this.selectedPages = [selectedPage.id];
-                }
-
-                this.displaySelection();
-            }
-
+            this.onSelectedPage({ pageId: selectedPage.id, multiselection: true});
             return;
         }
 
         // Set selection
-        // tslint:disable-next-line:prefer-const
-        let isMultiSelection = event.ctrlKey;
-        if (isMultiSelection) {
-            const indexOfSelectedPage = this.selectedPages.indexOf(selectedPage.id);
-            if (indexOfSelectedPage < 0) {
-                this.selectedPages.push(selectedPage.id);
-            } else {
-                this.selectedPages.splice(indexOfSelectedPage, 1);
-            }
-        } else {
-            this.selectedPages = [selectedPage.id];
-        }
-
-        // Show selection styles
-        this.displaySelection();
-    }
-
-    /**
-     * Updates the pages with the new values
-     * @param success if we need to update
-     */
-    private updatePages(success: boolean): void {
-        if (success) {
-            this.dataService.getPages().then((pages) => {
-                this.pages = pages;
-                this.displaySelection();
-            });
-        }
+        const isMultiSelection = event.ctrlKey;
+        this.onSelectedPage({ pageId: selectedPage.id, multiselection: isMultiSelection});
     }
 
     /**

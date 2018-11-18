@@ -6,7 +6,14 @@ import { PageGridController } from "./page-grid.component.ctrl";
  */
 export const PageGrid: IComponentOptions = {
     bindings: {
-        selectedDeviceId: "<"
+        capabilities: "<",
+        onAddPage: "&",
+        onDeletePage: "&",
+        onSelectedPage: "&",
+        onUpdatePages: "&",
+        pages: "<",
+        selectedDeviceId: "<",
+        selectedPages: "<"
     },
     controller: PageGridController,
     templateUrl: "pageGrid/page-grid.template.htm"

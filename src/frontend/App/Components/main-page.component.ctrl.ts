@@ -2,6 +2,7 @@ import { IComponentController, ILogService, IRootScopeService } from "angular";
 import { ModelUpdate } from "../Model/ModelEvents";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
+import { IVisualPage } from "./pageGrid/page-grid.component.ctrl";
 
 export class MainPageController implements IComponentController {
     /**
@@ -11,6 +12,8 @@ export class MainPageController implements IComponentController {
 
     public selectedDeviceId: number;
     public devices: DeviceDisplay[] = [];
+    public selectedPages: number[] = [];
+    public pages: IVisualPage[] = [];
 
     // event unsubscription
     private unsubscribeUpdateEvent: () => void;
@@ -25,6 +28,7 @@ export class MainPageController implements IComponentController {
      */
     public $onInit() {
         this.loadDevices();
+        this.loadPages();
 
         // Capture model events
         this.unsubscribeUpdateEvent = this.rootScopeService.$on(ModelUpdate.Devices, () => {
@@ -78,10 +82,63 @@ export class MainPageController implements IComponentController {
         });
     }
 
+    public selectPage(pageId: number, multiselection: boolean) {
+        if (multiselection && this.selectedPages.length > 0) {
+            const indexOfSelectedPage = this.selectedPages.indexOf(pageId);
+            if (indexOfSelectedPage < 1) {
+                this.selectedPages.push(pageId);
+            } else {
+                this.selectedPages.splice(indexOfSelectedPage, 1);
+            }
+        } else {
+            this.selectedPages = [pageId];
+        }
+    }
+
+    /**
+     * Adds a page to the selected device
+     */
+    public addPage(): any {
+        if (this.selectedDeviceId >= 0) {
+            this.dataService.addNewPage(this.selectedDeviceId).then((success) => {
+                if (success) {
+                    this.loadPages();
+                }
+            });
+        }
+    }
+
+    /**
+     * Deletes an existing page
+     * @param idTodelete the id for the page to be deleted
+     */
+    public deletePage(idTodelete: number) {
+        this.dataService.deletePage(idTodelete).then((success) => {
+            if (success) {
+                this.loadPages();
+            }
+        });
+    }
+
+    /**
+     * Update a particular page field
+     * @param field the field to be updated
+     * @param newValue the new value
+     */
+    public updatePageField(field: string, newValue: number) {
+        if (this.selectedPages.length > 0) {
+            this.dataService.updatePageField(field, this.selectedPages, newValue).then((success) => {
+                if (success) {
+                    this.loadPages();
+                }
+            });
+        }
+    }
+
     /**
      * Load the existing devices
      */
-    private loadDevices(): void {
+    private loadDevices() {
         this.devices = [];
         this.dataService.getDevices().then((devices) => {
             devices.forEach((device) => {
@@ -92,8 +149,14 @@ export class MainPageController implements IComponentController {
                 this.selectedDeviceId = this.devices[0].id;
             }
         })
-        .catch((reason) => {
-            this.logService.error(`Failed to load devices because : ${reason}`);
+            .catch((reason) => {
+                this.logService.error(`Failed to load devices because : ${reason}`);
+            });
+    }
+
+    private loadPages() {
+        this.dataService.getPages().then((pages) => {
+            this.pages = pages;
         });
     }
 }

@@ -1,6 +1,7 @@
 import * as angular from "angular";
-import { IQService, IRootScopeService } from "angular";
+import { IPromise, IQService, IRootScopeService } from "angular";
 import { PageFields } from "../../../common/model";
+import { ISelectableOption } from "../../../common/rest";
 import { ModelUpdate } from "../Model/ModelEvents";
 import { DataService } from "../Services/DataService";
 import { MainPageController } from "./main-page.component.ctrl";
@@ -11,6 +12,23 @@ describe("Given a main page component controller", () => {
     let rootScopeService: IRootScopeService;
     let dataServiceToMock: DataService;
     let getPagesMock: jasmine.Spy;
+
+    const PageSizeCapabilities: ISelectableOption[] = [
+        { value: "0", label: "page0" },
+        { value: "1", label: "page1" }
+    ];
+    const PrintQualityCapabilities: ISelectableOption[] =  [
+        { value: "0", label: "quality0" },
+        { value: "1", label: "quality1" }
+    ];
+    const MediaTypeCapabilities: ISelectableOption[] = [
+        { value: "0", label: "media0" },
+        { value: "1", label: "media1" }
+    ];
+    const DestinationCapabilities: ISelectableOption[] = [
+        { value: "0", label: "destination0" },
+        { value: "1", label: "destination1" }
+    ];
 
     beforeEach(angular.mock.module("myApp"));
 
@@ -26,6 +44,21 @@ describe("Given a main page component controller", () => {
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(q.resolve(true));
         getPagesMock = spyOn(dataServiceToMock, "getPages");
         getPagesMock.and.returnValue(q.resolve(true));
+        spyOn(dataServiceToMock, "getCapabilities")
+            .and.callFake((capability: string): IPromise<ISelectableOption[]> => {
+                switch (capability) {
+                    case PageFields.PageSize:
+                        return q.resolve(PageSizeCapabilities);
+                    case PageFields.PrintQuality:
+                        return q.resolve(PrintQualityCapabilities);
+                    case PageFields.MediaType:
+                        return q.resolve(MediaTypeCapabilities);
+                    case PageFields.Destination:
+                        return q.resolve(DestinationCapabilities);
+                    default:
+                        return q.reject("Invalid field");
+                }
+            });
         controller = $componentController("mainPage");
     }));
 
@@ -210,5 +243,15 @@ describe("Given a main page component controller", () => {
         rootScopeService.$apply();
 
         expect(dataServiceToMock.getPages).toHaveBeenCalled();
+    });
+
+    it("When initialized then The capabilitoies are reported", () => {
+        controller.$onInit();
+        rootScopeService.$apply();
+
+        expect(controller.capabilities[PageFields.PageSize]).toEqual(PageSizeCapabilities);
+        expect(controller.capabilities[PageFields.PrintQuality]).toEqual(PrintQualityCapabilities);
+        expect(controller.capabilities[PageFields.MediaType]).toEqual(MediaTypeCapabilities);
+        expect(controller.capabilities[PageFields.Destination]).toEqual(DestinationCapabilities);
     });
 });

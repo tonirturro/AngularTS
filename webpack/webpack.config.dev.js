@@ -6,5 +6,5 @@ module.exports = merge(webpackBaseConfig, {
         filename: 'bundle.js' 
     },
     mode: 'development',
-    devtool: 'inline-source-map'
+    devtool: 'cheap-module-eval-source-map'
 });

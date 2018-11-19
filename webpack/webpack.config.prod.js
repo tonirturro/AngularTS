@@ -5,5 +5,6 @@ module.exports = merge(webpackBaseConfig, {
     output: {
         filename: 'bundle.js' 
     },
-    mode: 'production'
+    mode: 'production',
+    target: "electron-renderer"
 });

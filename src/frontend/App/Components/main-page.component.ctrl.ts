@@ -1,8 +1,9 @@
 import { IComponentController, ILogService, IRootScopeService } from "angular";
+import { PageFields } from "../../../common/model";
 import { ModelUpdate } from "../Model/ModelEvents";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
-import { IVisualPage } from "./pageGrid/page-grid.component.ctrl";
+import { ICapabilities, IVisualPage } from "./pageGrid/page-grid.component.ctrl";
 
 export class MainPageController implements IComponentController {
     /**
@@ -10,10 +11,11 @@ export class MainPageController implements IComponentController {
      */
     public static $inject = ["$log", "$rootScope", "dataService"];
 
-    public selectedDeviceId: number;
+    public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
     public selectedPages: number[] = [];
     public pages: IVisualPage[] = [];
+    public capabilities: ICapabilities = {};
 
     // event unsubscription
     private unsubscribeUpdateEvent: () => void;
@@ -27,6 +29,7 @@ export class MainPageController implements IComponentController {
      * Component initialization
      */
     public $onInit() {
+        this.loadCapabilities();
         this.loadDevices();
         this.loadPages();
 
@@ -85,11 +88,13 @@ export class MainPageController implements IComponentController {
     public selectPage(pageId: number, multiselection: boolean) {
         if (multiselection && this.selectedPages.length > 0) {
             const indexOfSelectedPage = this.selectedPages.indexOf(pageId);
+            const currentSelected = this.selectedPages.concat();
             if (indexOfSelectedPage < 1) {
-                this.selectedPages.push(pageId);
+                currentSelected.push(pageId);
             } else {
-                this.selectedPages.splice(indexOfSelectedPage, 1);
+                currentSelected.splice(indexOfSelectedPage, 1);
             }
+            this.selectedPages = currentSelected;
         } else {
             this.selectedPages = [pageId];
         }
@@ -136,24 +141,46 @@ export class MainPageController implements IComponentController {
     }
 
     /**
+     * Loads the available capabilities
+     */
+    private loadCapabilities() {
+        this.dataService.getCapabilities(PageFields.PageSize).then((capabilities) => {
+            this.capabilities[PageFields.PageSize] = capabilities;
+        });
+        this.dataService.getCapabilities(PageFields.PrintQuality).then((capabilities) => {
+            this.capabilities[PageFields.PrintQuality] = capabilities;
+        });
+        this.dataService.getCapabilities(PageFields.MediaType).then((capabilities) => {
+            this.capabilities[PageFields.MediaType] = capabilities;
+        });
+        this.dataService.getCapabilities(PageFields.Destination).then((capabilities) => {
+            this.capabilities[PageFields.Destination] = capabilities;
+        });
+    }
+
+    /**
      * Load the existing devices
      */
     private loadDevices() {
-        this.devices = [];
+        const newDevices = [];
         this.dataService.getDevices().then((devices) => {
             devices.forEach((device) => {
-                this.devices.push(new DeviceDisplay(device.id, device.name));
+                newDevices.push(new DeviceDisplay(device.id, device.name));
             });
+            this.devices = newDevices;
 
             if (this.devices.length > 0 && this.selectedDeviceId < 0) {
                 this.selectedDeviceId = this.devices[0].id;
             }
         })
-            .catch((reason) => {
-                this.logService.error(`Failed to load devices because : ${reason}`);
-            });
+        .catch((reason) => {
+            this.logService.error(`Failed to load devices because : ${reason}`);
+        });
     }
 
+    /**
+     * Loads the available pages
+     */
     private loadPages() {
         this.dataService.getPages().then((pages) => {
             this.pages = pages;

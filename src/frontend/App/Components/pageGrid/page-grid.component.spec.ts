@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import { IAugmentedJQuery, ICompileService, IRootScopeService } from "angular";
+import { IAugmentedJQuery, ICompileService, IDocumentService, IRootScopeService } from "angular";
 import { PageFields } from "../../../../common/model";
 import { ISelectableOption } from "../../../../common/rest";
 import { ICapabilities, IVisualPage } from "./page-grid.component.ctrl";
@@ -53,6 +53,7 @@ describe("Given a page grid component ", () => {
 
     beforeEach(inject((
         $compile: ICompileService,
+        $document: IDocumentService,
         $rootScope: IRootScopeService) => {
         rootScope = $rootScope;
         scope = $rootScope.$new();

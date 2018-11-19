@@ -33,3 +33,7 @@ header {
 .app-printer-panel {
     background: ghostwhite;
 }
+
+.toolbar-button-right {
+    margin-left: 868px;
+}

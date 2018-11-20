@@ -6,8 +6,13 @@ import { ToolBarController } from "./toolbar.component.ctrl";
  */
 export const ToolBar: IComponentOptions = {
     bindings: {
+        editingDevices: "<",
         onAddDevice: "&",
+        onClose: "&",
+        onEditDevices: "&",
+        onEditPages: "&"
     },
     controller: ToolBarController,
+    controllerAs: "toolBarController",
     templateUrl: "toolBar/toolbar.template.htm"
 };

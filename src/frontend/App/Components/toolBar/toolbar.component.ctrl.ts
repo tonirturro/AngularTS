@@ -1,28 +1,41 @@
-import { IWindowService } from "angular";
-
 /**
  * Handles the bindings inside the component
  */
 export class ToolBarController {
-    public static $inject = [ "$window" ];
     /**
      * Bindings
      */
+    public editingDevices: boolean;
     public onAddDevice: () => void;
-
-    constructor(private $window: IWindowService) {}
+    public onClose: () => void;
+    public onEditDevices: () => void;
+    public onEditPages: () => void;
 
     /**
      * Report add action
      */
-    public addDevice(): void {
+    public addDevice() {
         this.onAddDevice();
     }
 
     /**
-     * Close main window
+     * Report edit devices action
+     */
+    public editDevices() {
+        this.onEditDevices();
+    }
+
+    /**
+     * Report edit devices action
+     */
+    public editPages() {
+        this.onEditPages();
+    }
+
+    /**
+     * Report close action
      */
     public close() {
-        this.$window.close();
+        this.onClose();
     }
 }

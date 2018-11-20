@@ -1,8 +1,7 @@
 import * as angular from "angular";
-import { IPromise, IQService, IRootScopeService } from "angular";
+import { IPromise, IQService, IRootScopeService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { ISelectableOption } from "../../../common/rest";
-import { ModelUpdate } from "../Model/ModelEvents";
 import { DataService } from "../Services/DataService";
 import { MainPageController } from "./main-page.component.ctrl";
 
@@ -11,6 +10,7 @@ describe("Given a main page component controller", () => {
     let q: IQService;
     let rootScopeService: IRootScopeService;
     let dataServiceToMock: DataService;
+    let windowServiceToMock: IWindowService;
     let getPagesMock: jasmine.Spy;
 
     const PageSizeCapabilities: ISelectableOption[] = [
@@ -32,8 +32,9 @@ describe("Given a main page component controller", () => {
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, dataService) => {
+    beforeEach(inject(($componentController, $q, $rootScope, $window, dataService) => {
         rootScopeService = $rootScope;
+        windowServiceToMock = $window;
         dataServiceToMock = dataService;
         q = $q;
         spyOn(dataServiceToMock, "getDevices").and.returnValue(q.resolve([]));
@@ -78,6 +79,26 @@ describe("Given a main page component controller", () => {
         expect(controller.selectedPages.length).toBe(0);
     });
 
+    it("When calling close Then the window sercice is called to close the window", () => {
+        spyOn(windowServiceToMock, "close");
+
+        controller.close();
+
+        expect(windowServiceToMock.close).toHaveBeenCalled();
+    });
+
+    it("When calling edit devices Then the view changes to the device edition", () => {
+        controller.editDevices();
+
+        expect(controller.editingDevices).toBeTruthy();
+    });
+
+    it("When calling edit pages Then the view changes to the device edition", () => {
+        controller.editPages();
+
+        expect(controller.editingDevices).toBeFalsy();
+    });
+
     it("When selecting device Then it is reflected by the associated property", () => {
         const ExpectedDeviceId = 5;
         controller.selectDevice(ExpectedDeviceId);
@@ -87,16 +108,14 @@ describe("Given a main page component controller", () => {
     it("When adding a device Then the data service is called", () => {
         controller.addDevice();
 
-        expect(dataServiceToMock.addNewDevice).toHaveBeenCalledTimes(1);
+        expect(dataServiceToMock.addNewDevice).toHaveBeenCalled();
     });
 
-    it("When adding a device Then a model change event is broadcasted", () => {
-        spyOn(rootScopeService, "$broadcast");
-
+    it("When adding a device Then the devives are reloaded", () => {
         controller.addDevice();
         rootScopeService.$apply();
 
-        expect(rootScopeService.$broadcast).toHaveBeenCalledTimes(1);
+        expect(dataServiceToMock.getDevices).toHaveBeenCalled();
     });
 
     it("When deleting a device Then the data service is called", () => {
@@ -123,22 +142,6 @@ describe("Given a main page component controller", () => {
 
         expect(dataServiceToMock.getDevices).toHaveBeenCalled();
     });
-
-    it("When a model update device event raises Then the device list is queried", () => {
-        controller.$onInit();
-        rootScopeService.$broadcast(ModelUpdate.Devices);
-
-        expect(dataServiceToMock.getDevices).toHaveBeenCalled();
-    });
-
-    it("When a model update device event raises " +
-        "Then the device list is not queried if the component has been destroyed", () => {
-            controller.$onInit();
-            controller.$onDestroy();
-            rootScopeService.$broadcast(ModelUpdate.Devices);
-
-            expect(dataServiceToMock.getDevices).toHaveBeenCalledTimes(1);
-        });
 
     it("When a page field is updated Then the data service is called", () => {
         const idToUpdate = 2;
@@ -245,7 +248,7 @@ describe("Given a main page component controller", () => {
         expect(dataServiceToMock.getPages).toHaveBeenCalled();
     });
 
-    it("When initialized then The capabilitoies are reported", () => {
+    it("When initialized then The capabilities are reported", () => {
         controller.$onInit();
         rootScopeService.$apply();
 

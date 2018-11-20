@@ -1,6 +1,4 @@
 import { IDeferred, IHttpService, ILogService, IPromise, IQService } from "angular";
-
-import { PageFields } from "../../../common/model";
 import { IDeleteDeviceResponse, IDevice, IPage, ISelectableOption, IUpdateResponse } from "../../../common/rest";
 import { IVisualPage } from "../Components/pageGrid/page-grid.component.ctrl";
 import { UpdateParams } from "./UpdateParams";

@@ -1,5 +1,10 @@
 <div>
-    <toolbar on-add-device="mainPageController.addDevice()"/>
+    <toolbar 
+        editing-devices="mainPageController.editingDevices"
+        on-edit-devices="mainPageController.editDevices()"
+        on-add-device="mainPageController.addDevice()"
+        on-edit-pages="mainPageController.editPages()"
+        on-close="mainPageController.close()" />
 </div>
 <div class="container">
     <div class="row">

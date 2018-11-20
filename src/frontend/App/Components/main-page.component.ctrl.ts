@@ -1,6 +1,5 @@
-import { IComponentController, ILogService, IRootScopeService } from "angular";
+import { IComponentController, ILogService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
-import { ModelUpdate } from "../Model/ModelEvents";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
 import { ICapabilities, IVisualPage } from "./pageGrid/page-grid.component.ctrl";
@@ -9,20 +8,21 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$log", "$rootScope", "dataService"];
+    public static $inject = ["$log", "$window", "dataService"];
 
     public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
     public selectedPages: number[] = [];
     public pages: IVisualPage[] = [];
     public capabilities: ICapabilities = {};
+    public editingDevices: boolean = false;
 
     // event unsubscription
     private unsubscribeUpdateEvent: () => void;
 
     constructor(
         private logService: ILogService,
-        private rootScopeService: IRootScopeService,
+        private $window: IWindowService,
         private dataService: DataService) { }
 
     /**
@@ -32,11 +32,6 @@ export class MainPageController implements IComponentController {
         this.loadCapabilities();
         this.loadDevices();
         this.loadPages();
-
-        // Capture model events
-        this.unsubscribeUpdateEvent = this.rootScopeService.$on(ModelUpdate.Devices, () => {
-            this.loadDevices();
-        });
     }
 
     /**
@@ -44,6 +39,27 @@ export class MainPageController implements IComponentController {
      */
     public $onDestroy() {
         this.unsubscribeUpdateEvent();
+    }
+
+    /**
+     * Close main window
+     */
+    public close() {
+        this.$window.close();
+    }
+
+    /**
+     * Switch to edit devices view
+     */
+    public editDevices() {
+        this.editingDevices = true;
+    }
+
+    /**
+     * Switch to edit pages view
+     */
+    public editPages(): any {
+        this.editingDevices = false;
     }
 
     /**
@@ -60,7 +76,7 @@ export class MainPageController implements IComponentController {
     public addDevice() {
         this.dataService.addNewDevice().then((success) => {
             if (success) {
-                this.rootScopeService.$broadcast(ModelUpdate.Devices);
+                this.loadDevices();
                 this.logService.log("New device added sucessfully");
             } else {
                 this.logService.log("Failed to add new device");

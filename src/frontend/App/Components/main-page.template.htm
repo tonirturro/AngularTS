@@ -16,7 +16,9 @@
                 on-selected-device="mainPageController.selectDevice(deviceId)" />
         </div>
         <div class="col-md-9 no-float">
-            <page-grid 
+            <ui-view></ui-view>
+            <!-- <device-edit selected-device-id="mainPageController.selectedDeviceId" /> -->
+            <!-- <page-grid 
                 capabilities="mainPageController.capabilities"
                 pages="mainPageController.pages"
                 selected-pages="mainPageController.selectedPages"
@@ -24,7 +26,7 @@
                 on-add-page="mainPageController.addPage()"
                 on-delete-page="mainPageController.deletePage(pageId)"
                 on-update-pages="mainPageController.updatePageField(field,newValue)"
-                on-selected-page="mainPageController.selectPage(pageId,multiselection)" />           
+                on-selected-page="mainPageController.selectPage(pageId,multiselection)" />            -->
         </div>
     </div>
 </div>

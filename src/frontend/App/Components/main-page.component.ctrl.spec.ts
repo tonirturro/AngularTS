@@ -1,14 +1,16 @@
+import { StateService } from "@uirouter/core";
 import * as angular from "angular";
 import { IPromise, IQService, IRootScopeService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-import { MainPageController } from "./main-page.component.ctrl";
+import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
 
 describe("Given a main page component controller", () => {
     let controller: MainPageController;
     let q: IQService;
     let rootScopeService: IRootScopeService;
+    let stateServiceToMock: StateService;
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
     let getPagesMock: jasmine.Spy;
@@ -32,11 +34,13 @@ describe("Given a main page component controller", () => {
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, $window, dataService) => {
+    beforeEach(inject(($componentController, $q, $rootScope, $state: StateService, $window, dataService) => {
         rootScopeService = $rootScope;
+        stateServiceToMock = $state;
         windowServiceToMock = $window;
         dataServiceToMock = dataService;
         q = $q;
+        spyOn(stateServiceToMock, "go");
         spyOn(dataServiceToMock, "getDevices").and.returnValue(q.resolve([]));
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
@@ -79,6 +83,13 @@ describe("Given a main page component controller", () => {
         expect(controller.selectedPages.length).toBe(0);
     });
 
+    it("When it is initialized Then it goes to the pages edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
+        controller.$onInit();
+
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("pages", expectedDeviceSelection);
+    });
+
     it("When calling close Then the window sercice is called to close the window", () => {
         spyOn(windowServiceToMock, "close");
 
@@ -88,21 +99,34 @@ describe("Given a main page component controller", () => {
     });
 
     it("When calling edit devices Then the view changes to the device edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editDevices();
 
         expect(controller.editingDevices).toBeTruthy();
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("device", expectedDeviceSelection);
     });
 
-    it("When calling edit pages Then the view changes to the device edition", () => {
+    it("When calling edit pages Then the view changes to the pages edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editPages();
 
         expect(controller.editingDevices).toBeFalsy();
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("pages", expectedDeviceSelection);
     });
 
     it("When selecting device Then it is reflected by the associated property", () => {
         const ExpectedDeviceId = 5;
         controller.selectDevice(ExpectedDeviceId);
         expect(controller.selectedDeviceId).toBe(ExpectedDeviceId);
+    });
+
+    it("When selecting device Then the view is adjusted with the selected device", () => {
+        const ExpectedDeviceId = 8;
+        controller.editingDevices = true;
+        controller.selectDevice(ExpectedDeviceId);
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
+
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("device", expectedDeviceSelection);
     });
 
     it("When adding a device Then the data service is called", () => {

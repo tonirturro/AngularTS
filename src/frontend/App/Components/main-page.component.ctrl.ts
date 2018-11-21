@@ -1,14 +1,19 @@
+import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
 import { ICapabilities, IVisualPage } from "./pageGrid/page-grid.component.ctrl";
 
+export interface IDeviceSelection {
+    deviceId: number;
+}
+
 export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$log", "$window", "dataService"];
+    public static $inject = [ "$state", "$log", "$window", "dataService"];
 
     public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
@@ -21,6 +26,7 @@ export class MainPageController implements IComponentController {
     private unsubscribeUpdateEvent: () => void;
 
     constructor(
+        private $state: StateService,
         private logService: ILogService,
         private $window: IWindowService,
         private dataService: DataService) { }
@@ -32,6 +38,7 @@ export class MainPageController implements IComponentController {
         this.loadCapabilities();
         this.loadDevices();
         this.loadPages();
+        this.changeView();
     }
 
     /**
@@ -53,6 +60,7 @@ export class MainPageController implements IComponentController {
      */
     public editDevices() {
         this.editingDevices = true;
+        this.changeView();
     }
 
     /**
@@ -60,6 +68,7 @@ export class MainPageController implements IComponentController {
      */
     public editPages(): any {
         this.editingDevices = false;
+        this.changeView();
     }
 
     /**
@@ -68,6 +77,7 @@ export class MainPageController implements IComponentController {
      */
     public selectDevice(deviceId: number) {
         this.selectedDeviceId = deviceId;
+        this.changeView();
     }
 
     /**
@@ -201,5 +211,14 @@ export class MainPageController implements IComponentController {
         this.dataService.getPages().then((pages) => {
             this.pages = pages;
         });
+    }
+
+    /**
+     * Selects the edition view
+     */
+    private changeView() {
+        const deviceSelection: IDeviceSelection = { deviceId: this.selectedDeviceId };
+        const view = this.editingDevices ? "device" : "pages";
+        this.$state.go(view, deviceSelection);
     }
 }

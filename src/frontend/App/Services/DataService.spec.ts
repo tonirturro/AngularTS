@@ -11,19 +11,19 @@ import {
 } from "../../../common/rest";
 import { DataService } from "./DataService";
 
-describe("Data Service Test", () => {
+describe("Given a data service", () => {
         const restUrl = "http://localhost:3000/REST";
         const pagesUrl = `${restUrl}/pages/`;
         const devicesUrl = `${restUrl}/devices/`;
         const deviceOptionsUrl = `${restUrl}/deviceOptions/`;
-        const expectedPage: IPage = {
+        const expectedPages: IPage[] = [{
             destination: 5,
             deviceId: 1,
             id: 1,
             mediaType: 4,
             pageSize: 2,
             printQuality: 3,
-        };
+        }];
         const response: IUpdateResponse = { success: true };
 
         /**
@@ -42,6 +42,7 @@ describe("Data Service Test", () => {
         beforeEach(inject((_dataService_, _$httpBackend_) => {
             service = _dataService_;
             httpBackend = _$httpBackend_;
+            httpBackend.whenGET(pagesUrl).respond(200, expectedPages);
         }));
 
         /**
@@ -53,30 +54,23 @@ describe("Data Service Test", () => {
          /************************************************************************
           * Pages
           ************************************************************************/
-        it("Reads Pages", (done) => {
-                httpBackend.whenGET(pagesUrl)
-                    .respond(200, [ expectedPage ]);
-
-                service.getPages().then((pages) => {
-                    expect(pages.length).toBe(1);
-                    done();
-                });
-
-                httpBackend.flush();
-            });
-
-        it("Translate from the model", (done) => {
-            httpBackend.whenGET(pagesUrl).respond(200, [ expectedPage ]);
-
-            service.getPages().then((pages) => {
-                expect(pages[0].pageSize).toBe(expectedPage.pageSize.toString());
-                expect(pages[0].printQuality).toBe(expectedPage.printQuality.toString());
-                expect(pages[0].mediaType).toBe(expectedPage.mediaType.toString());
-                expect(pages[0].destination).toBe(expectedPage.destination.toString());
-                done();
-            });
-
+        it("When is working Then it exposes the available pages", () => {
+            let pages = service.pages;
             httpBackend.flush();
+            pages = service.pages;
+
+            expect(pages.length).toBe(expectedPages.length);
+        });
+
+        it("Translate from the model", () => {
+            let pages = service.pages;
+            httpBackend.flush();
+            pages = service.pages;
+
+            expect(pages[0].pageSize).toBe(expectedPages[0].pageSize.toString());
+            expect(pages[0].printQuality).toBe(expectedPages[0].printQuality.toString());
+            expect(pages[0].mediaType).toBe(expectedPages[0].mediaType.toString());
+            expect(pages[0].destination).toBe(expectedPages[0].destination.toString());
         });
 
         it("Can add pages", (done) => {

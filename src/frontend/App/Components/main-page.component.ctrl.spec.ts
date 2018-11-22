@@ -13,7 +13,6 @@ describe("Given a main page component controller", () => {
     let stateServiceToMock: StateService;
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
-    let getPagesMock: jasmine.Spy;
 
     const PageSizeCapabilities: ISelectableOption[] = [
         { value: "0", label: "page0" },
@@ -47,8 +46,6 @@ describe("Given a main page component controller", () => {
         spyOn(dataServiceToMock, "updatePageField").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deletePage").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(q.resolve(true));
-        getPagesMock = spyOn(dataServiceToMock, "getPages");
-        getPagesMock.and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "getCapabilities")
             .and.callFake((capability: string): IPromise<ISelectableOption[]> => {
                 switch (capability) {
@@ -71,12 +68,6 @@ describe("Given a main page component controller", () => {
         controller.$onInit();
 
         expect(dataServiceToMock.getDevices).toHaveBeenCalled();
-    });
-
-    it("When it is initialized Then it gets the available pages", () => {
-        controller.$onInit();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
     });
 
     it("When it is initialized Then it has not selected pages", () => {
@@ -179,18 +170,6 @@ describe("Given a main page component controller", () => {
             .toHaveBeenCalledWith(pageField, [idToUpdate], newValue);
     });
 
-    it("When a page field is updated Then the pages are reloaded", () => {
-        const idToUpdate = 3;
-        const newValue = 1;
-        const pageField = "anyField";
-
-        controller.selectedPages = [idToUpdate];
-        controller.updatePageField(pageField, newValue);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
     it("When selecting a page Then its id is on the selected pages", () => {
         const pageId = 5;
         controller.selectPage(pageId, false);
@@ -243,33 +222,6 @@ describe("Given a main page component controller", () => {
         controller.deletePage(idTodelete);
 
         expect(dataServiceToMock.deletePage).toHaveBeenCalledWith(idTodelete);
-    });
-
-    it("Delete page refresh page list", () => {
-        getPagesMock.calls.reset();
-
-        controller.deletePage(0);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
-    it("The page is added to the selected device Id", () => {
-        controller.selectedDeviceId = 5;
-
-        controller.addPage();
-
-        expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(controller.selectedDeviceId);
-    });
-
-    it("Add pages refresh page list", () => {
-        getPagesMock.calls.reset();
-        controller.selectedDeviceId = 5;
-
-        controller.addPage();
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
     });
 
     it("When initialized then The capabilities are reported", () => {

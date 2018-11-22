@@ -3,7 +3,7 @@ import { IComponentController, ILogService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
-import { ICapabilities, IVisualPage } from "./pageGrid/page-grid.component.ctrl";
+import { ICapabilities } from "./pageGrid/page-grid.component.ctrl";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -18,12 +18,8 @@ export class MainPageController implements IComponentController {
     public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
     public selectedPages: number[] = [];
-    public pages: IVisualPage[] = [];
     public capabilities: ICapabilities = {};
     public editingDevices: boolean = false;
-
-    // event unsubscription
-    private unsubscribeUpdateEvent: () => void;
 
     constructor(
         private $state: StateService,
@@ -37,15 +33,7 @@ export class MainPageController implements IComponentController {
     public $onInit() {
         this.loadCapabilities();
         this.loadDevices();
-        this.loadPages();
         this.changeView();
-    }
-
-    /**
-     * Component termination
-     */
-    public $onDestroy() {
-        this.unsubscribeUpdateEvent();
     }
 
     /**
@@ -127,28 +115,11 @@ export class MainPageController implements IComponentController {
     }
 
     /**
-     * Adds a page to the selected device
-     */
-    public addPage(): any {
-        if (this.selectedDeviceId >= 0) {
-            this.dataService.addNewPage(this.selectedDeviceId).then((success) => {
-                if (success) {
-                    this.loadPages();
-                }
-            });
-        }
-    }
-
-    /**
      * Deletes an existing page
      * @param idTodelete the id for the page to be deleted
      */
     public deletePage(idTodelete: number) {
-        this.dataService.deletePage(idTodelete).then((success) => {
-            if (success) {
-                this.loadPages();
-            }
-        });
+        this.dataService.deletePage(idTodelete);
     }
 
     /**
@@ -158,11 +129,7 @@ export class MainPageController implements IComponentController {
      */
     public updatePageField(field: string, newValue: number) {
         if (this.selectedPages.length > 0) {
-            this.dataService.updatePageField(field, this.selectedPages, newValue).then((success) => {
-                if (success) {
-                    this.loadPages();
-                }
-            });
+            this.dataService.updatePageField(field, this.selectedPages, newValue);
         }
     }
 
@@ -201,15 +168,6 @@ export class MainPageController implements IComponentController {
         })
         .catch((reason) => {
             this.logService.error(`Failed to load devices because : ${reason}`);
-        });
-    }
-
-    /**
-     * Loads the available pages
-     */
-    private loadPages() {
-        this.dataService.getPages().then((pages) => {
-            this.pages = pages;
         });
     }
 

@@ -1,5 +1,6 @@
 import { Ng1StateDeclaration, StateProvider, Transition } from "@uirouter/angularjs";
 import { ILogService } from "angular";
+import { DataService } from "./Services/DataService";
 
 export class Routes {
     constructor(private $stateProvider: StateProvider) {
@@ -15,10 +16,13 @@ export class Routes {
             component: "pageGrid",
             name: "pages",
             resolve: {
-                onAddPage: [ "$log", ($log: ILogService) => () => {
-                    $log.log("Request Add Page");
+                onAddPage: [ "$transition$", "dataService", ($transition$: Transition, dataService: DataService) => {
+                    return () => {
+                        const id = $transition$.params().deviceId;
+                        dataService.addNewPage(id);
+                    };
                 }],
-                pages: () => [],
+                pages: [ "dataService", (dataService: DataService) => dataService.pages ],
                 selectedDeviceId: [ "$transition$", ($transition$: Transition) => $transition$.params().deviceId]
             },
             url: "/pages/{deviceId}"

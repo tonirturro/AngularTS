@@ -10,12 +10,19 @@ export class DataService {
     /**
      * Define dependencies
      */
-    public static $inject =  ["$http", "$log", "$q"];
+    public static $inject = ["$http", "$log", "$q"];
 
     /**
      * Internal constants
      */
     private readonly REST_URL = "http://localhost:3000/REST";
+
+    /**
+     * Internal properties
+     */
+    private cachedPages: IVisualPage[];
+    private defaultCachedPages: IVisualPage[] = [];
+    private isGettingPages: boolean = false;
 
     /**
      * Initializes a new instance of the DataService class.
@@ -30,38 +37,19 @@ export class DataService {
     }
 
     /**
-     * Gets pages from backend
+     * Gets the current cached pages
      */
-    public getPages(): IPromise<IVisualPage[]> {
+    public get pages() {
+        if (this.cachedPages) {
+            return this.cachedPages;
+        }
 
-        const deferred: IDeferred<IVisualPage[]> = this.$q.defer();
+        if (!this.isGettingPages) {
+            this.isGettingPages = true;
+            this.updatePages();
+        }
 
-        this.$http
-            .get<IPage[]>(this.getUrl("pages")).then((response) => {
-            let pages: IVisualPage[];
-
-            pages = [];
-
-            // Translate from the model
-            response.data.forEach((newPage) => {
-                const translatedPage: IVisualPage = {} as IVisualPage;
-                translatedPage.id = newPage.id;
-                translatedPage.deviceId = newPage.deviceId;
-                translatedPage.pageSize = newPage.pageSize.toString();
-                translatedPage.printQuality = newPage.printQuality.toString();
-                translatedPage.mediaType = newPage.mediaType.toString();
-                translatedPage.destination = newPage.destination.toString();
-                pages.push(translatedPage);
-            });
-
-            deferred.resolve(pages);
-        },
-        (errors) => {
-            this.$log.error(`Failure to get ${this.getUrl("pages")}`);
-            deferred.reject(errors.data);
-        });
-
-        return deferred.promise;
+        return this.defaultCachedPages;
     }
 
     /**
@@ -74,10 +62,10 @@ export class DataService {
         this.$http.get<IDevice[]>(this.getUrl("devices")).then((response) => {
             deferred.resolve(response.data);
         },
-        (errors) => {
-            this.$log.error(`Failure to get ${this.getUrl("devices")}`);
-            deferred.reject(errors.data);
-        });
+            (errors) => {
+                this.$log.error(`Failure to get ${this.getUrl("devices")}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -89,12 +77,13 @@ export class DataService {
         const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.post<IUpdateResponse>(`${this.getUrl("pages")}${deviceId}`, {}).then((response) => {
+            this.updatePages();
             deferred.resolve(response.data.success);
         },
-        (errors) => {
-            this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
-            deferred.reject(errors.data);
-        });
+            (errors) => {
+                this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -108,10 +97,10 @@ export class DataService {
         this.$http.put<IUpdateResponse>(this.getUrl("devices"), {}).then((response) => {
             deferred.resolve(response.data.success);
         },
-        (errors) => {
-            this.$log.error(`Failure to put ${this.getUrl("devices")}`);
-            deferred.reject(errors.data);
-        });
+            (errors) => {
+                this.$log.error(`Failure to put ${this.getUrl("devices")}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -127,10 +116,10 @@ export class DataService {
             .then((response) => {
                 deferred.resolve(response.data.success && response.data.deletedPageId === idToDelete);
             },
-            (errors) => {
-                this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
-                deferred.reject(errors.data);
-            });
+                (errors) => {
+                    this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
+                    deferred.reject(errors.data);
+                });
 
         return deferred.promise;
     }
@@ -145,10 +134,10 @@ export class DataService {
         this.$http.delete<IDeleteDeviceResponse>(`${this.getUrl("devices")}${idToDelete}`).then((response) => {
             deferred.resolve(response.data.success && response.data.deletedDeviceId === idToDelete);
         },
-        (errors) => {
-            this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
-            deferred.reject(errors.data);
-        });
+            (errors) => {
+                this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -163,10 +152,10 @@ export class DataService {
         this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
             deferred.resolve(response.data);
         },
-        (errors) => {
-            this.$log.error(`Failure to get ${capability} device capability`);
-            deferred.reject(errors.data);
-        });
+            (errors) => {
+                this.$log.error(`Failure to get ${capability} device capability`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -193,10 +182,10 @@ export class DataService {
             .then((response) => {
                 deferred.resolve(response.data.success);
             },
-            (errors) => {
-                this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
-                deferred.reject(errors.data);
-            });
+                (errors) => {
+                    this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
+                    deferred.reject(errors.data);
+                });
 
         return deferred.promise;
     }
@@ -208,4 +197,35 @@ export class DataService {
     private getUrl(api: string): string {
         return `${this.REST_URL}/${api}/`;
     }
+
+    /**
+     * Gets pages from backend
+     */
+    private updatePages() {
+        this.$http
+            .get<IPage[]>(this.getUrl("pages")).then((response) => {
+                let pages: IVisualPage[];
+
+                pages = [];
+
+                // Translate from the model
+                response.data.forEach((newPage) => {
+                    const translatedPage: IVisualPage = {} as IVisualPage;
+                    translatedPage.id = newPage.id;
+                    translatedPage.deviceId = newPage.deviceId;
+                    translatedPage.pageSize = newPage.pageSize.toString();
+                    translatedPage.printQuality = newPage.printQuality.toString();
+                    translatedPage.mediaType = newPage.mediaType.toString();
+                    translatedPage.destination = newPage.destination.toString();
+                    pages.push(translatedPage);
+                });
+
+                this.cachedPages = pages;
+
+            },
+            () => {
+                    this.$log.error(`Failure to get ${this.getUrl("pages")}`);
+            });
+    }
+
 }

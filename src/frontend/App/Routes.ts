@@ -1,8 +1,8 @@
 import { Ng1StateDeclaration, StateProvider, Transition } from "@uirouter/angularjs";
-import { ILogService } from "angular";
-import { DataService } from "./Services/DataService";
 
 export class Routes {
+    public static $inject = [ "$stateProvider" ];
+
     constructor(private $stateProvider: StateProvider) {
         const deviceEditState: Ng1StateDeclaration = {
             component: "deviceEdit",

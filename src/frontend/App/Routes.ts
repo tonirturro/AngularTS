@@ -16,13 +16,6 @@ export class Routes {
             component: "pageGrid",
             name: "pages",
             resolve: {
-                onAddPage: [ "$transition$", "dataService", ($transition$: Transition, dataService: DataService) => {
-                    return () => {
-                        const id = $transition$.params().deviceId;
-                        dataService.addNewPage(id);
-                    };
-                }],
-                pages: [ "dataService", (dataService: DataService) => dataService.pages ],
                 selectedDeviceId: [ "$transition$", ($transition$: Transition) => $transition$.params().deviceId]
             },
             url: "/pages/{deviceId}"

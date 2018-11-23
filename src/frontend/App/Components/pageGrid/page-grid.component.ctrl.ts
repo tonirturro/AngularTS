@@ -1,6 +1,7 @@
 import { IComponentController } from "angular";
 import { PageFields } from "../../../../common/model";
 import { ISelectableOption } from "../../../../common/rest";
+import { DataService } from "../../Services/DataService";
 
 export interface IVisualPage {
     id: number;
@@ -26,70 +27,78 @@ export interface IPageDeletionData {
     pageId: number;
 }
 
-export interface ICapabilities {
-    [index: string]: ISelectableOption[];
-}
-
 /**
  * Handles the bindings inside the component
  */
 export class PageGridController implements IComponentController {
+    /**
+     * Define dependencies
+     */
+    public static $inject = [ "dataService" ];
 
     /**
      * From Bindings
      */
-    public capabilities: ICapabilities = {};
     public selectedDeviceId: number;
-    public selectedPages: number[] = [];
-    public pages: IVisualPage[] = [];
-    public onAddPage: () => void;
-    public onSelectedPage: (data: IPageSelectionData) => void;
-    public onUpdatePages: (data: IPageUpdateData) => void;
-    public onDeletePage: (data: IPageDeletionData) => void;
 
     /**
-     * Detects changes on parameters
-     * @param changes the parameters that may change
+     * Internal properties
      */
-    public $onChanges(changes: any) {
-        if (changes.pages  || changes.selectedPages) {
-            this.displaySelection();
-        }
+    private selectedPages: number[] = [];
+
+    /**
+     * Inuitializes an object from the PageGridController class
+     * @param dataService the service that provides data from the model
+     */
+    constructor(private dataService: DataService) {}
+
+    /**
+     * Initialize view
+     */
+    public $onInit() {
+        this.displaySelection();
+    }
+
+    /**
+     * Retrieves the model pages
+     */
+    public get pages(): IVisualPage[] {
+        return this.dataService.pages;
     }
 
     /**
      * Get the available page options
      */
     public get PageSizeOptions(): ISelectableOption[] {
-        return this.capabilities[PageFields.PageSize];
+        return this.dataService.getCapabilities(PageFields.PageSize);
     }
 
     /**
      * Get the available print quality options
      */
     public get PrintQualityOptions(): ISelectableOption[] {
-        return this.capabilities[PageFields.PrintQuality];
+        return this.dataService.getCapabilities(PageFields.PrintQuality);
     }
 
     /**
      * Get the available madia type options
      */
     public get MediaTypeOptions(): ISelectableOption[] {
-        return this.capabilities[PageFields.MediaType];
+        return this.dataService.getCapabilities(PageFields.MediaType);
     }
 
     /**
      * Get the available destination options
      */
     public get DestinationOptions(): ISelectableOption[] {
-        return this.capabilities[PageFields.Destination];
+        return this.dataService.getCapabilities(PageFields.Destination);
     }
 
     /**
      * Request a new page
      */
     public addPage(): void {
-        this.onAddPage();
+        this.dataService.addNewPage(this.selectedDeviceId);
     }
 
     /**
@@ -97,7 +106,7 @@ export class PageGridController implements IComponentController {
      * @param pageTodelete is the page id to be deletd
      */
     public deletePage(pageTodelete: number): void {
-        this.onDeletePage({ pageId: pageTodelete });
+        this.dataService.deletePage(pageTodelete);
     }
 
     /**
@@ -105,7 +114,9 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new page size value
      */
     public updatePageSize(newValue: number): void {
-        this.onUpdatePages({ field: PageFields.PageSize, newValue });
+        if (this.selectedPages.length > 0) {
+            this.dataService.updatePageField(PageFields.PageSize, this.selectedPages, newValue);
+        }
     }
 
     /**
@@ -113,7 +124,9 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new print quality value
      */
     public updatePrintQuality(newValue: number): void {
-        this.onUpdatePages({ field: PageFields.PrintQuality, newValue });
+        if (this.selectedPages.length > 0) {
+            this.dataService.updatePageField(PageFields.PrintQuality, this.selectedPages, newValue);
+        }
     }
 
     /**
@@ -121,7 +134,9 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new media type value
      */
     public updateMediaType(newValue: number): void {
-        this.onUpdatePages({ field: PageFields.MediaType, newValue });
+        if (this.selectedPages.length > 0) {
+            this.dataService.updatePageField(PageFields.MediaType, this.selectedPages, newValue);
+        }
     }
 
     /**
@@ -129,7 +144,9 @@ export class PageGridController implements IComponentController {
      * @param newValue is the new media type destination value
      */
     public updateDestination(newValue: number): void {
-        this.onUpdatePages({ field: PageFields.Destination, newValue });
+        if (this.selectedPages.length > 0) {
+            this.dataService.updatePageField(PageFields.Destination, this.selectedPages, newValue);
+        }
     }
 
     /**
@@ -142,13 +159,35 @@ export class PageGridController implements IComponentController {
         const isSelector = event.srcElement.attributes.getNamedItem("ng-model");
         const isButton = event.srcElement.attributes.getNamedItem("ng-click");
         if (isSelector || isButton) {
-            this.onSelectedPage({ pageId: selectedPage.id, multiselection: true});
+            this.updatePageSelection(selectedPage.id, true);
             return;
         }
 
         // Set selection
         const isMultiSelection = event.ctrlKey;
-        this.onSelectedPage({ pageId: selectedPage.id, multiselection: isMultiSelection});
+        this.updatePageSelection(selectedPage.id, isMultiSelection);
+    }
+
+    /**
+     * Modify the page selection list based on the id selected and the multiselection option
+     * @param pageId the id to be selected
+     * @param multiselection if we consider multiselection
+     */
+    private updatePageSelection(pageId: number, multiselection: boolean) {
+        if (multiselection && this.selectedPages.length > 0) {
+            const indexOfSelectedPage = this.selectedPages.indexOf(pageId);
+            const currentSelected = this.selectedPages.concat();
+            if (indexOfSelectedPage < 1) {
+                currentSelected.push(pageId);
+            } else {
+                currentSelected.splice(indexOfSelectedPage, 1);
+            }
+            this.selectedPages = currentSelected;
+        } else {
+            this.selectedPages = [pageId];
+        }
+
+        this.displaySelection();
     }
 
     /**

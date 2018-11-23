@@ -1,9 +1,7 @@
 import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
-import { PageFields } from "../../../common/model";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
-import { ICapabilities } from "./pageGrid/page-grid.component.ctrl";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -18,7 +16,6 @@ export class MainPageController implements IComponentController {
     public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
     public selectedPages: number[] = [];
-    public capabilities: ICapabilities = {};
     public editingDevices: boolean = false;
 
     constructor(
@@ -31,7 +28,6 @@ export class MainPageController implements IComponentController {
      * Component initialization
      */
     public $onInit() {
-        this.loadCapabilities();
         this.loadDevices();
         this.changeView();
     }
@@ -96,58 +92,6 @@ export class MainPageController implements IComponentController {
             } else {
                 this.logService.log(`Failed to delete device id ${deviceId}`);
             }
-        });
-    }
-
-    public selectPage(pageId: number, multiselection: boolean) {
-        if (multiselection && this.selectedPages.length > 0) {
-            const indexOfSelectedPage = this.selectedPages.indexOf(pageId);
-            const currentSelected = this.selectedPages.concat();
-            if (indexOfSelectedPage < 1) {
-                currentSelected.push(pageId);
-            } else {
-                currentSelected.splice(indexOfSelectedPage, 1);
-            }
-            this.selectedPages = currentSelected;
-        } else {
-            this.selectedPages = [pageId];
-        }
-    }
-
-    /**
-     * Deletes an existing page
-     * @param idTodelete the id for the page to be deleted
-     */
-    public deletePage(idTodelete: number) {
-        this.dataService.deletePage(idTodelete);
-    }
-
-    /**
-     * Update a particular page field
-     * @param field the field to be updated
-     * @param newValue the new value
-     */
-    public updatePageField(field: string, newValue: number) {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updatePageField(field, this.selectedPages, newValue);
-        }
-    }
-
-    /**
-     * Loads the available capabilities
-     */
-    private loadCapabilities() {
-        this.dataService.getCapabilities(PageFields.PageSize).then((capabilities) => {
-            this.capabilities[PageFields.PageSize] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.PrintQuality).then((capabilities) => {
-            this.capabilities[PageFields.PrintQuality] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.MediaType).then((capabilities) => {
-            this.capabilities[PageFields.MediaType] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.Destination).then((capabilities) => {
-            this.capabilities[PageFields.Destination] = capabilities;
         });
     }
 

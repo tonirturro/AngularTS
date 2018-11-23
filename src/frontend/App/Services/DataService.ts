@@ -3,6 +3,14 @@ import { IDeleteDeviceResponse, IDevice, IPage, ISelectableOption, IUpdateRespon
 import { IVisualPage } from "../Components/pageGrid/page-grid.component.ctrl";
 import { UpdateParams } from "./UpdateParams";
 
+interface ICapabilitiesDictionary {
+    [key: string]: ISelectableOption[];
+}
+
+interface IGettingCapabilitiesDictionary {
+    [key: string]: boolean;
+}
+
 /*
 ** Service to access data from the backend
 */
@@ -23,6 +31,9 @@ export class DataService {
     private cachedPages: IVisualPage[];
     private defaultCachedPages: IVisualPage[] = [];
     private isGettingPages: boolean = false;
+    private cachedCapabilities: ICapabilitiesDictionary = {};
+    private isGettingCapabilities: IGettingCapabilitiesDictionary = {};
+    private defaultCachedCapabilities: ISelectableOption[] = [];
 
     /**
      * Initializes a new instance of the DataService class.
@@ -71,21 +82,36 @@ export class DataService {
     }
 
     /**
+     * Get the options available for a particular device capability
+     * @param capability the capability to be queried
+     */
+    public getCapabilities(capability: string): ISelectableOption[] {
+        if (this.cachedCapabilities[capability]) {
+            return this.cachedCapabilities[capability];
+        }
+
+        if (!this.getCapabilities[capability]) {
+            this.getCapabilities[capability] = true;
+            this.getCapabilitiesFromModel(capability);
+        }
+
+        return this.defaultCachedCapabilities;
+    }
+
+    /**
      * Request a new page
      */
-    public addNewPage(deviceId: number): IPromise<boolean> {
-        const deferred: IDeferred<boolean> = this.$q.defer();
-
+    public addNewPage(deviceId: number) {
         this.$http.post<IUpdateResponse>(`${this.getUrl("pages")}${deviceId}`, {}).then((response) => {
-            this.updatePages();
-            deferred.resolve(response.data.success);
+            if (response.data.success) {
+                this.updatePages();
+            } else {
+                this.$log.error(`Error while adding new page to device : ${deviceId}`);
+            }
         },
-            (errors) => {
-                this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
-                deferred.reject(errors.data);
-            });
-
-        return deferred.promise;
+        () => {
+            this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
+        });
     }
 
     /**
@@ -114,12 +140,13 @@ export class DataService {
 
         this.$http.delete<{ deletedPageId: number, success: boolean }>(`${this.getUrl("pages")}${idToDelete}`)
             .then((response) => {
+                this.updatePages();
                 deferred.resolve(response.data.success && response.data.deletedPageId === idToDelete);
             },
-                (errors) => {
-                    this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
-                    deferred.reject(errors.data);
-                });
+            (errors) => {
+                this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
+                deferred.reject(errors.data);
+            });
 
         return deferred.promise;
     }
@@ -136,24 +163,6 @@ export class DataService {
         },
             (errors) => {
                 this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
-                deferred.reject(errors.data);
-            });
-
-        return deferred.promise;
-    }
-
-    /**
-     * Query the options available for a particular device capability
-     * @param capability the capability to be queried
-     */
-    public getCapabilities(capability: string): IPromise<ISelectableOption[]> {
-        const deferred: IDeferred<ISelectableOption[]> = this.$q.defer();
-
-        this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
-            deferred.resolve(response.data);
-        },
-            (errors) => {
-                this.$log.error(`Failure to get ${capability} device capability`);
                 deferred.reject(errors.data);
             });
 
@@ -180,6 +189,7 @@ export class DataService {
 
         this.$http.put<IUpdateResponse>(`${this.getUrl("pages")}${field}`, JSON.stringify(params))
             .then((response) => {
+                this.updatePages();
                 deferred.resolve(response.data.success);
             },
                 (errors) => {
@@ -228,4 +238,17 @@ export class DataService {
             });
     }
 
+    /**
+     * Query the options available for a particular device capability
+     * @param capability the capability to be queried
+     */
+    private getCapabilitiesFromModel(capability: string) {
+
+        this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
+            this.cachedCapabilities[capability] = response.data;
+        },
+        () => {
+                this.$log.error(`Failure to get ${capability} device capability`);
+        });
+    }
 }

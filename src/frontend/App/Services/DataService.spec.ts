@@ -1,5 +1,5 @@
 import * as angular from "angular";
-import { IHttpBackendService } from "angular";
+import { IHttpBackendService, IHttpService, IQService, IRootScopeService } from "angular";
 import { PageFields } from "../../../common/model";
 import {
     IDeleteDeviceResponse,
@@ -24,7 +24,13 @@ describe("Given a data service", () => {
             pageSize: 2,
             printQuality: 3,
         }];
-        const response: IUpdateResponse = { success: true };
+        const response: IUpdateResponse = {
+            success: true
+        };
+        const deletePageResponse: IDeletePageResponse = {
+            deletedPageId: 1,
+            success: true
+        };
 
         /**
          * Common test resources
@@ -32,16 +38,26 @@ describe("Given a data service", () => {
         const SelectedDeviceId = 1;
         let service: DataService;
         let httpBackend: IHttpBackendService;
+        let http: IHttpService;
+        let q: IQService;
+        let rootscope: IRootScopeService;
 
         /**
          * Initialize test environment
          */
         beforeEach(angular.mock.module("myApp"));
 
-        // tslint:disable-next-line:variable-name
-        beforeEach(inject((_dataService_, _$httpBackend_) => {
-            service = _dataService_;
-            httpBackend = _$httpBackend_;
+        beforeEach(inject((
+                dataService: DataService,
+                $rootScope: IRootScopeService,
+                $q: IQService,
+                $http: IHttpService,
+                $httpBackend: IHttpBackendService) => {
+            service = dataService;
+            rootscope = $rootScope;
+            q = $q;
+            httpBackend = $httpBackend;
+            http = $http;
             httpBackend.whenGET(pagesUrl).respond(200, expectedPages);
         }));
 
@@ -73,10 +89,28 @@ describe("Given a data service", () => {
             expect(pages[0].destination).toBe(expectedPages[0].destination.toString());
         });
 
-        it("Can add pages", (done) => {
-            httpBackend.whenPOST(`${pagesUrl}${SelectedDeviceId}`).respond(200, response);
+        it("Can add pages", () => {
+            spyOn(http, "post").and.returnValue(q.reject());
 
-            service.addNewPage(SelectedDeviceId).then((success) => {
+            service.addNewPage(SelectedDeviceId);
+
+            expect(http.post).toHaveBeenCalledWith(`${pagesUrl}${SelectedDeviceId}`, {});
+        });
+
+        it("When adding pages Then it refreshes the page list", () => {
+            spyOn(http, "post").and.returnValue(q.resolve({ data: response }));
+            spyOn(http, "get").and.returnValue(q.resolve({ data: expectedPages }));
+
+            service.addNewPage(SelectedDeviceId);
+            rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(pagesUrl);
+        });
+
+        it("Can delete pages", (done) => {
+            httpBackend.whenDELETE(`${pagesUrl}${deletePageResponse.deletedPageId}`).respond(200, deletePageResponse);
+
+            service.deletePage(deletePageResponse.deletedPageId).then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
@@ -84,20 +118,16 @@ describe("Given a data service", () => {
             httpBackend.flush();
         });
 
-        it("Can delete pages", (done) => {
-            const deleteResponse: IDeletePageResponse = {
-                deletedPageId: 1,
-                success: true
-            };
+        it("When deleting pages Then Tthe page list is reloaded", (done) => {
+            spyOn(http, "delete").and.returnValue(q.resolve({ data: deletePageResponse }));
+            spyOn(http, "get").and.returnValue(q.resolve({ data: expectedPages }));
 
-            httpBackend.whenDELETE(`${pagesUrl}${deleteResponse.deletedPageId}`).respond(200, deleteResponse);
-
-            service.deletePage(deleteResponse.deletedPageId).then((success) => {
-                expect(success).toBeTruthy();
+            service.deletePage(deletePageResponse.deletedPageId).then(() => {
+                expect(http.get).toHaveBeenCalledWith(pagesUrl);
                 done();
             });
 
-            httpBackend.flush();
+            rootscope.$apply();
         });
 
         it("Can update page field", (done) => {
@@ -110,6 +140,19 @@ describe("Given a data service", () => {
             });
 
             httpBackend.flush();
+        });
+
+        it("When updating pages Then the page list is reloaded", (done) => {
+            const fieldToSet = "anyField";
+            spyOn(http, "put").and.returnValue(q.resolve({ data: response }));
+            spyOn(http, "get").and.returnValue(q.resolve({ data: expectedPages }));
+
+            service.updatePageField(fieldToSet, [ 10 ], 0).then(() => {
+                expect(http.get).toHaveBeenCalledWith(pagesUrl);
+                done();
+            });
+
+            rootscope.$apply();
         });
 
         /***********************************************************************************************
@@ -145,12 +188,12 @@ describe("Given a data service", () => {
         });
 
         it("Can delete devices", (done) => {
-            const deleteResponse: IDeleteDeviceResponse = { deletedDeviceId: 1, success: true };
+            const deleteDeviceResponse: IDeleteDeviceResponse = { deletedDeviceId: 1, success: true };
 
             httpBackend
-                .whenDELETE(`${devicesUrl}${deleteResponse.deletedDeviceId}`).respond(200, deleteResponse);
+                .whenDELETE(`${devicesUrl}${deleteDeviceResponse.deletedDeviceId}`).respond(200, deleteDeviceResponse);
 
-            service.deleteDevice(deleteResponse.deletedDeviceId).then((success) => {
+            service.deleteDevice(deleteDeviceResponse.deletedDeviceId).then((success) => {
                 expect(success).toBeTruthy();
                 done();
             });
@@ -158,18 +201,17 @@ describe("Given a data service", () => {
             httpBackend.flush();
         });
 
-        it("Can read device page options", (done) => {
+        it("Can read device page options", () => {
             const devicePageOptionsResponse: ISelectableOption[] = [
                 { value: "0", label: "label0 "}
             ];
 
             httpBackend.whenGET(`${deviceOptionsUrl}${PageFields.PageSize}`).respond(200, devicePageOptionsResponse);
 
-            service.getCapabilities(PageFields.PageSize).then((options) => {
-                expect(options).toEqual(devicePageOptionsResponse);
-                done();
-            });
-
+            let capabilities = service.getCapabilities(PageFields.PageSize);
             httpBackend.flush();
+            capabilities = service.getCapabilities(PageFields.PageSize);
+
+            expect(capabilities).toEqual(devicePageOptionsResponse);
         });
     });

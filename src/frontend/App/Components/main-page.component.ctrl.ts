@@ -1,26 +1,25 @@
+import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
-import { PageFields } from "../../../common/model";
 import { DataService } from "../Services/DataService";
 import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
-import { ICapabilities, IVisualPage } from "./pageGrid/page-grid.component.ctrl";
+
+export interface IDeviceSelection {
+    deviceId: number;
+}
 
 export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$log", "$window", "dataService"];
+    public static $inject = [ "$state", "$log", "$window", "dataService"];
 
     public selectedDeviceId: number = -1;
     public devices: DeviceDisplay[] = [];
     public selectedPages: number[] = [];
-    public pages: IVisualPage[] = [];
-    public capabilities: ICapabilities = {};
     public editingDevices: boolean = false;
 
-    // event unsubscription
-    private unsubscribeUpdateEvent: () => void;
-
     constructor(
+        private $state: StateService,
         private logService: ILogService,
         private $window: IWindowService,
         private dataService: DataService) { }
@@ -29,16 +28,8 @@ export class MainPageController implements IComponentController {
      * Component initialization
      */
     public $onInit() {
-        this.loadCapabilities();
         this.loadDevices();
-        this.loadPages();
-    }
-
-    /**
-     * Component termination
-     */
-    public $onDestroy() {
-        this.unsubscribeUpdateEvent();
+        this.changeView();
     }
 
     /**
@@ -53,6 +44,7 @@ export class MainPageController implements IComponentController {
      */
     public editDevices() {
         this.editingDevices = true;
+        this.changeView();
     }
 
     /**
@@ -60,6 +52,7 @@ export class MainPageController implements IComponentController {
      */
     public editPages(): any {
         this.editingDevices = false;
+        this.changeView();
     }
 
     /**
@@ -68,6 +61,7 @@ export class MainPageController implements IComponentController {
      */
     public selectDevice(deviceId: number) {
         this.selectedDeviceId = deviceId;
+        this.changeView();
     }
 
     /**
@@ -101,79 +95,6 @@ export class MainPageController implements IComponentController {
         });
     }
 
-    public selectPage(pageId: number, multiselection: boolean) {
-        if (multiselection && this.selectedPages.length > 0) {
-            const indexOfSelectedPage = this.selectedPages.indexOf(pageId);
-            const currentSelected = this.selectedPages.concat();
-            if (indexOfSelectedPage < 1) {
-                currentSelected.push(pageId);
-            } else {
-                currentSelected.splice(indexOfSelectedPage, 1);
-            }
-            this.selectedPages = currentSelected;
-        } else {
-            this.selectedPages = [pageId];
-        }
-    }
-
-    /**
-     * Adds a page to the selected device
-     */
-    public addPage(): any {
-        if (this.selectedDeviceId >= 0) {
-            this.dataService.addNewPage(this.selectedDeviceId).then((success) => {
-                if (success) {
-                    this.loadPages();
-                }
-            });
-        }
-    }
-
-    /**
-     * Deletes an existing page
-     * @param idTodelete the id for the page to be deleted
-     */
-    public deletePage(idTodelete: number) {
-        this.dataService.deletePage(idTodelete).then((success) => {
-            if (success) {
-                this.loadPages();
-            }
-        });
-    }
-
-    /**
-     * Update a particular page field
-     * @param field the field to be updated
-     * @param newValue the new value
-     */
-    public updatePageField(field: string, newValue: number) {
-        if (this.selectedPages.length > 0) {
-            this.dataService.updatePageField(field, this.selectedPages, newValue).then((success) => {
-                if (success) {
-                    this.loadPages();
-                }
-            });
-        }
-    }
-
-    /**
-     * Loads the available capabilities
-     */
-    private loadCapabilities() {
-        this.dataService.getCapabilities(PageFields.PageSize).then((capabilities) => {
-            this.capabilities[PageFields.PageSize] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.PrintQuality).then((capabilities) => {
-            this.capabilities[PageFields.PrintQuality] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.MediaType).then((capabilities) => {
-            this.capabilities[PageFields.MediaType] = capabilities;
-        });
-        this.dataService.getCapabilities(PageFields.Destination).then((capabilities) => {
-            this.capabilities[PageFields.Destination] = capabilities;
-        });
-    }
-
     /**
      * Load the existing devices
      */
@@ -195,11 +116,11 @@ export class MainPageController implements IComponentController {
     }
 
     /**
-     * Loads the available pages
+     * Selects the edition view
      */
-    private loadPages() {
-        this.dataService.getPages().then((pages) => {
-            this.pages = pages;
-        });
+    private changeView() {
+        const deviceSelection: IDeviceSelection = { deviceId: this.selectedDeviceId };
+        const view = this.editingDevices ? "device" : "pages";
+        this.$state.go(view, deviceSelection);
     }
 }

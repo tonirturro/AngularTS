@@ -1,17 +1,16 @@
 import * as angular from "angular";
-import { IAugmentedJQuery, ICompileService, IDocumentService, IRootScopeService } from "angular";
+import { IAugmentedJQuery, ICompileService, IRootScopeService } from "angular";
 import { PageFields } from "../../../../common/model";
 import { ISelectableOption } from "../../../../common/rest";
-import { ICapabilities, IVisualPage } from "./page-grid.component.ctrl";
+import { DataService } from "../../Services/DataService";
+import { IVisualPage } from "./page-grid.component.ctrl";
 
 describe("Given a page grid component ", () => {
     const SelectedDeviceId = 1;
     let element: IAugmentedJQuery;
     let scope: any;
     let rootScope: IRootScopeService;
-    let lastSelectedPage: number;
-    let lastDeletedPage: number;
-    let pageAdded: boolean;
+    let dataServiceToMock: DataService;
 
     const InitialPages: IVisualPage[] = [
         {
@@ -24,7 +23,7 @@ describe("Given a page grid component ", () => {
             destination: "1", deviceId: SelectedDeviceId, id: 2, mediaType: "1", pageSize: "1", printQuality: "1"
         } as IVisualPage,
     ];
-    const Capabilities: ICapabilities = {};
+    const Capabilities: { [key: string]: ISelectableOption[] } = {};
     const PageSizeCapabilities: ISelectableOption[] = [
         { value: "0", label: "page0" },
         { value: "1", label: "page1" }
@@ -52,33 +51,16 @@ describe("Given a page grid component ", () => {
     });
 
     beforeEach(inject((
+        dataService: DataService,
         $compile: ICompileService,
-        $document: IDocumentService,
         $rootScope: IRootScopeService) => {
+        dataServiceToMock = dataService;
         rootScope = $rootScope;
+        spyOnProperty(dataService, "pages").and.returnValue(InitialPages);
+        spyOn(dataService, "getCapabilities").and.callFake((capability: string) => Capabilities[capability]);
         scope = $rootScope.$new();
         scope.selectedDeviceID = SelectedDeviceId;
-        scope.pages = InitialPages;
-        scope.selectedPages = [];
-        scope.capabilites = Capabilities;
-        scope.selectPage = (pageId: number, multiselection: boolean) => {
-            lastSelectedPage = pageId;
-        };
-        scope.deletePage = (pageId: number) => {
-            lastDeletedPage = pageId;
-        };
-        scope.addPage = () => {
-            pageAdded = true;
-        };
-        element = angular.element(`<page-grid ` +
-                                    `capabilities="capabilites" ` +
-                                    `pages="pages" ` +
-                                    `selected-pages="selectedPages" ` +
-                                    `selected-device-id="selectedDeviceID" ` +
-                                    `on-add-page="addPage()" ` +
-                                    `on-delete-page="deletePage(pageId)"` +
-                                    `on-update-pages="updatePageField(field,newValue)" ` +
-                                    `on-selected-page="selectPage(pageId,multiselection)" />` );
+        element = angular.element(`<page-grid selected-device-id="selectedDeviceID" />`);
         element = $compile(element)(scope);
         rootScope.$apply();
     }));
@@ -107,21 +89,11 @@ describe("Given a page grid component ", () => {
         }
     });
 
-    it("When clicking on a page Then it is selected", () => {
-        lastSelectedPage = -1;
-        const selectedItem = 1;
-        const page = element.find("tbody").find("tr")[selectedItem];
-        page.click();
-
-        expect(lastSelectedPage).toBe(InitialPages[selectedItem].id);
-    });
-
     it("When a page is selected Then it is displayed as selected", () => {
         const SelectedItem = 0;
         const pages = element.find("tbody").find("tr");
 
-        scope.selectedPages = [ InitialPages[SelectedItem].id ];
-        rootScope.$apply();
+        pages[SelectedItem].click();
 
         // tslint:disable-next-line:prefer-for-of
         for (let index = 0; index < pages.length; index++) {
@@ -131,6 +103,19 @@ describe("Given a page grid component ", () => {
                 expect(pages[index].classList.contains("item-selected")).toBeFalsy();
             }
         }
+    });
+
+    // Debug when symbols available
+    xit("When page selected and anotheris clicked Then the first one is displayed as not selected", () => {
+        const SelectedItem1 = 0;
+        const SelectedItem2 = 1;
+        const pages = element.find("tbody").find("tr");
+
+        pages[SelectedItem1].click();
+        pages[SelectedItem2].click();
+
+        expect(pages[SelectedItem1].classList.contains("item-selected")).toBeFalsy();
+        expect(pages[SelectedItem2].classList.contains("item-selected")).toBeTruthy();
     });
 
     it("When capabilities are reported Then they are displayed", () => {
@@ -147,19 +132,21 @@ describe("Given a page grid component ", () => {
     });
 
     it("When a page is added Then the adition is reported", () => {
+        spyOn(dataServiceToMock, "addNewPage");
         const addButton = element.find("thead").find("tr").find("button")[0];
-        pageAdded = false;
 
         addButton.click();
 
-        expect(pageAdded).toBeTruthy();
+        expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(SelectedDeviceId);
     });
 
     it("When a page is deleted Then the deletion is reported", () => {
+        spyOn(dataServiceToMock, "deletePage");
         const selectedPage = 1;
         const deleteButton = element.find("tbody").find("tr").find("button");
+
         deleteButton[selectedPage].click();
 
-        expect(lastDeletedPage).toBe(InitialPages[selectedPage].id);
+        expect(dataServiceToMock.deletePage).toHaveBeenCalledWith(InitialPages[selectedPage].id);
     });
 });

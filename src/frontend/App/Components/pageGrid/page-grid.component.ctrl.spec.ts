@@ -1,30 +1,41 @@
 import * as angular from "angular";
+import { IComponentControllerService } from "angular";
 import { PageFields } from "../../../../common/model";
+import { DataService } from "../../Services/DataService";
 import { PageGridController } from "./page-grid.component.ctrl";
 
 describe("Page grid controller", () => {
+    const fakeMouseEvent: any = {
+        ctrlKey: false,
+        srcElement: {
+            attributes: {
+                getNamedItem: () => false
+            }
+        }
+    };
+    const selectedPage: any = {
+        id: 1
+    };
+    const NewValue = 5;
 
     /**
      * Common test resources
      */
     let controller: PageGridController;
-    let lastFieldUpdated: string;
+    let dataServiceToMock: DataService;
 
     /**
      * Initialize the test environment
      */
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController) => {
-        controller = $componentController("pageGrid");
-        controller.onUpdatePages = (data: any) => {
-            lastFieldUpdated = data.field;
-        };
-        controller.capabilities = {};
-        controller.capabilities[PageFields.PageSize] = [];
-        controller.capabilities[PageFields.PrintQuality] = [];
-        controller.capabilities[PageFields.MediaType] = [];
-        controller.capabilities[PageFields.Destination] = [];
+    beforeEach(inject((
+        $componentController: IComponentControllerService,
+        dataService: DataService) => {
+        dataServiceToMock = dataService;
+        controller = $componentController("pageGrid", {});
+        controller.selectPage(fakeMouseEvent, selectedPage );
+        spyOn(dataServiceToMock, "updatePageField");
     }));
 
     /**
@@ -33,31 +44,31 @@ describe("Page grid controller", () => {
      *
      */
     it("A page size change is reported", () => {
-        lastFieldUpdated = "";
-        controller.updatePageSize(0);
+        controller.updatePageSize(NewValue);
 
-        expect(lastFieldUpdated).toBe(PageFields.PageSize);
+        expect(dataServiceToMock.updatePageField)
+            .toHaveBeenCalledWith(PageFields.PageSize, [ selectedPage.id ], NewValue);
     });
 
     it("A print quality change is reported", () => {
-        lastFieldUpdated = "";
-        controller.updatePrintQuality(0);
+        controller.updatePrintQuality(NewValue);
 
-        expect(lastFieldUpdated).toBe(PageFields.PrintQuality);
+        expect(dataServiceToMock.updatePageField)
+            .toHaveBeenCalledWith(PageFields.PrintQuality, [ selectedPage.id ], NewValue);
     });
 
     it("A media type change is reported", () => {
-        lastFieldUpdated = "";
-        controller.updateMediaType(0);
+        controller.updateMediaType(NewValue);
 
-        expect(lastFieldUpdated).toBe(PageFields.MediaType);
+        expect(dataServiceToMock.updatePageField)
+            .toHaveBeenCalledWith(PageFields.MediaType, [ selectedPage.id ], NewValue);
     });
 
     it("A destination change is reported", () => {
-        lastFieldUpdated = "";
-        controller.updateDestination(0);
+        controller.updateDestination(NewValue);
 
-        expect(lastFieldUpdated).toBe(PageFields.Destination);
+        expect(dataServiceToMock.updatePageField)
+            .toHaveBeenCalledWith(PageFields.Destination, [ selectedPage.id ], NewValue);
     });
 
 });

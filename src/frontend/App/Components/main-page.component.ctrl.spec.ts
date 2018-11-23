@@ -1,17 +1,18 @@
+import { StateService } from "@uirouter/core";
 import * as angular from "angular";
 import { IPromise, IQService, IRootScopeService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-import { MainPageController } from "./main-page.component.ctrl";
+import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
 
 describe("Given a main page component controller", () => {
     let controller: MainPageController;
     let q: IQService;
     let rootScopeService: IRootScopeService;
+    let stateServiceToMock: StateService;
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
-    let getPagesMock: jasmine.Spy;
 
     const PageSizeCapabilities: ISelectableOption[] = [
         { value: "0", label: "page0" },
@@ -32,19 +33,19 @@ describe("Given a main page component controller", () => {
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, $window, dataService) => {
+    beforeEach(inject(($componentController, $q, $rootScope, $state: StateService, $window, dataService) => {
         rootScopeService = $rootScope;
+        stateServiceToMock = $state;
         windowServiceToMock = $window;
         dataServiceToMock = dataService;
         q = $q;
+        spyOn(stateServiceToMock, "go");
         spyOn(dataServiceToMock, "getDevices").and.returnValue(q.resolve([]));
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "updatePageField").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deletePage").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "addNewPage").and.returnValue(q.resolve(true));
-        getPagesMock = spyOn(dataServiceToMock, "getPages");
-        getPagesMock.and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "getCapabilities")
             .and.callFake((capability: string): IPromise<ISelectableOption[]> => {
                 switch (capability) {
@@ -69,14 +70,15 @@ describe("Given a main page component controller", () => {
         expect(dataServiceToMock.getDevices).toHaveBeenCalled();
     });
 
-    it("When it is initialized Then it gets the available pages", () => {
-        controller.$onInit();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
     it("When it is initialized Then it has not selected pages", () => {
         expect(controller.selectedPages.length).toBe(0);
+    });
+
+    it("When it is initialized Then it goes to the pages edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
+        controller.$onInit();
+
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("pages", expectedDeviceSelection);
     });
 
     it("When calling close Then the window sercice is called to close the window", () => {
@@ -88,21 +90,34 @@ describe("Given a main page component controller", () => {
     });
 
     it("When calling edit devices Then the view changes to the device edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editDevices();
 
         expect(controller.editingDevices).toBeTruthy();
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("device", expectedDeviceSelection);
     });
 
-    it("When calling edit pages Then the view changes to the device edition", () => {
+    it("When calling edit pages Then the view changes to the pages edition", () => {
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editPages();
 
         expect(controller.editingDevices).toBeFalsy();
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("pages", expectedDeviceSelection);
     });
 
     it("When selecting device Then it is reflected by the associated property", () => {
         const ExpectedDeviceId = 5;
         controller.selectDevice(ExpectedDeviceId);
         expect(controller.selectedDeviceId).toBe(ExpectedDeviceId);
+    });
+
+    it("When selecting device Then the view is adjusted with the selected device", () => {
+        const ExpectedDeviceId = 8;
+        controller.editingDevices = true;
+        controller.selectDevice(ExpectedDeviceId);
+        const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
+
+        expect(stateServiceToMock.go).toHaveBeenCalledWith("device", expectedDeviceSelection);
     });
 
     it("When adding a device Then the data service is called", () => {
@@ -141,120 +156,5 @@ describe("Given a main page component controller", () => {
         rootScopeService.$apply();
 
         expect(dataServiceToMock.getDevices).toHaveBeenCalled();
-    });
-
-    it("When a page field is updated Then the data service is called", () => {
-        const idToUpdate = 2;
-        const newValue = 0;
-        const pageField = "anyField";
-
-        controller.selectedPages = [idToUpdate];
-        controller.updatePageField(pageField, newValue);
-
-        expect(dataServiceToMock.updatePageField)
-            .toHaveBeenCalledWith(pageField, [idToUpdate], newValue);
-    });
-
-    it("When a page field is updated Then the pages are reloaded", () => {
-        const idToUpdate = 3;
-        const newValue = 1;
-        const pageField = "anyField";
-
-        controller.selectedPages = [idToUpdate];
-        controller.updatePageField(pageField, newValue);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
-    it("When selecting a page Then its id is on the selected pages", () => {
-        const pageId = 5;
-        controller.selectPage(pageId, false);
-
-        expect(controller.selectedPages.indexOf(pageId)).toBeGreaterThanOrEqual(0);
-    });
-
-    it("When several pages are selected and a new one is selected Then only this will be at the selection list", () => {
-        const pageId1 = 1;
-        const pageId2 = 3;
-        const pageId3 = 5;
-
-        controller.selectedPages = [pageId1, pageId2];
-        controller.selectPage(pageId3, false);
-
-        expect(controller.selectedPages.indexOf(pageId1)).toBeLessThan(0);
-        expect(controller.selectedPages.indexOf(pageId2)).toBeLessThan(0);
-        expect(controller.selectedPages.indexOf(pageId3)).toBeGreaterThanOrEqual(0);
-    });
-
-    it("When several pages are selected and a new one is selected in multiselection " +
-        "Then this will be added at the selection list", () => {
-            const pageId1 = 1;
-            const pageId2 = 3;
-            const pageId3 = 5;
-
-            controller.selectedPages = [pageId1, pageId2];
-            controller.selectPage(pageId3, true);
-
-            expect(controller.selectedPages.indexOf(pageId1)).toBeGreaterThanOrEqual(0);
-            expect(controller.selectedPages.indexOf(pageId2)).toBeGreaterThanOrEqual(0);
-            expect(controller.selectedPages.indexOf(pageId3)).toBeGreaterThanOrEqual(0);
-        });
-
-    it("When several pages are selected and a previously seleted one is selected in multiselection " +
-        "Then this will be removed from the selection list", () => {
-            const pageId1 = 1;
-            const pageId2 = 3;
-
-            controller.selectedPages = [pageId1, pageId2];
-            controller.selectPage(pageId2, true);
-
-            expect(controller.selectedPages.indexOf(pageId1)).toBeGreaterThanOrEqual(0);
-            expect(controller.selectedPages.indexOf(pageId2)).toBeLessThan(0);
-        });
-
-    it("When a page is deleted Then the data service is called", () => {
-        const idTodelete = 5;
-
-        controller.deletePage(idTodelete);
-
-        expect(dataServiceToMock.deletePage).toHaveBeenCalledWith(idTodelete);
-    });
-
-    it("Delete page refresh page list", () => {
-        getPagesMock.calls.reset();
-
-        controller.deletePage(0);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
-    it("The page is added to the selected device Id", () => {
-        controller.selectedDeviceId = 5;
-
-        controller.addPage();
-
-        expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(controller.selectedDeviceId);
-    });
-
-    it("Add pages refresh page list", () => {
-        getPagesMock.calls.reset();
-        controller.selectedDeviceId = 5;
-
-        controller.addPage();
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getPages).toHaveBeenCalled();
-    });
-
-    it("When initialized then The capabilities are reported", () => {
-        controller.$onInit();
-        rootScopeService.$apply();
-
-        expect(controller.capabilities[PageFields.PageSize]).toEqual(PageSizeCapabilities);
-        expect(controller.capabilities[PageFields.PrintQuality]).toEqual(PrintQualityCapabilities);
-        expect(controller.capabilities[PageFields.MediaType]).toEqual(MediaTypeCapabilities);
-        expect(controller.capabilities[PageFields.Destination]).toEqual(DestinationCapabilities);
     });
 });

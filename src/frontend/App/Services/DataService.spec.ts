@@ -10,6 +10,7 @@ import {
     IUpdateResponse
 } from "../../../common/rest";
 import { DataService } from "./DataService";
+import { IUpdateParams } from "./interfaces";
 
 describe("Given a data service", () => {
         const restUrl = "http://localhost:3000/REST";
@@ -17,12 +18,12 @@ describe("Given a data service", () => {
         const devicesUrl = `${restUrl}/devices/`;
         const deviceOptionsUrl = `${restUrl}/deviceOptions/`;
         const expectedPages: IPage[] = [{
-            destination: 5,
+            destination: "5",
             deviceId: 1,
             id: 1,
-            mediaType: 4,
-            pageSize: 2,
-            printQuality: 3,
+            mediaType: "4",
+            pageSize: "2",
+            printQuality: "3",
         }];
         const response: IUpdateResponse = {
             success: true
@@ -31,6 +32,7 @@ describe("Given a data service", () => {
             deletedPageId: 1,
             success: true
         };
+        const updateParams = { pages: [10], newValue: "0" } as IUpdateParams;
 
         /**
          * Common test resources
@@ -78,19 +80,8 @@ describe("Given a data service", () => {
             expect(pages.length).toBe(expectedPages.length);
         });
 
-        it("Translate from the model", () => {
-            let pages = service.pages;
-            httpBackend.flush();
-            pages = service.pages;
-
-            expect(pages[0].pageSize).toBe(expectedPages[0].pageSize.toString());
-            expect(pages[0].printQuality).toBe(expectedPages[0].printQuality.toString());
-            expect(pages[0].mediaType).toBe(expectedPages[0].mediaType.toString());
-            expect(pages[0].destination).toBe(expectedPages[0].destination.toString());
-        });
-
         it("Can add pages", () => {
-            spyOn(http, "post").and.returnValue(q.reject());
+            spyOn(http, "post").and.returnValue(q.resolve());
 
             service.addNewPage(SelectedDeviceId);
 
@@ -107,52 +98,44 @@ describe("Given a data service", () => {
             expect(http.get).toHaveBeenCalledWith(pagesUrl);
         });
 
-        it("Can delete pages", (done) => {
-            httpBackend.whenDELETE(`${pagesUrl}${deletePageResponse.deletedPageId}`).respond(200, deletePageResponse);
+        it("Can delete pages", () => {
+            const ExpectedCall = `${pagesUrl}${deletePageResponse.deletedPageId}`;
+            spyOn(http, "delete").and.returnValue(q.resolve());
 
-            service.deletePage(deletePageResponse.deletedPageId).then((success) => {
-                expect(success).toBeTruthy();
-                done();
-            });
+            service.deletePage(deletePageResponse.deletedPageId);
 
-            httpBackend.flush();
+            expect(http.delete).toHaveBeenCalledWith(ExpectedCall);
         });
 
-        it("When deleting pages Then Tthe page list is reloaded", (done) => {
+        it("When deleting pages Then the page list is reloaded", () => {
             spyOn(http, "delete").and.returnValue(q.resolve({ data: deletePageResponse }));
             spyOn(http, "get").and.returnValue(q.resolve({ data: expectedPages }));
 
-            service.deletePage(deletePageResponse.deletedPageId).then(() => {
-                expect(http.get).toHaveBeenCalledWith(pagesUrl);
-                done();
-            });
-
+            service.deletePage(deletePageResponse.deletedPageId);
             rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(pagesUrl);
         });
 
-        it("Can update page field", (done) => {
+        it("Can update page field", () => {
             const fieldToSet = "anyField";
-            httpBackend.whenPUT(`${pagesUrl}${fieldToSet}`).respond(200, response);
+            const ExpectedCall = `${pagesUrl}${fieldToSet}`;
+            spyOn(http, "put").and.returnValue(q.resolve());
 
-            service.updatePageField(fieldToSet, [ 10 ], 0).then((succes) => {
-                expect(succes).toBeTruthy();
-                done();
-            });
+            service.updatePageField(fieldToSet, updateParams.pages, updateParams.newValue);
 
-            httpBackend.flush();
+            expect(http.put).toHaveBeenCalledWith(ExpectedCall, JSON.stringify(updateParams));
         });
 
-        it("When updating pages Then the page list is reloaded", (done) => {
+        it("When updating pages Then the page list is reloaded", () => {
             const fieldToSet = "anyField";
             spyOn(http, "put").and.returnValue(q.resolve({ data: response }));
             spyOn(http, "get").and.returnValue(q.resolve({ data: expectedPages }));
 
-            service.updatePageField(fieldToSet, [ 10 ], 0).then(() => {
-                expect(http.get).toHaveBeenCalledWith(pagesUrl);
-                done();
-            });
-
+            service.updatePageField(fieldToSet, updateParams.pages, updateParams.newValue);
             rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(pagesUrl);
         });
 
         /***********************************************************************************************
@@ -199,6 +182,30 @@ describe("Given a data service", () => {
             });
 
             httpBackend.flush();
+        });
+
+        it ("When reading capabilities for the first time Then they are got from the model", () => {
+            const ExpectedCall = `${deviceOptionsUrl}${PageFields.PageSize}`;
+            spyOn(http, "get").and.returnValue(q.resolve({}));
+
+            const capabilities = service.getCapabilities(PageFields.PageSize);
+
+            expect(capabilities.length).toBe(0);
+            expect(http.get).toHaveBeenCalledWith(ExpectedCall);
+        });
+
+        it ("When reading capabilities after the first time and before the model responds" +
+            "Then they are'nt got from the model", () => {
+            const ExpectedCall = `${deviceOptionsUrl}${PageFields.PageSize}`;
+            const getSpy = spyOn(http, "get");
+            getSpy.and.returnValue(q.resolve({}));
+
+            let capabilities = service.getCapabilities(PageFields.PageSize);
+            getSpy.calls.reset();
+            capabilities = service.getCapabilities(PageFields.PageSize);
+
+            expect(capabilities.length).toBe(0);
+            expect(http.get).not.toHaveBeenCalled();
         });
 
         it("Can read device page options", () => {

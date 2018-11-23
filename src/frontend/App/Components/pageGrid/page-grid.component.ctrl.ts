@@ -1,17 +1,6 @@
-import { IComponentController } from "angular";
 import { PageFields } from "../../../../common/model";
-import { ISelectableOption } from "../../../../common/rest";
+import { IPage, ISelectableOption } from "../../../../common/rest";
 import { DataService } from "../../Services/DataService";
-
-export interface IVisualPage {
-    id: number;
-    deviceId: number;
-    class: string;
-    pageSize: string;
-    printQuality: string;
-    mediaType: string;
-    destination: string;
-}
 
 export interface IPageSelectionData {
     pageId: number;
@@ -30,7 +19,7 @@ export interface IPageDeletionData {
 /**
  * Handles the bindings inside the component
  */
-export class PageGridController implements IComponentController {
+export class PageGridController {
     /**
      * Define dependencies
      */
@@ -53,16 +42,9 @@ export class PageGridController implements IComponentController {
     constructor(private dataService: DataService) {}
 
     /**
-     * Initialize view
-     */
-    public $onInit() {
-        this.displaySelection();
-    }
-
-    /**
      * Retrieves the model pages
      */
-    public get pages(): IVisualPage[] {
+    public get pages(): IPage[] {
         return this.dataService.pages;
     }
 
@@ -113,7 +95,7 @@ export class PageGridController implements IComponentController {
      * Request a page size update
      * @param newValue is the new page size value
      */
-    public updatePageSize(newValue: number): void {
+    public updatePageSize(newValue: string): void {
         if (this.selectedPages.length > 0) {
             this.dataService.updatePageField(PageFields.PageSize, this.selectedPages, newValue);
         }
@@ -123,7 +105,7 @@ export class PageGridController implements IComponentController {
      * Request a print quality update
      * @param newValue is the new print quality value
      */
-    public updatePrintQuality(newValue: number): void {
+    public updatePrintQuality(newValue: string): void {
         if (this.selectedPages.length > 0) {
             this.dataService.updatePageField(PageFields.PrintQuality, this.selectedPages, newValue);
         }
@@ -133,7 +115,7 @@ export class PageGridController implements IComponentController {
      * Request a media type update
      * @param newValue is the new media type value
      */
-    public updateMediaType(newValue: number): void {
+    public updateMediaType(newValue: string): void {
         if (this.selectedPages.length > 0) {
             this.dataService.updatePageField(PageFields.MediaType, this.selectedPages, newValue);
         }
@@ -143,7 +125,7 @@ export class PageGridController implements IComponentController {
      * Request a destination update
      * @param newValue is the new media type destination value
      */
-    public updateDestination(newValue: number): void {
+    public updateDestination(newValue: string): void {
         if (this.selectedPages.length > 0) {
             this.dataService.updatePageField(PageFields.Destination, this.selectedPages, newValue);
         }
@@ -154,18 +136,26 @@ export class PageGridController implements IComponentController {
      * @param event is the event generating the click
      * @param page is the selected page
      */
-    public selectPage(event: MouseEvent, selectedPage: IVisualPage): void {
+    public selectPage(event: MouseEvent, pageId: number): void {
         // Do dot break multiselection if clicked on control
         const isSelector = event.srcElement.attributes.getNamedItem("ng-model");
         const isButton = event.srcElement.attributes.getNamedItem("ng-click");
         if (isSelector || isButton) {
-            this.updatePageSelection(selectedPage.id, true);
+            this.updatePageSelection(pageId, true);
             return;
         }
 
         // Set selection
         const isMultiSelection = event.ctrlKey;
-        this.updatePageSelection(selectedPage.id, isMultiSelection);
+        this.updatePageSelection(pageId, isMultiSelection);
+    }
+
+    /**
+     * Checks if the page is at the selected list
+     * @param pageId the id to be checked
+     */
+    public isSelected(pageId: number): boolean {
+        return this.selectedPages.indexOf(pageId) > -1;
     }
 
     /**
@@ -186,21 +176,5 @@ export class PageGridController implements IComponentController {
         } else {
             this.selectedPages = [pageId];
         }
-
-        this.displaySelection();
-    }
-
-    /**
-     * Displays the visual selection
-     */
-    private displaySelection(): void {
-        // Set selected style
-        this.pages.forEach((page) => {
-            if (this.selectedPages.indexOf(page.id) < 0) {
-                page.class = "";
-            } else {
-                page.class = "item-selected";
-            }
-        });
     }
 }

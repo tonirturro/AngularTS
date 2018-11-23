@@ -1,6 +1,6 @@
 ﻿import * as express from "express";
 import { PageFields } from "../../common/model";
-import { IUpdateResponse } from "../../common/rest";
+import { IUpdateParams, IUpdateResponse } from "../../common/rest";
 import { Capabilities } from "../Repository/Capabilities";
 import { Data } from "../Repository/Data";
 
@@ -122,23 +122,23 @@ export class RestRouter {
      */
     private processUpdate(updateFunction: string, req: express.Request): IUpdateResponse {
         let result = true;
-        const pages = req.body.pages;
+        const params = req.body as IUpdateParams;
+        const pages = params.pages;
 
         if (pages) {
-            const newValue = req.body.newValue;
             pages.forEach((page) => {
                     switch (updateFunction) {
                         case PageFields.PageSize:
-                            result = result && this.data.updatePageSize(page, newValue);
+                            result = result && this.data.updatePageSize(page, params.newValue);
                             break;
                         case PageFields.PrintQuality:
-                            result = result && this.data.updatePrintQuality(page, newValue);
+                            result = result && this.data.updatePrintQuality(page, params.newValue);
                             break;
                         case PageFields.MediaType:
-                            result = result && this.data.updateMediaType(page, newValue);
+                            result = result && this.data.updateMediaType(page, params.newValue);
                             break;
                         case PageFields.Destination:
-                            result = result && this.data.updateDestination(page, newValue);
+                            result = result && this.data.updateDestination(page, params.newValue);
                             break;
                     }
                 });

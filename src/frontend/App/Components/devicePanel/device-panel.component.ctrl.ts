@@ -1,6 +1,5 @@
 
-import { IComponentController } from "angular";
-import { DeviceDisplay } from "./DeviceDisplay";
+import { IDevice } from "../../../../common/rest";
 
 interface IReportDeviceId {
     deviceId: number;
@@ -9,31 +8,15 @@ interface IReportDeviceId {
 /**
  * handles the bindings inside the component
  */
-export class DevicePanelController implements IComponentController {
+export class DevicePanelController {
 
     /**
      * Bindings
      */
-    public devices: DeviceDisplay[];
+    public devices: IDevice[];
     public selectedDeviceId: number;
     public onDeleteDevice: (data: IReportDeviceId ) => void;
     public onSelectedDevice: (data: IReportDeviceId ) => void;
-
-    /**
-     * Component initialization
-     */
-    public $onInit() {
-        this.displaySelection();
-    }
-
-    /**
-     * Component update
-     */
-    public $onChanges(changes: any) {
-        if (changes.selectedDeviceId || changes.devices) {
-            this.displaySelection();
-        }
-    }
 
     /**
      * Delete the requested device
@@ -49,19 +32,5 @@ export class DevicePanelController implements IComponentController {
      */
     public selectDevice(deviceId: number): void {
         this.onSelectedDevice({ deviceId });
-    }
-
-    /**
-     * Displays the visual selection
-     */
-    private displaySelection(): void {
-        // Set selected style
-        this.devices.forEach((device) => {
-            if (device.id === this.selectedDeviceId) {
-                device.class = "item-selected";
-            } else {
-                device.class = "";
-            }
-        });
     }
 }

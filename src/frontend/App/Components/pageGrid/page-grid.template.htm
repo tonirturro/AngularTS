@@ -9,7 +9,10 @@
         </tr>
     </thead>
     <tbody>
-        <tr class="{{page.class}}" ng-repeat="page in $ctrl.pages | filter:{ deviceId : $ctrl.selectedDeviceId }" ng-click="$ctrl.selectPage($event,page)">
+        <tr 
+            ng-class="{'item-selected' : $ctrl.isSelected(page.id)}"
+            ng-repeat="page in $ctrl.pages | filter:{ deviceId : $ctrl.selectedDeviceId }" 
+            ng-click="$ctrl.selectPage($event,page.id)">
             <td>
                 <select ng-model="page.pageSize" ng-change="$ctrl.updatePageSize(page.pageSize)">
                     <option ng-repeat="size in $ctrl.PageSizeOptions" value="{{ size.value }}">{{ size.label }}</option>

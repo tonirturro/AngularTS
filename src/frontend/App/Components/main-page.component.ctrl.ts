@@ -1,7 +1,7 @@
 import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
+import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-import { DeviceDisplay } from "./devicePanel/DeviceDisplay";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -11,10 +11,10 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = [ "$state", "$log", "$window", "dataService"];
+    public static $inject = ["$state", "$log", "$window", "dataService"];
 
     public selectedDeviceId: number = -1;
-    public devices: DeviceDisplay[] = [];
+    public devices: IDevice[] = [];
     public selectedPages: number[] = [];
     public editingDevices: boolean = false;
 
@@ -87,6 +87,7 @@ export class MainPageController implements IComponentController {
             if (sucess) {
                 if (this.selectedDeviceId === deviceId) {
                     this.selectedDeviceId = -1;
+                    this.changeView();
                 }
                 this.loadDevices();
             } else {
@@ -99,20 +100,16 @@ export class MainPageController implements IComponentController {
      * Load the existing devices
      */
     private loadDevices() {
-        const newDevices = [];
-        this.dataService.getDevices().then((devices) => {
-            devices.forEach((device) => {
-                newDevices.push(new DeviceDisplay(device.id, device.name));
-            });
-            this.devices = newDevices;
+        this.dataService.getDevices().then((devices: IDevice[]) => {
+            this.devices = devices;
 
             if (this.devices.length > 0 && this.selectedDeviceId < 0) {
                 this.selectedDeviceId = this.devices[0].id;
             }
         })
-        .catch((reason) => {
-            this.logService.error(`Failed to load devices because : ${reason}`);
-        });
+            .catch((reason) => {
+                this.logService.error(`Failed to load devices because : ${reason}`);
+            });
     }
 
     /**

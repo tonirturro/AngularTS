@@ -1,9 +1,8 @@
 import * as angular from "angular";
 import { IAugmentedJQuery, ICompileService, IRootScopeService } from "angular";
 import { PageFields } from "../../../../common/model";
-import { ISelectableOption } from "../../../../common/rest";
+import { IPage, ISelectableOption } from "../../../../common/rest";
 import { DataService } from "../../Services/DataService";
-import { IVisualPage } from "./page-grid.component.ctrl";
 
 describe("Given a page grid component ", () => {
     const SelectedDeviceId = 1;
@@ -12,16 +11,16 @@ describe("Given a page grid component ", () => {
     let rootScope: IRootScopeService;
     let dataServiceToMock: DataService;
 
-    const InitialPages: IVisualPage[] = [
+    const InitialPages: IPage[] = [
         {
             destination: "1", deviceId: SelectedDeviceId, id: 0, mediaType: "1", pageSize: "1", printQuality: "1"
-        } as IVisualPage,
+        } as IPage,
         {
             destination: "1", deviceId: SelectedDeviceId, id: 1, mediaType: "1", pageSize: "1", printQuality: "1"
-        } as IVisualPage,
+        } as IPage,
         {
             destination: "1", deviceId: SelectedDeviceId, id: 2, mediaType: "1", pageSize: "1", printQuality: "1"
-        } as IVisualPage,
+        } as IPage,
     ];
     const Capabilities: { [key: string]: ISelectableOption[] } = {};
     const PageSizeCapabilities: ISelectableOption[] = [

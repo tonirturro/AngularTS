@@ -45,12 +45,12 @@ export class Data {
      */
     public newPage(deviceId: number): void {
         const newPage: IPage = {
-            destination: 0,
+            destination: "0",
             deviceId,
             id: this.lastPageIndex++,
-            mediaType: 0,
-            pageSize: 0,
-            printQuality: 0,
+            mediaType: "0",
+            pageSize: "0",
+            printQuality: "0",
         };
         this.entities.pages.push(newPage);
     }
@@ -123,7 +123,7 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new page size value
      */
-    public updatePageSize(pageId: number, newValue: number): boolean {
+    public updatePageSize(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
@@ -139,7 +139,7 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new print quality value
      */
-    public updatePrintQuality(pageId: number, newValue: number): boolean {
+    public updatePrintQuality(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
@@ -155,7 +155,7 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new media type value
      */
-    public updateMediaType(pageId: number, newValue: number): boolean {
+    public updateMediaType(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {
@@ -171,7 +171,7 @@ export class Data {
      * @param pageId is the id for the page to be updated
      * @param newValue is the new destination value
      */
-    public updateDestination(pageId: number, newValue: number): boolean {
+    public updateDestination(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
 
         if (pageToUpdate != null) {

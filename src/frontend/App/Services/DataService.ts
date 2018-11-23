@@ -1,7 +1,13 @@
 import { IDeferred, IHttpService, ILogService, IPromise, IQService } from "angular";
-import { IDeleteDeviceResponse, IDevice, IPage, ISelectableOption, IUpdateResponse } from "../../../common/rest";
-import { IVisualPage } from "../Components/pageGrid/page-grid.component.ctrl";
-import { UpdateParams } from "./UpdateParams";
+import {
+    IDeleteDeviceResponse,
+    IDeletePageResponse,
+    IDevice,
+    IPage,
+    ISelectableOption,
+    IUpdateParams,
+    IUpdateResponse
+} from "../../../common/rest";
 
 interface ICapabilitiesDictionary {
     [key: string]: ISelectableOption[];
@@ -28,8 +34,8 @@ export class DataService {
     /**
      * Internal properties
      */
-    private cachedPages: IVisualPage[];
-    private defaultCachedPages: IVisualPage[] = [];
+    private cachedPages: IPage[];
+    private defaultCachedPages: IPage[] = [];
     private isGettingPages: boolean = false;
     private cachedCapabilities: ICapabilitiesDictionary = {};
     private isGettingCapabilities: IGettingCapabilitiesDictionary = {};
@@ -50,7 +56,7 @@ export class DataService {
     /**
      * Gets the current cached pages
      */
-    public get pages() {
+    public get pages(): IPage[] {
         if (this.cachedPages) {
             return this.cachedPages;
         }
@@ -90,8 +96,8 @@ export class DataService {
             return this.cachedCapabilities[capability];
         }
 
-        if (!this.getCapabilities[capability]) {
-            this.getCapabilities[capability] = true;
+        if (!this.isGettingCapabilities[capability]) {
+            this.isGettingCapabilities[capability] = true;
             this.getCapabilitiesFromModel(capability);
         }
 
@@ -109,9 +115,9 @@ export class DataService {
                 this.$log.error(`Error while adding new page to device : ${deviceId}`);
             }
         },
-        () => {
-            this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
-        });
+            () => {
+                this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
+            });
     }
 
     /**
@@ -135,20 +141,19 @@ export class DataService {
      * Delete an existing page
      * @param idToDelete is the id for the page to be deleted
      */
-    public deletePage(idToDelete: number): IPromise<boolean> {
-        const deferred: IDeferred<boolean> = this.$q.defer();
+    public deletePage(idToDelete: number) {
 
-        this.$http.delete<{ deletedPageId: number, success: boolean }>(`${this.getUrl("pages")}${idToDelete}`)
+        this.$http.delete<IDeletePageResponse>(`${this.getUrl("pages")}${idToDelete}`)
             .then((response) => {
-                this.updatePages();
-                deferred.resolve(response.data.success && response.data.deletedPageId === idToDelete);
+                if (response.data.success) {
+                    this.updatePages();
+                } else {
+                    this.$log.error(`Error while deleting page id: ${idToDelete}`);
+                }
             },
-            (errors) => {
-                this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
-                deferred.reject(errors.data);
-            });
-
-        return deferred.promise;
+                () => {
+                    this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
+                });
     }
 
     /**
@@ -175,8 +180,8 @@ export class DataService {
      * @param pages The pages to be updated
      * @param newValueToSet The new value to be set
      */
-    public updatePageField(field: string, pages: number[], newValueToSet: number): IPromise<boolean> {
-        return this.performUpdate(field, new UpdateParams(pages, newValueToSet));
+    public updatePageField(field: string, pages: number[], newValue: string) {
+        this.performUpdate(field, { pages, newValue } as IUpdateParams);
     }
 
     /**
@@ -184,20 +189,18 @@ export class DataService {
      * @param field is the field to be updated
      * @param params are the params for the update
      */
-    private performUpdate(field: string, params: UpdateParams): IPromise<boolean> {
-        const deferred: angular.IDeferred<boolean> = this.$q.defer();
-
+    private performUpdate(field: string, params: IUpdateParams) {
         this.$http.put<IUpdateResponse>(`${this.getUrl("pages")}${field}`, JSON.stringify(params))
             .then((response) => {
-                this.updatePages();
-                deferred.resolve(response.data.success);
+                if (response.data.success) {
+                    this.updatePages();
+                } else {
+                    this.$log.error(`Error while updating field ${field} for page id: ${params.pages[0]}`);
+                }
             },
-                (errors) => {
+                () => {
                     this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
-                    deferred.reject(errors.data);
                 });
-
-        return deferred.promise;
     }
 
     /**
@@ -214,28 +217,11 @@ export class DataService {
     private updatePages() {
         this.$http
             .get<IPage[]>(this.getUrl("pages")).then((response) => {
-                let pages: IVisualPage[];
-
-                pages = [];
-
-                // Translate from the model
-                response.data.forEach((newPage) => {
-                    const translatedPage: IVisualPage = {} as IVisualPage;
-                    translatedPage.id = newPage.id;
-                    translatedPage.deviceId = newPage.deviceId;
-                    translatedPage.pageSize = newPage.pageSize.toString();
-                    translatedPage.printQuality = newPage.printQuality.toString();
-                    translatedPage.mediaType = newPage.mediaType.toString();
-                    translatedPage.destination = newPage.destination.toString();
-                    pages.push(translatedPage);
-                });
-
-                this.cachedPages = pages;
-
+                this.cachedPages = response.data;
             },
-            () => {
+                () => {
                     this.$log.error(`Failure to get ${this.getUrl("pages")}`);
-            });
+                });
     }
 
     /**
@@ -247,8 +233,8 @@ export class DataService {
         this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
             this.cachedCapabilities[capability] = response.data;
         },
-        () => {
+            () => {
                 this.$log.error(`Failure to get ${capability} device capability`);
-        });
+            });
     }
 }

@@ -1,14 +1,19 @@
+export interface IUpdateParams {
+    pages: number[];
+    newValue: string;
+}
+
 export interface IUpdateResponse {
     success: boolean;
 }
 
 export interface IPage {
-    id: any
+    id: number,
     deviceId: number,
-    pageSize: number,
-    printQuality: number,
-    mediaType: number,
-    destination: number
+    pageSize: string,
+    printQuality: string,
+    mediaType: string,
+    destination: string
 }
 
 export interface ISelectableOption {

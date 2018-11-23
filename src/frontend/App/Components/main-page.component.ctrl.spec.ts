@@ -151,6 +151,16 @@ describe("Given a main page component controller", () => {
         expect(controller.selectedDeviceId).not.toEqual(SelectedDeviceId);
     });
 
+    it("When deleting the selected device Then the view is changed", () => {
+        const SelectedDeviceId = 4;
+        controller.selectedDeviceId = SelectedDeviceId;
+
+        controller.deleteDevice(SelectedDeviceId);
+        rootScopeService.$apply();
+
+        expect(stateServiceToMock.go).toHaveBeenCalled();
+    });
+
     it("When deleting a device Then the device list is updated", () => {
         controller.deleteDevice(0);
         rootScopeService.$apply();

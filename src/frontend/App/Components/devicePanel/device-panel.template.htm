@@ -7,9 +7,11 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="device in $ctrl.devices">
-            <td ng-class="device.class" ng-click="$ctrl.selectDevice(device.id)">
-                <span><button type="button" class="btn btn-danger" ng-click="$ctrl.deleteDevice(device.id)">x</button> {{device.name}}</span>              
+        <tr ng-repeat="device in devicePanelController.devices">
+            <td 
+                ng-class="{'item-selected' : device.id === devicePanelController.selectedDeviceId}" 
+                ng-click="devicePanelController.selectDevice(device.id)">
+                <span><button type="button" class="btn btn-danger" ng-click="devicePanelController.deleteDevice(device.id)">x</button> {{device.name}}</span>              
             </td>
         </tr>
     </tbody>

@@ -12,5 +12,6 @@ export const DevicePanel: IComponentOptions = {
         selectedDeviceId: "<"
     },
     controller: DevicePanelController,
+    controllerAs: "devicePanelController",
     templateUrl: "devicePanel/device-panel.template.htm"
 };

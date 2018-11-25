@@ -6,7 +6,8 @@ import {
     IPage,
     ISelectableOption,
     IUpdateParams,
-    IUpdateResponse
+    IUpdateResponse,
+    IUpdateDeviceParams
 } from "../../../common/rest";
 
 interface ICapabilitiesDictionary {
@@ -36,7 +37,10 @@ export class DataService {
      */
     private cachedPages: IPage[];
     private defaultCachedPages: IPage[] = [];
-    private isGettingPages: boolean = false;
+    private isGettingPages = false;
+    private cachedDevices: IDevice[];
+    private defaultCachedDevices: IDevice[] = [];
+    private isGettingDevices = false;
     private cachedCapabilities: ICapabilitiesDictionary = {};
     private isGettingCapabilities: IGettingCapabilitiesDictionary = {};
     private defaultCachedCapabilities: ISelectableOption[] = [];
@@ -70,21 +74,19 @@ export class DataService {
     }
 
     /**
-     * Gets devices from backend
+     * Gets the current cached devices
      */
-    public getDevices(): IPromise<IDevice[]> {
+    public get devices(): IDevice[] {
+        if (this.cachedDevices) {
+            return this.cachedDevices;
+        }
 
-        const deferred: IDeferred<IDevice[]> = this.$q.defer();
+        if (!this.isGettingDevices) {
+            this.isGettingDevices = true;
+            this.updateDevices();
+        }
 
-        this.$http.get<IDevice[]>(this.getUrl("devices")).then((response) => {
-            deferred.resolve(response.data);
-        },
-            (errors) => {
-                this.$log.error(`Failure to get ${this.getUrl("devices")}`);
-                deferred.reject(errors.data);
-            });
-
-        return deferred.promise;
+        return this.defaultCachedDevices;
     }
 
     /**
@@ -114,27 +116,25 @@ export class DataService {
             } else {
                 this.$log.error(`Error while adding new page to device : ${deviceId}`);
             }
-        },
-            () => {
-                this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
-            });
+        }, () => {
+            this.$log.error(`Failure to post ${this.getUrl("pages")}${deviceId}`);
+        });
     }
 
     /**
      * Request a new device
      */
-    public addNewDevice(): IPromise<boolean> {
-        const deferred: IDeferred<boolean> = this.$q.defer();
+    public addNewDevice() {
 
         this.$http.put<IUpdateResponse>(this.getUrl("devices"), {}).then((response) => {
-            deferred.resolve(response.data.success);
-        },
-            (errors) => {
-                this.$log.error(`Failure to put ${this.getUrl("devices")}`);
-                deferred.reject(errors.data);
-            });
-
-        return deferred.promise;
+            if (response.data.success) {
+                this.updateDevices();
+            } else {
+                this.$log.error("Error while adding new device");
+            }
+        }, () => {
+            this.$log.error(`Failure to put ${this.getUrl("devices")}`);
+        });
     }
 
     /**
@@ -150,10 +150,9 @@ export class DataService {
                 } else {
                     this.$log.error(`Error while deleting page id: ${idToDelete}`);
                 }
-            },
-                () => {
-                    this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
-                });
+            }, () => {
+                this.$log.error(`Failure to delete ${this.getUrl("pages")}${idToDelete}`);
+            });
     }
 
     /**
@@ -164,14 +163,32 @@ export class DataService {
         const deferred: IDeferred<boolean> = this.$q.defer();
 
         this.$http.delete<IDeleteDeviceResponse>(`${this.getUrl("devices")}${idToDelete}`).then((response) => {
+            this.updateDevices();
             deferred.resolve(response.data.success && response.data.deletedDeviceId === idToDelete);
-        },
-            (errors) => {
-                this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
-                deferred.reject(errors.data);
-            });
+        }, (errors) => {
+            this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
+            deferred.reject(errors.data);
+        });
 
         return deferred.promise;
+    }
+
+    /**
+     * Updates the name for a device
+     * @param id the id for the device to be updated
+     * @param newValue the new value for the update
+     */
+    public updateDeviceName(id: number, newValue: string) {
+        const data = JSON.stringify({ id, newValue } as IUpdateDeviceParams);
+        this.$http.put<IUpdateResponse>(`${this.getUrl("devices/name")}`, data).then((response) => {
+            if (response.data.success) {
+                this.updateDevices();
+            } else {
+                this.$log.error(`Error while updating device id : ${id}`);
+            }
+        }, () => {
+            this.$log.error(`Failure to put ${this.getUrl("devices/name")}`);
+        });
     }
 
     /**
@@ -182,6 +199,18 @@ export class DataService {
      */
     public updatePageField(field: string, pages: number[], newValue: string) {
         this.performUpdate(field, { pages, newValue } as IUpdateParams);
+    }
+
+    /**
+     * Gets devices from backend
+     */
+    private updateDevices() {
+        this.$http.get<IDevice[]>(this.getUrl("devices")).then((response) => {
+            this.cachedDevices = response.data;
+        }, () => {
+            this.$log.error(`Failure to get ${this.getUrl("devices")}`);
+            this.isGettingDevices = false;
+        });
     }
 
     /**
@@ -197,10 +226,9 @@ export class DataService {
                 } else {
                     this.$log.error(`Error while updating field ${field} for page id: ${params.pages[0]}`);
                 }
-            },
-                () => {
-                    this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
-                });
+            }, () => {
+                this.$log.error(`Failure to put ${this.getUrl("pages")}${field}`);
+            });
     }
 
     /**
@@ -218,10 +246,9 @@ export class DataService {
         this.$http
             .get<IPage[]>(this.getUrl("pages")).then((response) => {
                 this.cachedPages = response.data;
-            },
-                () => {
-                    this.$log.error(`Failure to get ${this.getUrl("pages")}`);
-                });
+            }, () => {
+                this.$log.error(`Failure to get ${this.getUrl("pages")}`);
+            });
     }
 
     /**
@@ -232,9 +259,8 @@ export class DataService {
 
         this.$http.get<ISelectableOption[]>(`${this.getUrl("deviceOptions")}${capability}`).then((response) => {
             this.cachedCapabilities[capability] = response.data;
-        },
-            () => {
-                this.$log.error(`Failure to get ${capability} device capability`);
-            });
+        }, () => {
+            this.$log.error(`Failure to get ${capability} device capability`);
+        });
     }
 }

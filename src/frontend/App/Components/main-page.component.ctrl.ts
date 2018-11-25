@@ -14,7 +14,6 @@ export class MainPageController implements IComponentController {
     public static $inject = ["$state", "$log", "$window", "dataService"];
 
     public selectedDeviceId: number = -1;
-    public devices: IDevice[] = [];
     public selectedPages: number[] = [];
     public editingDevices: boolean = false;
 
@@ -22,13 +21,19 @@ export class MainPageController implements IComponentController {
         private $state: StateService,
         private logService: ILogService,
         private $window: IWindowService,
-        private dataService: DataService) { }
+        private dataService: DataService) {}
+
+    /**
+     * Exposes the devices from the data service
+     */
+    public get devices(): IDevice[] {
+        return this.dataService.devices;
+    }
 
     /**
      * Component initialization
      */
     public $onInit() {
-        this.loadDevices();
         this.changeView();
     }
 
@@ -68,14 +73,7 @@ export class MainPageController implements IComponentController {
      * Request to add a new device
      */
     public addDevice() {
-        this.dataService.addNewDevice().then((success) => {
-            if (success) {
-                this.loadDevices();
-                this.logService.log("New device added sucessfully");
-            } else {
-                this.logService.log("Failed to add new device");
-            }
-        });
+        this.dataService.addNewDevice();
     }
 
     /**
@@ -89,27 +87,10 @@ export class MainPageController implements IComponentController {
                     this.selectedDeviceId = -1;
                     this.changeView();
                 }
-                this.loadDevices();
             } else {
                 this.logService.log(`Failed to delete device id ${deviceId}`);
             }
         });
-    }
-
-    /**
-     * Load the existing devices
-     */
-    private loadDevices() {
-        this.dataService.getDevices().then((devices: IDevice[]) => {
-            this.devices = devices;
-
-            if (this.devices.length > 0 && this.selectedDeviceId < 0) {
-                this.selectedDeviceId = this.devices[0].id;
-            }
-        })
-            .catch((reason) => {
-                this.logService.error(`Failed to load devices because : ${reason}`);
-            });
     }
 
     /**

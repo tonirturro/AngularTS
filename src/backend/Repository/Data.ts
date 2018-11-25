@@ -5,7 +5,6 @@ import { Entities } from "../Model/Entities";
  * Class definition for the repository
  */
 export class Data {
-
     // Track page index
     private lastPageIndex;
 
@@ -71,21 +70,13 @@ export class Data {
      * @param idToDelete is the id for the page to be deleted.
      */
     public deletePage(idToDelete: number): boolean {
-        let indexToDelete = -1;
-
-        for (let i = 0; i < this.entities.pages.length; i++) {
-            if (this.entities.pages[i].id === idToDelete) {
-                indexToDelete = i;
-                break;
-            }
-        }
-
-        if (indexToDelete >= 0) {
+        const indexToDelete = this.entities.pages.findIndex((p) => p.id === idToDelete);
+        if (indexToDelete > -1) {
             this.entities.pages.splice(indexToDelete, 1);
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -93,29 +84,40 @@ export class Data {
      * @param idToDelete is the id for the device to be deleted.
      */
     public deleteDevice(idToDelete: number): boolean {
-        let indexToDelete = -1;
+        const indexToDelete = this.entities.devices.findIndex((d) => d.id === idToDelete);
 
-        for (let i = 0; i < this.entities.devices.length; i++) {
-            if (this.entities.devices[i].id === idToDelete) {
-                indexToDelete = i;
-                break;
-            }
-        }
-
-        if (indexToDelete >= 0) {
+        if (indexToDelete > -1) {
             // Delete the pages
-            const originalPages = this.entities.pages.slice();
-            originalPages.forEach((page) => {
-                if (page.deviceId === idToDelete) {
-                    this.deletePage(page.id);
-                }
-            });
+            const pagesToDelete = this.entities.pages.map(
+                (p) => {
+                    if (p.deviceId === idToDelete) {
+                        return p.id;
+                    }
+                });
+
+            pagesToDelete.forEach((id) => this.deletePage(id));
             // Delete the device
             this.entities.devices.splice(indexToDelete, 1);
             return true;
-        } else {
-            return false;
         }
+
+        return false;
+    }
+
+    /**
+     * Updates the name for a particular device
+     * @param deviceId the id for the device to modify
+     * @param newValue the value to set to the previous devive
+     */
+    public updateDeviceName(deviceId: number, newValue: string): boolean {
+        const device = this.entities.devices.find((d) => d.id === deviceId);
+
+        if (device) {
+             device.name = newValue;
+             return true;
+        }
+
+        return false;
     }
 
     /**
@@ -125,7 +127,6 @@ export class Data {
      */
     public updatePageSize(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
-
         if (pageToUpdate != null) {
             pageToUpdate.pageSize = newValue;
             return true;
@@ -141,8 +142,7 @@ export class Data {
      */
     public updatePrintQuality(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
-
-        if (pageToUpdate != null) {
+        if (pageToUpdate) {
             pageToUpdate.printQuality = newValue;
             return true;
         }
@@ -157,8 +157,7 @@ export class Data {
      */
     public updateMediaType(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
-
-        if (pageToUpdate != null) {
+        if (pageToUpdate) {
             pageToUpdate.mediaType = newValue;
             return true;
         }
@@ -173,8 +172,7 @@ export class Data {
      */
     public updateDestination(pageId: number, newValue: string): boolean {
         const pageToUpdate = this.getPage(pageId);
-
-        if (pageToUpdate != null) {
+        if (pageToUpdate) {
             pageToUpdate.destination = newValue;
             return true;
         }
@@ -187,13 +185,6 @@ export class Data {
      * @param pageId is the id for the page to be found
      */
     private getPage(pageId: number): IPage {
-        let pageFound: IPage = null;
-        this.entities.pages.forEach((page) => {
-            if (page.id === pageId) {
-                 pageFound = page;
-            }
-        });
-
-        return pageFound;
+        return this.entities.pages.find((p) => p.id === pageId);
     }
 }

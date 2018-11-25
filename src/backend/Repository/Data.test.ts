@@ -2,7 +2,7 @@
 import { IPage } from "../../common/rest";
 import { Data } from "./Data";
 
-describe("Data test repository", () => {
+describe("Given a data layer", () => {
 
     /**
      * Test common resources
@@ -62,7 +62,7 @@ describe("Data test repository", () => {
     /*
      * The test cases
      */
-    it("Has no pages when initialized", () => {
+    it("When it is initialized Then it has no pages", () => {
         const pages = dataLayer.getPages();
 
         expect(pages.length).to.equal(0);
@@ -103,7 +103,7 @@ describe("Data test repository", () => {
     });
 
     it("Can't update page size if the page does not exist", () => {
-        const result = dataLayer.updatePageSize(getInvalidId(), 0);
+        const result = dataLayer.updatePageSize(getInvalidId(), "0");
 
         expect(result).equals(false);
     });
@@ -120,7 +120,7 @@ describe("Data test repository", () => {
     });
 
     it("Can't update print quality if the page does not exist", () => {
-        const result = dataLayer.updatePrintQuality(getInvalidId(), 0);
+        const result = dataLayer.updatePrintQuality(getInvalidId(), "0");
 
         expect(result).equals(false);
     });
@@ -137,7 +137,7 @@ describe("Data test repository", () => {
     });
 
     it("Can't update media type if the page does not exist", () => {
-        const result = dataLayer.updateMediaType(getInvalidId(), 0);
+        const result = dataLayer.updateMediaType(getInvalidId(), "0");
 
         expect(result).equals(false);
     });
@@ -154,15 +154,11 @@ describe("Data test repository", () => {
     });
 
     it("Can't update destination if the page does not exist", () => {
-        const result = dataLayer.updateDestination(getInvalidId(), 0);
-
-        expect(result).equals(false);
+        expect( dataLayer.updateDestination(getInvalidId(), "0")).equals(false);
     });
 
     it("Has no devices when initialized", () => {
-        const devices = dataLayer.getDevices();
-
-        expect(devices.length).to.equal(0);
+        const result = expect(dataLayer.getDevices()).to.be.empty;
     });
 
     it("Can add devices", () => {
@@ -170,6 +166,26 @@ describe("Data test repository", () => {
 
         const pages = dataLayer.getDevices();
         expect(pages.length).to.be.greaterThan(0);
+    });
+
+    it("Can update the device name", () => {
+        const ExpectedValue = "New Device Value";
+        addDevices();
+        const deviceToModify = dataLayer.getDevices()[0];
+
+        const result = dataLayer.updateDeviceName(deviceToModify.id, ExpectedValue);
+
+        const res = expect(result).to.be.true;
+        expect(deviceToModify.name).to.equal(ExpectedValue);
+    });
+
+    it ("When device id to be update does not exits Then it cannot be deleted", () => {
+        addDevices();
+        const devices = dataLayer.getDevices();
+        const id = 9999;
+
+        let res = expect(devices.some((d) => d.id === id)).to.be.false;
+        res = expect(dataLayer.updateDeviceName(id, "any")).to.be.false;
     });
 
     it("Can delete devices", () => {
@@ -180,7 +196,7 @@ describe("Data test repository", () => {
 
         // Delete on device
         const idToDelete = devices[0].id;
-        expect(dataLayer.deleteDevice(idToDelete)).equals(true);
+        const res = expect(dataLayer.deleteDevice(idToDelete)).to.be.true;
 
         // Verify device deletion
         devices = dataLayer.getDevices();

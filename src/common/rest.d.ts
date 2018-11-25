@@ -3,6 +3,11 @@ export interface IUpdateParams {
     newValue: string;
 }
 
+export interface IUpdateDeviceParams {
+    id: number;
+    newValue: string;
+}
+
 export interface IUpdateResponse {
     success: boolean;
 }

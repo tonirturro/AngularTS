@@ -1,7 +1,6 @@
 import * as angular from "angular";
 import { IAugmentedJQuery, ICompileService, IQService, IRootScopeService } from "angular";
 import { IDevice } from "../../../../common/rest";
-import { DataService } from "../../Services/DataService";
 
 describe("Given a device panel component", () => {
     const InitialDevices: IDevice[] = [
@@ -22,11 +21,8 @@ describe("Given a device panel component", () => {
 
     beforeEach(inject((
         $compile: ICompileService,
-        $rootScope: IRootScopeService,
-        $q: IQService,
-        dataService: DataService) => {
+        $rootScope: IRootScopeService) => {
         rootScope = $rootScope;
-        spyOn(dataService, "getDevices").and.returnValue($q.resolve(InitialDevices));
         scope = $rootScope.$new();
         scope.devices = InitialDevices;
         scope.selectedDeviceId = -1;

@@ -1,3 +1,5 @@
 <div ng-if="deviceEditController.selectedDeviceId > -1">
-    <h1>Hello Device Edit : {{ deviceEditController.selectedDeviceId }}</h1>
+    <label for="deviceNameBox">Name </label>
+    <input type="text" name="deviceNameBox" ng-model="deviceEditController.deviceName">
+    <button class="btn btn-info" ng-click="deviceEditController.apply()">Apply</button>
 </div>

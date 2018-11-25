@@ -1,6 +1,6 @@
 ﻿import * as express from "express";
 import { PageFields } from "../../common/model";
-import { IUpdateParams, IUpdateResponse } from "../../common/rest";
+import { IUpdateDeviceParams, IUpdateParams, IUpdateResponse } from "../../common/rest";
 import { Capabilities } from "../Repository/Capabilities";
 import { Data } from "../Repository/Data";
 
@@ -82,6 +82,13 @@ export class RestRouter {
         this.router.get("/deviceOptions/:capability", (req: express.Request, res: express.Response) => {
             const capabilityToQuery = req.params.capability;
             res.json(this.capabilities.getCapabilities(capabilityToQuery));
+        });
+
+        // Updating device name
+        this.router.put("/devices/name", (req: express.Request, res: express.Response) => {
+            const params = req.body as IUpdateDeviceParams;
+            const result = this.data.updateDeviceName(params.id, params.newValue);
+            res.json({ success: result } as IUpdateResponse);
         });
 
         // Update page sizes

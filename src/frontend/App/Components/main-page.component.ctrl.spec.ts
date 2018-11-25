@@ -2,7 +2,7 @@ import { StateService } from "@uirouter/core";
 import * as angular from "angular";
 import { IPromise, IQService, IRootScopeService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
-import { ISelectableOption } from "../../../common/rest";
+import { IDevice, ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
 
@@ -14,11 +14,15 @@ describe("Given a main page component controller", () => {
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
 
+    const devices: IDevice[] = [{
+        id: 1,
+        name: "Device 2"
+    }];
     const PageSizeCapabilities: ISelectableOption[] = [
         { value: "0", label: "page0" },
         { value: "1", label: "page1" }
     ];
-    const PrintQualityCapabilities: ISelectableOption[] =  [
+    const PrintQualityCapabilities: ISelectableOption[] = [
         { value: "0", label: "quality0" },
         { value: "1", label: "quality1" }
     ];
@@ -40,7 +44,7 @@ describe("Given a main page component controller", () => {
         dataServiceToMock = dataService;
         q = $q;
         spyOn(stateServiceToMock, "go");
-        spyOn(dataServiceToMock, "getDevices").and.returnValue(q.resolve([]));
+        spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "updatePageField").and.returnValue(q.resolve(true));
@@ -67,7 +71,7 @@ describe("Given a main page component controller", () => {
     it("When is ititialized Then it gets the existing devices", () => {
         controller.$onInit();
 
-        expect(dataServiceToMock.getDevices).toHaveBeenCalled();
+        expect(controller.devices).toEqual(devices);
     });
 
     it("When it is initialized Then it has not selected pages", () => {
@@ -126,13 +130,6 @@ describe("Given a main page component controller", () => {
         expect(dataServiceToMock.addNewDevice).toHaveBeenCalled();
     });
 
-    it("When adding a device Then the devives are reloaded", () => {
-        controller.addDevice();
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getDevices).toHaveBeenCalled();
-    });
-
     it("When deleting a device Then the data service is called", () => {
         const idToDelete = 4;
 
@@ -159,12 +156,5 @@ describe("Given a main page component controller", () => {
         rootScopeService.$apply();
 
         expect(stateServiceToMock.go).toHaveBeenCalled();
-    });
-
-    it("When deleting a device Then the device list is updated", () => {
-        controller.deleteDevice(0);
-        rootScopeService.$apply();
-
-        expect(dataServiceToMock.getDevices).toHaveBeenCalled();
     });
 });

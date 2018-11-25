@@ -4,6 +4,7 @@ import chaiHttp = require("chai-http");
 import * as sinon from "sinon";
 
 import { PageFields } from "../../common/model";
+import { IUpdateParams, IUpdateDeviceParams } from "../../common/rest";
 import { main } from "../app";
 import { Data } from "../Repository/Data";
 
@@ -33,12 +34,12 @@ describe("REST Route", () => {
         dataFuntionToSpy: keyof Data,
         field: string,
         pageId: number,
-        newValue: number,
+        newValue: string,
         done: () => void) => {
 
         const spy = sinon.spy(main.dependencies.dataLayer, dataFuntionToSpy);
 
-        const data = {
+        const data: IUpdateParams = {
             newValue,
             pages: [pageId],
         };
@@ -133,7 +134,7 @@ describe("REST Route", () => {
     });
 
     it("Update page size calls update media size with the right parameters", (done) => {
-        executeAndValidateUpdate("updatePageSize", "pageSize", 10, 0, done);
+        executeAndValidateUpdate("updatePageSize", "pageSize", 10, "0", done);
     });
 
     it("Update print quality responds ok", (done) => {
@@ -141,7 +142,7 @@ describe("REST Route", () => {
     });
 
     it("Update print quality calls update print quality with the right parameters", (done) => {
-        executeAndValidateUpdate("updatePrintQuality", "printQuality", 15, 1, done);
+        executeAndValidateUpdate("updatePrintQuality", "printQuality", 15, "1", done);
     });
 
     it("Update media type responds ok", (done) => {
@@ -149,7 +150,7 @@ describe("REST Route", () => {
     });
 
     it("Update media type calls update media type with the right parameters", (done) => {
-        executeAndValidateUpdate("updateMediaType", "mediaType", 5, 2, done);
+        executeAndValidateUpdate("updateMediaType", "mediaType", 5, "2", done);
     });
 
     it("Update destination responds ok", (done) => {
@@ -157,7 +158,7 @@ describe("REST Route", () => {
     });
 
     it("Update destination calls update destination with the right parameters", (done) => {
-        executeAndValidateUpdate("updateDestination", "destination", 20, 0, done);
+        executeAndValidateUpdate("updateDestination", "destination", 20, "0", done);
     });
 
     /**************************************************************************************
@@ -215,10 +216,28 @@ describe("REST Route", () => {
         chai.request(main.application)
             .del(`/REST/devices/${ExpectedDeviceId}`)
             .then(() => {
-                expect(spy.calledOnce).to.equal(true);
-                expect(spy.calledWith(ExpectedDeviceId)).to.equal(true);
+                let r = expect(spy.calledOnce).to.be.true;
+                r = expect(spy.calledWith(ExpectedDeviceId)).to.be.true;
                 done();
             });
+    });
+
+    it("Put device name responds ok", (done) => {
+        const spy = sinon.spy(main.dependencies.dataLayer, "updateDeviceName");
+        const data: IUpdateDeviceParams = {
+            id: 0,
+            newValue: "any"
+        };
+
+        chai.request(main.application)
+        .put(`/REST/devices/name`)
+        .set("content-type", "application/json")
+        .send(JSON.stringify(data))
+        .then(() => {
+            let r = expect(spy.calledOnce).to.be.true;
+            r = expect(spy.calledWith(data.id, data.newValue)).to.be.true;
+            done();
+        });
     });
 
     it("Getting device options responds ok", (done) => {

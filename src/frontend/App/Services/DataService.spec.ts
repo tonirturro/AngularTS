@@ -7,16 +7,26 @@ import {
     IDevice,
     IPage,
     ISelectableOption,
+    IUpdateDeviceParams,
+    IUpdateParams,
     IUpdateResponse
 } from "../../../common/rest";
 import { DataService } from "./DataService";
-import { IUpdateParams } from "./interfaces";
 
 describe("Given a data service", () => {
         const restUrl = "http://localhost:3000/REST";
         const pagesUrl = `${restUrl}/pages/`;
         const devicesUrl = `${restUrl}/devices/`;
         const deviceOptionsUrl = `${restUrl}/deviceOptions/`;
+        const devicesResponse: { data: IDevice[] } = {
+            data: [{
+                id: 1,
+                name: "Device 2"
+            }]
+        };
+        const deleteDeviceResponse: { data: IDeleteDeviceResponse } = {
+            data: { deletedDeviceId: 1, success: true }
+        };
         const expectedPages: IPage[] = [{
             destination: "5",
             deviceId: 1,
@@ -141,47 +151,112 @@ describe("Given a data service", () => {
         /***********************************************************************************************
          * Devices
          ***********************************************************************************************/
-        it("Reads Devices", (done) => {
-            const devicesResponse: IDevice[] = [{
-                id: 1,
-                name: "Device 2"
-            }];
+        it("When it reads devices and they are not queried Then they are queried", () => {
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
 
-            httpBackend.whenGET(devicesUrl).respond(200, devicesResponse);
+            const devices = service.devices;
 
-            service.getDevices().then( (devices) => {
-                expect(devices.length).toBe(1);
-                expect(devices[0].id).toBe(devicesResponse[0].id);
-                expect(devices[0].name).toBe(devicesResponse[0].name);
-                done();
-            });
-
-            httpBackend.flush();
+            expect(devices.length).toBe(0);
+            expect(http.get).toHaveBeenCalledWith(devicesUrl);
         });
 
-        it("Can add devices", (done) => {
-            httpBackend.whenPUT(devicesUrl).respond(200, response);
+        it("When it reads the devices while they are queried Then they are not queried again", () => {
+            const getSpy = spyOn(http, "get");
+            getSpy.and.returnValue(q.resolve(devicesResponse));
 
-            service.addNewDevice().then((success) => {
-                expect(success).toBeTruthy();
-                done();
-            });
+            let devices = service.devices;
+            getSpy.calls.reset();
+            devices = service.devices;
 
-            httpBackend.flush();
+            expect(devices.length).toBe(0);
+            expect(http.get).not.toHaveBeenCalled();
+        });
+
+        it("When it reads the devices after a query failed Then they are queried again", () => {
+            const getSpy = spyOn(http, "get");
+            getSpy.and.returnValue(q.reject({}));
+
+            let devices = service.devices;
+            rootscope.$apply();
+            getSpy.calls.reset();
+            devices = service.devices;
+
+            expect(devices.length).toBe(0);
+            expect(http.get).toHaveBeenCalledWith(devicesUrl);
+        });
+
+        it("When read devices Then the ones from the backend are read", () => {
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
+
+            let devices = service.devices;
+            rootscope.$apply();
+            devices = service.devices;
+            expect(devices).toEqual(devicesResponse.data);
+        });
+
+        it("Can add devices", () => {
+            spyOn(http, "put").and.returnValue(q.resolve({ data: response }));
+
+            service.addNewDevice();
+
+            expect(http.put).toHaveBeenCalledWith(devicesUrl, {});
+        });
+
+        it("When adding devices Then the device list is reloaded", () => {
+            spyOn(http, "put").and.returnValue(q.resolve({ data: response }));
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
+
+            service.addNewDevice();
+            rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(devicesUrl);
         });
 
         it("Can delete devices", (done) => {
-            const deleteDeviceResponse: IDeleteDeviceResponse = { deletedDeviceId: 1, success: true };
+            const expectedCall = `${devicesUrl}${deleteDeviceResponse.data.deletedDeviceId}`;
+            spyOn(http, "delete").and.returnValue(q.resolve(deleteDeviceResponse));
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
 
-            httpBackend
-                .whenDELETE(`${devicesUrl}${deleteDeviceResponse.deletedDeviceId}`).respond(200, deleteDeviceResponse);
-
-            service.deleteDevice(deleteDeviceResponse.deletedDeviceId).then((success) => {
+            service.deleteDevice(deleteDeviceResponse.data.deletedDeviceId).then((success) => {
+                expect(http.delete).toHaveBeenCalledWith(expectedCall);
                 expect(success).toBeTruthy();
                 done();
             });
 
-            httpBackend.flush();
+            rootscope.$apply();
+        });
+
+        it("When deleting devices Then the device list is reloaded", () => {
+            spyOn(http, "delete").and.returnValue(q.resolve(deleteDeviceResponse));
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
+
+            service.deleteDevice(deleteDeviceResponse.data.deletedDeviceId);
+            rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(devicesUrl);
+        });
+
+        it("Can update device name", () => {
+            const ExpectedId = 1;
+            const ExpectedValue = "any";
+            const ExpectedCall = `${devicesUrl}name/`;
+            const ExpectedParams = JSON.stringify({ id: ExpectedId, newValue: ExpectedValue } as IUpdateDeviceParams);
+            spyOn(http, "put").and.returnValue(q.resolve());
+            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
+
+            service.updateDeviceName(ExpectedId, ExpectedValue);
+
+            expect(http.put).toHaveBeenCalledWith(ExpectedCall, ExpectedParams);
+        });
+
+        it("When Updating name then the devices are reloaded", () => {
+            spyOn(http, "put").and.returnValue(q.resolve({ data: response }));
+            spyOn(http, "get").and.returnValue((q.resolve(devicesResponse)));
+
+            service.updateDeviceName(1, "any");
+            rootscope.$apply();
+
+            expect(http.get).toHaveBeenCalledWith(devicesUrl);
         });
 
         it ("When reading capabilities for the first time Then they are got from the model", () => {

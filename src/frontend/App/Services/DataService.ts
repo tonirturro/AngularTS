@@ -5,9 +5,9 @@ import {
     IDevice,
     IPage,
     ISelectableOption,
+    IUpdateDeviceParams,
     IUpdateParams,
-    IUpdateResponse,
-    IUpdateDeviceParams
+    IUpdateResponse
 } from "../../../common/rest";
 
 interface ICapabilitiesDictionary {

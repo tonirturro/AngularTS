@@ -10,8 +10,10 @@ import "../styles/app.css";
 
 import "@uirouter/angularjs";
 import * as angular from "angular";
+import "angular-ui-bootstrap";
 import "./templates";
 
+import { CloseDialog } from "./Components/closeDialog/close-dialog.component";
 import { DeviceEdit } from "./Components/deviceEdit/device-edit.component";
 import { DevicePanel } from "./Components/devicePanel/device-panel.component";
 import { MainPage } from "./Components/main-page.component";
@@ -21,9 +23,10 @@ import { Routes } from "./Routes";
 import { DataService } from "./Services/DataService";
 
 export let app = angular
-    .module("myApp", ["templates", "ui.router"])
+    .module("myApp", ["templates", "ui.router", "ui.bootstrap"] )
     .service("dataService", DataService)
     .config(Routes)
+    .component("closeDialog", CloseDialog)
     .component("toolbar", ToolBar)
     .component("devicePanel", DevicePanel)
     .component("deviceEdit", DeviceEdit)

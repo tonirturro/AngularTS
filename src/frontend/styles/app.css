@@ -37,3 +37,9 @@ header {
 .toolbar-button-right {
     margin-left: 868px;
 }
+
+.close-dialog {
+    background: white;
+    height: 200px;
+    width: 400px;
+}

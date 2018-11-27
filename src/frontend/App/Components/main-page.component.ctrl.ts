@@ -1,5 +1,6 @@
 import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
+import { IModalService, IModalSettings, IModalInstanceService } from "angular-ui-bootstrap";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 
@@ -11,7 +12,7 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$state", "$log", "$window", "dataService"];
+    public static $inject = ["$state", "$log", "$window", "dataService", "$uibModal"];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
@@ -21,7 +22,8 @@ export class MainPageController implements IComponentController {
         private $state: StateService,
         private logService: ILogService,
         private $window: IWindowService,
-        private dataService: DataService) {}
+        private dataService: DataService,
+        private $uibModal: IModalService) {}
 
     /**
      * Exposes the devices from the data service
@@ -41,7 +43,14 @@ export class MainPageController implements IComponentController {
      * Close main window
      */
     public close() {
-        this.$window.close();
+        const modalInstance: IModalInstanceService = this.$uibModal.open({
+            animation: false,
+            component: "closeDialog"
+        } as IModalSettings);
+
+        modalInstance.result.then(() => {
+            this.$window.close();
+        });
     }
 
     /**

@@ -1,6 +1,7 @@
 import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
-import { IModalService, IModalSettings, IModalInstanceService } from "angular-ui-bootstrap";
+import * as angular from "angular";
+import { IModalInstanceService, IModalService, IModalSettings } from "angular-ui-bootstrap";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 
@@ -20,7 +21,7 @@ export class MainPageController implements IComponentController {
 
     constructor(
         private $state: StateService,
-        private logService: ILogService,
+        private $log: ILogService,
         private $window: IWindowService,
         private dataService: DataService,
         private $uibModal: IModalService) {}
@@ -45,11 +46,16 @@ export class MainPageController implements IComponentController {
     public close() {
         const modalInstance: IModalInstanceService = this.$uibModal.open({
             animation: false,
-            component: "closeDialog"
+            backdrop: "static",
+            component: "closeDialog",
+            keyboard: false,
+            size: "sm"
         } as IModalSettings);
 
         modalInstance.result.then(() => {
             this.$window.close();
+        }, () => {
+            this.$log.info("Modal closed");
         });
     }
 
@@ -97,7 +103,7 @@ export class MainPageController implements IComponentController {
                     this.changeView();
                 }
             } else {
-                this.logService.log(`Failed to delete device id ${deviceId}`);
+                this.$log.log(`Failed to delete device id ${deviceId}`);
             }
         });
     }

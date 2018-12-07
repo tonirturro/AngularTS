@@ -4,8 +4,7 @@ require("../src/frontend/App/Boot");
 // load the mocks
 require("angular-mocks");
 
-// load the tests
-const contextTS = require.context("../src/frontend/App", true, /\.spec.ts$/);
+// Load the tests
+const contextApp = require.context("../src/frontend/App", true, /\.spec.ts$/);
+contextApp.keys().map(contextApp);
 
-// And load the modules.
-contextTS.keys().map(contextTS);

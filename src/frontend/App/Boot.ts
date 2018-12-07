@@ -11,7 +11,9 @@ import "../styles/app.css";
 import "@uirouter/angularjs";
 import * as angular from "angular";
 import "angular-ui-bootstrap";
+
 import "./templates";
+import "./UiLib";
 
 import { CloseDialog } from "./Components/closeDialog/close-dialog.component";
 import { DeviceEdit } from "./Components/deviceEdit/device-edit.component";
@@ -23,7 +25,7 @@ import { Routes } from "./Routes";
 import { DataService } from "./Services/DataService";
 
 export let app = angular
-    .module("myApp", ["templates", "ui.router", "ui.bootstrap"] )
+    .module("myApp", ["templates", "ui.router", "ui.bootstrap", "ui-lib"] )
     .service("dataService", DataService)
     .config(Routes)
     .component("closeDialog", CloseDialog)

@@ -40,17 +40,18 @@ describe("Given a modal service", () => {
 
     const open = (modalOptions: IModalSettings, noFlush: boolean, noDigest: boolean) => {
         const modal: IModalInstanceService = serviceToTest.open(modalOptions);
-        // modal.opened.catch(angular.noop);
-        // modal.result.catch(angular.noop);
+        modal.opened.catch(angular.noop);
+        modal.result.catch(angular.noop);
         if (!noDigest) {
             rootScope.$digest();
-            // if (!noFlush) {
-            //     animate.flush();
-            // }
+            if (!noFlush) {
+                 animate.flush();
+            }
         }
         return modal;
     };
 
+    beforeEach(angular.mock.module("ngAnimateMock"));
     beforeEach(angular.mock.module("ui-lib"));
 
     beforeEach(inject((
@@ -70,7 +71,7 @@ describe("Given a modal service", () => {
 
     describe("and basic scenarios with default options", () => {
         it("should open and dismiss a modal with a minimal set of options", () => {
-            open({ template: "<div>Content</div>" }, false, false);
+            // open({ template: "<div>Content</div>" }, false, false);
 
             // expect(document).toHaveModalsOpen(1);
         });

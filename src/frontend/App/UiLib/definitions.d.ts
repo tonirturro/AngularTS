@@ -1,4 +1,4 @@
-import { IScope, IPromise, IAugmentedJQuery } from "angular";
+import { IAugmentedJQuery , IPromise, IScope} from "angular";
 
 interface IResolver {
     resolve(invocables: any, locals: any, parent: any, self: any): any;
@@ -31,6 +31,33 @@ interface IModalStackService {
     getTop(): IModalStackedMapKeyValuePair;
 }
 
+interface IMultiMapFactory {
+    createNew(): IMultiMap;
+}
+
+interface IMultiMap {
+    entries(): any[];
+    get(key: string): any;
+    hasKey(key: string): boolean;
+    keys(): string[];
+    put(key: string, value: any);
+    remove(key: string, value: any);
+}
+
+interface IStackedMapFactory {
+    createNew(): IStakedMap;
+}
+
+interface IStakedMap {
+    add(key: any, value: any);
+    get(key: any): any;
+    keys(): any[];
+    top(): any;
+    remove(key: any);
+    removeTop();
+    length(): number;
+}
+
 interface IModalStackedMapKeyValuePair {
     key: IModalInstanceService;
     value: any;
@@ -38,14 +65,16 @@ interface IModalStackedMapKeyValuePair {
 
 interface IModalScope extends IScope {
     /**
-     * Dismiss the dialog without assigning a value to the promise output. If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
+     * Dismiss the dialog without assigning a value to the promise output.
+     * If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
      *
      * @returns true if the modal was closed; otherwise false
      */
     $dismiss(reason?: any): boolean;
 
     /**
-     * Close the dialog resolving the promise to the given value. If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
+     * Close the dialog resolving the promise to the given value. If `preventDefault` is called
+     * on the `modal.closing` event then the modal will remain open.
      *
      * @returns true if the modal was closed; otherwise false
      */
@@ -54,8 +83,8 @@ interface IModalScope extends IScope {
 
 export interface IModalSettings {
     /**
-    * a path to a template representing modal's content
-    */
+     * a path to a template representing modal's content
+     */
     templateUrl?: string | (() => string);
 
     /**
@@ -64,7 +93,8 @@ export interface IModalSettings {
     template?: string | (() => string);
 
     /**
-     * a scope instance to be used for the modal's content (actually the $modal service is going to create a child scope of a provided scope).
+     * a scope instance to be used for the modal's content
+     * (actually the $modal service is going to create a child scope of a provided scope).
      * Defaults to `$rootScope`.
      */
     scope?: IScope | IModalScope;
@@ -72,9 +102,10 @@ export interface IModalSettings {
     /**
      * a controller for a modal instance - it can initialize scope used by modal.
      * A controller can be injected with `$modalInstance`
-     * If value is an array, it must be in Inline Array Annotation format for injection (strings followed by factory method)
+     * If value is an array, it must be in Inline Array Annotation format for injection
+     * (strings followed by factory method)
      */
-    controller?: string | Function | Array<string | Function>;
+    controller?: any;
 
     /**
      *  an alternative to the controller-as syntax, matching the API of directive definitions.
@@ -90,13 +121,15 @@ export interface IModalSettings {
     bindToController?: boolean;
 
     /**
-     * members that will be resolved and passed to the controller as locals; it is equivalent of the `resolve` property for AngularJS routes
-     * If property value is an array, it must be in Inline Array Annotation format for injection (strings followed by factory method)
+     * members that will be resolved and passed to the controller as locals; it is equivalent of the
+     * `resolve` property for AngularJS routes. If property value is an array, it must be in Inline
+     * Array Annotation format for injection (strings followed by factory method)
      */
-    resolve?: { [key: string]: string | Function | Array<string | Function> | Object };
+    resolve?: { [key: string]: any };
 
     /**
-     * Set to false to disable animations on new modal/backdrop. Does not toggle animations for modals/backdrops that are already displayed.
+     * Set to false to disable animations on new modal/backdrop. Does not toggle animations
+     * for modals/backdrops that are already displayed.
      *
      * @default true
      */
@@ -131,7 +164,8 @@ export interface IModalSettings {
     windowClass?: string;
 
     /**
-     * Optional suffix of modal window class. The value used is appended to the `modal-` class, i.e. a value of `sm` gives `modal-sm`.
+     * Optional suffix of modal window class. The value used is appended to the
+     * `modal-` class, i.e. a value of `sm` gives `modal-sm`.
      */
     size?: string;
 
@@ -160,12 +194,16 @@ export interface IModalSettings {
     appendTo?: IAugmentedJQuery;
 
     /**
-     * A string reference to the component to be rendered that is registered with Angular's compiler. If using a directive, the directive must have `restrict: 'E'` and a template or templateUrl set.
+     * A string reference to the component to be rendered that is registered with Angular's compiler.
+     * If using a directive, the directive must have `restrict: 'E'` and a template or templateUrl set.
      *
      * It supports these bindings:
-     *   - `close` - A method that can be used to close a modal, passing a result. The result must be passed in this format: `{$value: myResult}`
-     *   - `dismiss` - A method that can be used to dismiss a modal, passing a result. The result must be passed in this format: `{$value: myRejectedResult}`
-     *   - `modalInstance` - The modal instance. This is the same `$uibModalInstance` injectable found when using `controller`.
+     *   - `close` - A method that can be used to close a modal, passing a result. The result must be
+     *      passed in this format: `{$value: myResult}`
+     *   - `dismiss` - A method that can be used to dismiss a modal, passing a result.
+     *      The result must be passed in this format: `{$value: myRejectedResult}`
+     *   - `modalInstance` - The modal instance. This is the same `$uibModalInstance`
+     *      injectable found when using `controller`.
      *   - `resolve` - An object of the modal resolve values. See [UI Router resolves] for details.
      */
     component?: string;
@@ -189,22 +227,13 @@ export interface IModalSettings {
 
 export interface IModalInstanceService {
     /**
-     * A method that can be used to close a modal, passing a result. If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
-     */
-    close(result?: any): void;
-
-    /**
-     * A method that can be used to dismiss a modal, passing a reason. If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
-     */
-    dismiss(reason?: any): void;
-
-    /**
      * A promise that is resolved when a modal is closed and rejected when a modal is dismissed.
      */
     result: IPromise<any>;
 
     /**
-     * A promise that is resolved when a modal gets opened after downloading content's template and resolving all variables.
+     * A promise that is resolved when a modal gets opened after downloading content's
+     * template and resolving all variables.
      */
     opened: IPromise<any>;
 
@@ -217,6 +246,18 @@ export interface IModalInstanceService {
      * A promise that is resolved when a modal is closed and the animation completes.
      */
     closed: IPromise<any>;
+
+    /**
+     * A method that can be used to close a modal, passing a result.
+     * If `preventDefault` is called on the `modal.closing` event then the modal will remain open.
+     */
+    close(result?: any): void;
+
+    /**
+     * A method that can be used to dismiss a modal, passing a reason. If `preventDefault`
+     * is called on the `modal.closing` event then the modal will remain open.
+     */
+    dismiss(reason?: any): void;
 }
 
 export interface IModalService {

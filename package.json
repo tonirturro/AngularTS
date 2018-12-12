@@ -14,7 +14,8 @@
     "test": "gulp test-all",
     "test:frontend": "gulp test-frontend-single",
     "test:frontend:watch": "gulp test-frontend",
-    "test:backend": "gulp test-backend"
+    "test:backend": "gulp test-backend",
+    "lint": "gulp tslint"
   },
   "description": "Angular TS spike",
   "author": {

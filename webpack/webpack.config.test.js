@@ -6,7 +6,7 @@ module.exports = merge(webpackDevConfig, {
         rules: [{
             enforce: 'post',
             test: /\.ts$/,
-            exclude: /node_modules|\.specs.ts$/,
+            exclude: /node_modules|\.spec.ts$/,
             loader: 'istanbul-instrumenter-loader'
         }],
     }

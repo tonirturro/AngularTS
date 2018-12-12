@@ -1,5 +1,77 @@
 import { IAugmentedJQuery , IPromise, IScope} from "angular";
 
+interface IPositionCoordinates {
+    width?: number;
+    height?: number;
+    top?: number;
+    left?: number;
+}
+
+interface IViewPortOffset {
+    top: number;
+    bottom: number;
+    right: number;
+    left: number;
+}
+
+interface IPositionService {
+    /**
+     * Provides the padding required on an element to replace the scrollbar.
+     */
+    scrollbarPadding(element: any): any;
+
+    /**
+     * Provides coordinates for an element to be positioned relative to
+     * another element.  Passing 'auto' as part of the placement parameter
+     * will enable smart placement - where the element fits. i.e:
+     * 'auto left-top' will check to see if there is enough space to the left
+     * of the hostElem to fit the targetElem, if not place right (same for secondary
+     * top placement).  Available space is calculated using the viewportOffset
+     * function.
+     */
+    positionElements(hostElem: IAugmentedJQuery, targetElem: IAugmentedJQuery, placement: string, appendToBody?: boolean): any;
+
+    /**
+     * Provides the closest scrollable ancestor.
+     * A port of the jQuery UI scrollParent method:
+     * https://github.com/jquery/jquery-ui/blob/master/ui/scroll-parent.js
+     */
+    scrollParent(innerEl: HTMLElement, includeHidden?: boolean, includeSelf?: boolean): HTMLElement;
+
+    /**
+     * Checks to see if the element is scrollable.
+     *
+     */
+    isScrollable(el: IAugmentedJQuery, includeHidden?: boolean): boolean;
+
+    /**
+     * Provides offset distance to the closest scrollable ancestor
+     * or viewport.  Accounts for border and scrollbar width.
+     *
+     * Right and bottom dimensions represent the distance to the
+     * respective edge of the viewport element.  If the element
+     * edge extends beyond the viewport, a negative value will be
+     * reported.
+     */
+    viewportOffset(element: HTMLElement, useDocument?: boolean, includePadding?: boolean): IViewPortOffset;
+
+    /**
+     * Provides a raw DOM element from a jQuery/jQLite element.
+     */
+    getRawNode(angularEl: any): any;
+
+    /**
+     * Provides a read-only equivalent of jQuery's position function.
+     */
+    position(element: IAugmentedJQuery, includeMagins?: boolean): IPositionCoordinates;
+
+    /**
+     * Provides a read-only equivalent of jQuery's offset function.
+     */
+    offset(element: any): IPositionCoordinates;
+}
+
+
 interface IResolver {
     resolve(invocables: any, locals: any, parent: any, self: any): any;
 }

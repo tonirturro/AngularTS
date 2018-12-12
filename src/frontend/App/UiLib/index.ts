@@ -3,11 +3,13 @@ import "angular-animate";
 import { UiLibModal } from "./modal/modal";
 import { ModalStack } from "./modal/modalStack";
 import { Resolve } from "./modal/resolve";
-import { MultiMap } from "./multiMap/multimap";
+import { MultiMapFactory } from "./multiMap/multiMapFactory";
+import { Position } from "./position/position";
 import { StackedMapFactory } from "./stackedMap/stakedMapFactory";
 
 angular.module("ui-lib", ["ngAnimate"] )
-    .service("$$multiMap", MultiMap)
+    .service("$uibPosition", Position)
+    .service("$$multiMap", MultiMapFactory)
     .service("$$stackedMap", StackedMapFactory)
     .service("$uibResolve", Resolve)
     .service("$uibModalStack", ModalStack)

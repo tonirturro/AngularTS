@@ -1,7 +1,8 @@
 // Karma configuration
 // Generated on Tue Mar 21 2017 21:29:48 GMT+0100 (Romance Standard Time)
 const path = require('path');
-const webpackConfig = require('../webpack/webpack.config.test');
+// const webpackConfig = require('../webpack/webpack.config.test');
+const webpackConfig = require('../webpack/webpack.config.dev');
 webpackConfig.resolve.alias = {
     'angular': path.resolve(path.join(__dirname, '..', 'node_modules', 'angular'))
 };
@@ -18,7 +19,7 @@ module.exports = function (config) {
         ],
 
         preprocessors: {
-            "unitFrontend.js": ["webpack", "sourcemap"]
+            "unitFrontend.js": [ "webpack", "sourcemap" ]
         },
 
         webpack: webpackConfig,

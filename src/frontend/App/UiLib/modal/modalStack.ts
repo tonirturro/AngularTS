@@ -1,4 +1,4 @@
-import { IAugmentedJQuery, ICompileService, IDocumentService, IRootScopeService } from "angular";
+import { IAugmentedJQuery, ICompileService, IDocumentService, IPromise, IRootScopeService, IScope } from "angular";
 import * as angular from "angular";
 import {
     IModalInstanceService,
@@ -14,6 +14,7 @@ import {
 export class ModalStack implements IModalStackService {
 
     public static $inject = [
+        "$q",
         "$animate",
         "$rootScope",
         "$compile",
@@ -22,6 +23,7 @@ export class ModalStack implements IModalStackService {
         "$$multiMap",
         "$$stackedMap"];
 
+    private readonly NOW_CLOSING_EVENT = "modal.stack.now-closing";
     private readonly OPENED_MODAL_CLASS = "modal-open";
     private readonly SNAKE_CASE_REGEXP = /[A-Z]/g;
     private readonly ARIA_HIDDEN_ATTRIBUTE_NAME = "data-bootstrap-modal-aria-hidden-count";
@@ -34,6 +36,7 @@ export class ModalStack implements IModalStackService {
     private scrollbarPadding: any;
 
     constructor(
+        private $q: angular.IQService,
         private $animate: angular.animate.IAnimateService,
         private $rootScope: IRootScopeService,
         private $compile: ICompileService,
@@ -160,8 +163,16 @@ export class ModalStack implements IModalStackService {
         throw new Error("Method not implemented.");
     }
 
-    public dismiss(modalInstance: IModalInstanceService, reason?: any): void {
-        throw new Error("Method not implemented.");
+    public dismiss(modalInstance: IModalInstanceService, reason?: any): any {
+        const modalWindow = this.openedWindows.get(modalInstance);
+        this.unhideBackgroundElements();
+        if (modalWindow && this.broadcastClosing(modalWindow, reason, false)) {
+            modalWindow.value.modalScope.$$uibDestructionScheduled = true;
+            modalWindow.value.deferred.reject(reason);
+            this.removeModalWindow(modalInstance, modalWindow.value.modalOpener);
+            return true;
+        }
+        return !modalWindow;
     }
 
     public dismissAll(reason?: any): void {
@@ -205,19 +216,19 @@ export class ModalStack implements IModalStackService {
 
     private applyAriaHidden(el: IAugmentedJQuery) {
         if (!el || el[0].tagName === "BODY") {
-          return;
+            return;
         }
 
         this.getSiblings(el).forEach((sibling) => {
-          const elemIsAlreadyHidden = sibling.getAttribute("aria-hidden") === "true";
-          let ariaHiddenCount = parseInt(sibling.getAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME), 10);
+            const elemIsAlreadyHidden = sibling.getAttribute("aria-hidden") === "true";
+            let ariaHiddenCount = parseInt(sibling.getAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME), 10);
 
-          if (!ariaHiddenCount) {
-            ariaHiddenCount = elemIsAlreadyHidden ? 1 : 0;
-          }
+            if (!ariaHiddenCount) {
+                ariaHiddenCount = elemIsAlreadyHidden ? 1 : 0;
+            }
 
-          sibling.setAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME, (ariaHiddenCount + 1).toString());
-          sibling.setAttribute("aria-hidden", "true");
+            sibling.setAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME, (ariaHiddenCount + 1).toString());
+            sibling.setAttribute("aria-hidden", "true");
         });
 
         return this.applyAriaHidden(el.parent());
@@ -227,7 +238,117 @@ export class ModalStack implements IModalStackService {
         const children = el.parent() ? el.parent().children() : [];
 
         return Array.prototype.filter.call(children, (child) => {
-          return child !== el[0];
+            return child !== el[0];
         });
+    }
+
+    private unhideBackgroundElements() {
+        Array.prototype.forEach.call(
+            document.querySelectorAll("[" + this.ARIA_HIDDEN_ATTRIBUTE_NAME + "]"),
+            (hiddenEl) => {
+                const ariaHiddenCount = parseInt(hiddenEl.getAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME), 10);
+                const newHiddenCount = ariaHiddenCount - 1;
+                hiddenEl.setAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME, newHiddenCount);
+
+                if (!newHiddenCount) {
+                    hiddenEl.removeAttribute(this.ARIA_HIDDEN_ATTRIBUTE_NAME);
+                    hiddenEl.removeAttribute("aria-hidden");
+                }
+            }
+        );
+    }
+
+    private broadcastClosing(modalWindow: any, resultOrReason: any, closing: boolean) {
+        return !modalWindow.value.modalScope.$broadcast("modal.closing", resultOrReason, closing).defaultPrevented;
+    }
+
+    private removeModalWindow(modalInstance: IModalInstanceService, elementToReceiveFocus: HTMLElement) {
+        const modalWindow = this.openedWindows.get(modalInstance).value;
+        const appendToElement = modalWindow.appendTo;
+
+        // clean up the stack
+        this.openedWindows.remove(modalInstance);
+        this.previousTopOpenedModal = this.openedWindows.top();
+        if (this.previousTopOpenedModal) {
+            this.topModalIndex = parseInt(this.previousTopOpenedModal.value.modalDomEl.attr("index"), 10);
+        }
+
+        this.removeAfterAnimate(modalWindow.modalDomEl, modalWindow.modalScope, () => {
+            const modalBodyClass = modalWindow.openedClass || this.OPENED_MODAL_CLASS;
+            this.openedClasses.remove(modalBodyClass, modalInstance);
+            const areAnyOpen = this.openedClasses.hasKey(modalBodyClass);
+            appendToElement.toggleClass(modalBodyClass, areAnyOpen);
+            if (!areAnyOpen &&
+                this.scrollbarPadding &&
+                this.scrollbarPadding.heightOverflow &&
+                this.scrollbarPadding.scrollbarWidth) {
+                if (this.scrollbarPadding.originalRight) {
+                    appendToElement.css({ paddingRight: this.scrollbarPadding.originalRight + "px" });
+                } else {
+                    appendToElement.css({ paddingRight: "" });
+                }
+                this.scrollbarPadding = null;
+            }
+            this.toggleTopWindowClass(true);
+        }, modalWindow.closedDeferred);
+        this.checkRemoveBackdrop();
+
+        // move focus to specified element if available, or else to body
+        if (elementToReceiveFocus && elementToReceiveFocus.focus) {
+            elementToReceiveFocus.focus();
+        } else if (appendToElement.focus) {
+            appendToElement.focus();
+        }
+    }
+
+    private removeAfterAnimate(domEl: IAugmentedJQuery, scope: IScope, done: () => void, closedDeferred?: any) {
+        let asyncDeferred;
+        let asyncPromise = null;
+        const setIsAsync = () => {
+            if (!asyncDeferred) {
+                asyncDeferred = this.$q.defer();
+                asyncPromise = asyncDeferred.promise;
+            }
+
+            return function asyncDone() {
+                asyncDeferred.resolve();
+            };
+        };
+        scope.$broadcast(this.NOW_CLOSING_EVENT, setIsAsync);
+
+        // Note that it's intentional that asyncPromise might be null.
+        // That's when setIsAsync has not been called during the
+        // NOW_CLOSING_EVENT broadcast.
+        return this.$q.when(asyncPromise).then((afterAnimating: any) => {
+            if (afterAnimating.done) {
+                return;
+            }
+            afterAnimating.done = true;
+
+            this.$animate.leave(domEl).then(() => {
+                if (done) {
+                    done();
+                }
+
+                domEl.remove();
+                if (closedDeferred) {
+                    closedDeferred.resolve();
+                }
+            });
+
+            scope.$destroy();
+        });
+    }
+
+    private checkRemoveBackdrop() {
+        // remove backdrop if no longer needed
+        if (this.backdropDomEl && this.backdropIndex() === -1) {
+            let backdropScopeRef = this.backdropScope;
+            this.removeAfterAnimate(this.backdropDomEl, this.backdropScope, () => {
+                backdropScopeRef = null;
+            });
+            this.backdropDomEl = undefined;
+            this.backdropScope = undefined;
+        }
     }
 }

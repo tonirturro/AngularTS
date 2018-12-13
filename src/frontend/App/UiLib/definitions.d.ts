@@ -73,7 +73,7 @@ interface IPositionService {
 
 
 interface IResolver {
-    resolve(invocables: any, locals: any, parent: any, self: any): any;
+    resolve(invocables: any, locals?: any, parent?: any, self?: any): any;
 }
 
 interface IModalStackService {

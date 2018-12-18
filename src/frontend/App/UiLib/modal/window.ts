@@ -7,7 +7,7 @@ export const UibModalWindow = (
     $animateCss: angular.animate.IAnimateCssService,
     $document: IDocumentService) => {
     return {
-        link: (scope: any, element: IAugmentedJQuery, attrs: IAttributes) => {
+        link: (scope: any, element: any, attrs: IAttributes) => {
             element.addClass(attrs.windowTopClass || "");
             scope.size = attrs.size;
 
@@ -69,7 +69,7 @@ export const UibModalWindow = (
                      * directive that causes focus) then there's no need to try to focus anything.
                      */
                     if (!($document[0].activeElement && element[0].contains($document[0].activeElement))) {
-                        const inputWithAutofocus = element[0].querySelector("[autofocus]")[0];
+                        const inputWithAutofocus = element[0].querySelector("[autofocus]");
                         /**
                          * Auto-focusing of a freshly-opened modal element causes any child elements
                          * with the autofocus attribute to lose focus. This is an issue on touch

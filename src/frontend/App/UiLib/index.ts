@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import { ITemplateCacheService } from "angular";
-import "angular-animate";
 import { UibModalAnimationClass } from "./modal/animation";
 import { UibModalBackdrop } from "./modal/backdrop";
 import { UiLibModal } from "./modal/modal";
@@ -12,7 +11,7 @@ import { MultiMapFactory } from "./multiMap/multiMapFactory";
 import { Position } from "./position/position";
 import { StackedMapFactory } from "./stackedMap/stakedMapFactory";
 
-angular.module("ui-lib", ["ngAnimate"] )
+angular.module("ui-lib", [])
     .directive("uibModalBackdrop", UibModalBackdrop)
     .directive("uibModalWindow", UibModalWindow)
     .directive("uibModalAnimationClass", UibModalAnimationClass)

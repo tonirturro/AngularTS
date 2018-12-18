@@ -1,6 +1,5 @@
 import * as angular from "angular";
 import { IDocumentService, IRootScopeService } from "angular";
-import "angular-animate";
 import { IModalInstanceService, IModalService, IModalSettings } from "../definitions";
 
 const DialogCustomMatchers: jasmine.CustomMatcherFactories = {
@@ -142,12 +141,12 @@ describe("Given a modal service", () => {
 
             expect(document).toHaveModalsOpen(1);
             expect(document).toHaveModalOpenWithContent("Content", "div");
-            // expect(document).toHaveBackdrop();
+            expect(document).toHaveBackdrop();
 
             dismiss(modal, "closing in test");
 
-            // expect(document).toHaveModalsOpen(0);
-            // expect(document).not.toHaveBackdrop();
+            expect(document).toHaveModalsOpen(0);
+            expect(document).not.toHaveBackdrop();
         });
     });
 });

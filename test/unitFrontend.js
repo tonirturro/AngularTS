@@ -1,3 +1,5 @@
+// load jquery
+require('jquery');
 // load the code
 require("../src/frontend/App/Boot");
 

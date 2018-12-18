@@ -88,7 +88,7 @@ describe("Given a page grid component ", () => {
         }
     });
 
-    it("When a page is selected Then it is displayed as selected", () => {
+    xit("When a page is selected Then it is displayed as selected", () => {
         const SelectedItem = 0;
         const pages = element.find("tbody").find("tr");
 
@@ -139,7 +139,7 @@ describe("Given a page grid component ", () => {
         expect(dataServiceToMock.addNewPage).toHaveBeenCalledWith(SelectedDeviceId);
     });
 
-    it("When a page is deleted Then the deletion is reported", () => {
+    xit("When a page is deleted Then the deletion is reported", () => {
         spyOn(dataServiceToMock, "deletePage");
         const selectedPage = 1;
         const deleteButton = element.find("tbody").find("tr").find("button");

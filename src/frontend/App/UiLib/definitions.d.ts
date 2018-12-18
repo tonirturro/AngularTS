@@ -29,7 +29,11 @@ interface IPositionService {
      * top placement).  Available space is calculated using the viewportOffset
      * function.
      */
-    positionElements(hostElem: IAugmentedJQuery, targetElem: IAugmentedJQuery, placement: string, appendToBody?: boolean): any;
+    positionElements(
+        hostElem: IAugmentedJQuery,
+        targetElem: IAugmentedJQuery,
+        placement: string,
+        appendToBody?: boolean): any;
 
     /**
      * Provides the closest scrollable ancestor.
@@ -71,12 +75,14 @@ interface IPositionService {
     offset(element: any): IPositionCoordinates;
 }
 
-
 interface IResolver {
     resolve(invocables: any, locals?: any, parent?: any, self?: any): any;
 }
 
 interface IModalStackService {
+
+    closingEvent: string;
+
     /**
      * Opens a new modal instance.
      */
@@ -101,6 +107,8 @@ interface IModalStackService {
      * Gets the topmost modal instance that is open.
      */
     getTop(): IModalStackedMapKeyValuePair;
+
+    modalRendered(modalInstance: IModalInstanceService);
 }
 
 interface IMultiMapFactory {

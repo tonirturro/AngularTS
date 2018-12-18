@@ -4,7 +4,7 @@ import { IMultiMap, IMultiMapFactory } from "../definitions";
 describe("Given a multi map", () => {
     let multiMap: IMultiMap;
 
-    beforeEach(angular.mock.module("ui.bootstrap.multiMap"));
+    beforeEach(angular.mock.module("ui-lib"));
     beforeEach(inject(($$multiMap: IMultiMapFactory) => {
         multiMap = $$multiMap.createNew();
     }));

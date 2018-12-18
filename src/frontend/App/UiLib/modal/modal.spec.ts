@@ -71,9 +71,9 @@ describe("Given a modal service", () => {
 
     describe("and basic scenarios with default options", () => {
         it("should open and dismiss a modal with a minimal set of options", () => {
-            // open({ template: "<div>Content</div>" }, false, false);
+            open({ template: "<div>Content</div>" }, false, false);
 
-            // expect(document).toHaveModalsOpen(1);
+            expect(document).toHaveModalsOpen(1);
         });
     });
 });

@@ -2,10 +2,16 @@
 // Generated on Tue Mar 21 2017 21:29:48 GMT+0100 (Romance Standard Time)
 const path = require('path');
 // const webpackConfig = require('../webpack/webpack.config.test');
+const webpack = require('webpack');
 const webpackConfig = require('../webpack/webpack.config.dev');
 webpackConfig.resolve.alias = {
     'angular': path.resolve(path.join(__dirname, '..', 'node_modules', 'angular'))
 };
+webpackConfig.plugins.push(
+    new webpack.ProvidePlugin({
+        'window.jQuery': 'jquery'
+    })
+);
 
 module.exports = function (config) {
     config.set({

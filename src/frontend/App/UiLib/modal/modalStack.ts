@@ -12,7 +12,6 @@ import {
 } from "../definitions";
 
 export class ModalStack implements IModalStackService {
-
     public static $inject = [
         "$q",
         "$animate",
@@ -34,6 +33,10 @@ export class ModalStack implements IModalStackService {
     private backdropDomEl: IAugmentedJQuery;
     private backdropScope: any;
     private scrollbarPadding: any;
+
+    public get closingEvent(): string {
+        return this.NOW_CLOSING_EVENT;
+    }
 
     constructor(
         private $q: angular.IQService,
@@ -181,6 +184,13 @@ export class ModalStack implements IModalStackService {
 
     public getTop(): IModalStackedMapKeyValuePair {
         throw new Error("Method not implemented.");
+    }
+
+    public modalRendered(modalInstance: IModalInstanceService) {
+        const modalWindow = this.openedWindows.get(modalInstance);
+        if (modalWindow) {
+          modalWindow.value.renderDeferred.resolve();
+        }
     }
 
     // Add or remove "windowTopClass" from the top window in the stack

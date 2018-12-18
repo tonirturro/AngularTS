@@ -2,7 +2,7 @@ import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-// import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
+import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -12,7 +12,7 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$state", "$log", "$window", "dataService", /* "$uiLibModal" */];
+    public static $inject = ["$state", "$log", "$window", "dataService", "$uiLibModal"];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
@@ -22,8 +22,8 @@ export class MainPageController implements IComponentController {
         private $state: StateService,
         private $log: ILogService,
         private $window: IWindowService,
-        private dataService: DataService/*,
-        private $uiLibModal: IModalService*/) {}
+        private dataService: DataService,
+        private $uiLibModal: IModalService) {}
 
     /**
      * Exposes the devices from the data service
@@ -43,20 +43,19 @@ export class MainPageController implements IComponentController {
      * Close main window
      */
     public close() {
-        // const modalInstance: IModalInstanceService = this.$uiLibModal.open({
-        //     animation: false,
-        //     backdrop: "static",
-        //     component: "closeDialog",
-        //     keyboard: false,
-        //     size: "sm"
-        // } as IModalSettings);
+        const modalInstance: IModalInstanceService = this.$uiLibModal.open({
+            animation: false,
+            backdrop: "static",
+            component: "closeDialog",
+            keyboard: false,
+            size: "sm"
+        } as IModalSettings);
 
-        // modalInstance.result.then(() => {
-        //     this.$window.close();
-        // }, () => {
-        //     this.$log.info("Modal closed");
-        // });
-        this.$window.close();
+        modalInstance.result.then(() => {
+            this.$window.close();
+        }, () => {
+            this.$log.info("Modal closed");
+        });
     }
 
     /**

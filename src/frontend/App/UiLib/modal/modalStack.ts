@@ -26,6 +26,12 @@ export class ModalStack implements IModalStackService {
     private readonly OPENED_MODAL_CLASS = "modal-open";
     private readonly SNAKE_CASE_REGEXP = /[A-Z]/g;
     private readonly ARIA_HIDDEN_ATTRIBUTE_NAME = "data-bootstrap-modal-aria-hidden-count";
+    // Modal focus behavior
+    private readonly tabbableSelector = "a[href], area[href], input:not([disabled]):not([tabindex='-1']), " +
+        "button:not([disabled]):not([tabindex='-1']),select:not([disabled]):not([tabindex='-1']), " +
+        "textarea:not([disabled]):not([tabindex='-1']), " +
+        "iframe, object, embed, *[tabindex]:not([tabindex='-1']), *[contenteditable=true]";
+
     private openedWindows: IStakedMap;
     private previousTopOpenedModal = null;
     private openedClasses: IMultiMap;
@@ -49,6 +55,7 @@ export class ModalStack implements IModalStackService {
         private $$stackedMap: IStackedMapFactory) {
         this.openedWindows = this.$$stackedMap.createNew();
         this.openedClasses = this.$$multiMap.createNew();
+        this.hookEvents();
     }
 
     public open(modalInstance: IModalInstanceService, modal: any) {
@@ -77,7 +84,7 @@ export class ModalStack implements IModalStackService {
         this.openedClasses.put(modalBodyClass, modalInstance);
 
         const appendToElement = modal.appendTo;
-        const currBackdropIndex = this.backdropIndex();
+        const currBackdropIndex = this.backdropIndex;
 
         if (currBackdropIndex >= 0 && !this.backdropDomEl) {
             this.backdropScope = this.$rootScope.$new(true);
@@ -162,11 +169,20 @@ export class ModalStack implements IModalStackService {
         this.applyAriaHidden(angularDomEl);
     }
 
-    public close(modalInstance: IModalInstanceService, result?: any): void {
-        throw new Error("Method not implemented.");
+    public close(modalInstance: IModalInstanceService, result?: any): boolean {
+        const modalWindow = this.openedWindows.get(modalInstance);
+        this.unhideBackgroundElements();
+        if (modalWindow && this.broadcastClosing(modalWindow, result, true)) {
+            modalWindow.value.modalScope.$$uibDestructionScheduled = true;
+            modalWindow.value.deferred.resolve(result);
+            this.removeModalWindow(modalInstance, modalWindow.value.modalOpener);
+            return true;
+        }
+
+        return !modalWindow;
     }
 
-    public dismiss(modalInstance: IModalInstanceService, reason?: any): any {
+    public dismiss(modalInstance: IModalInstanceService, reason?: any): boolean {
         const modalWindow = this.openedWindows.get(modalInstance);
         this.unhideBackgroundElements();
         if (modalWindow && this.broadcastClosing(modalWindow, reason, false)) {
@@ -179,17 +195,20 @@ export class ModalStack implements IModalStackService {
     }
 
     public dismissAll(reason?: any): void {
-        throw new Error("Method not implemented.");
+        let topModal = this.getTop();
+        while (topModal && this.dismiss(topModal.key, reason)) {
+            topModal = this.getTop();
+        }
     }
 
     public getTop(): IModalStackedMapKeyValuePair {
-        throw new Error("Method not implemented.");
+        return this.openedWindows.top();
     }
 
     public modalRendered(modalInstance: IModalInstanceService) {
         const modalWindow = this.openedWindows.get(modalInstance);
         if (modalWindow) {
-          modalWindow.value.renderDeferred.resolve();
+            modalWindow.value.renderDeferred.resolve();
         }
     }
 
@@ -201,7 +220,7 @@ export class ModalStack implements IModalStackService {
         }
     }
 
-    private backdropIndex(): number {
+    private get backdropIndex(): number {
         let topBackdropIndex = -1;
         this.openedWindows.keys().forEach((opened, i) => {
             if (this.openedWindows.get(opened).value.backdrop) {
@@ -315,21 +334,20 @@ export class ModalStack implements IModalStackService {
         let asyncDeferred;
         let asyncPromise = null;
         const setIsAsync = () => {
+            const asyncDone = () => {
+                asyncDeferred.resolve();
+            };
+
             if (!asyncDeferred) {
                 asyncDeferred = this.$q.defer();
                 asyncPromise = asyncDeferred.promise;
             }
 
-            return function asyncDone() {
-                asyncDeferred.resolve();
-            };
+            return asyncDone;
         };
         scope.$broadcast(this.NOW_CLOSING_EVENT, setIsAsync);
 
-        // Note that it's intentional that asyncPromise might be null.
-        // That's when setIsAsync has not been called during the
-        // NOW_CLOSING_EVENT broadcast.
-        return this.$q.when(asyncPromise).then((afterAnimating: any) => {
+        const afterAnimating: any = () => {
             if (afterAnimating.done) {
                 return;
             }
@@ -347,12 +365,17 @@ export class ModalStack implements IModalStackService {
             });
 
             scope.$destroy();
-        });
+        };
+
+        // Note that it's intentional that asyncPromise might be null.
+        // That's when setIsAsync has not been called during the
+        // NOW_CLOSING_EVENT broadcast.
+        return this.$q.when(asyncPromise).then(afterAnimating);
     }
 
     private checkRemoveBackdrop() {
         // remove backdrop if no longer needed
-        if (this.backdropDomEl && this.backdropIndex() === -1) {
+        if (this.backdropDomEl && this.backdropIndex === -1) {
             let backdropScopeRef = this.backdropScope;
             this.removeAfterAnimate(this.backdropDomEl, this.backdropScope, () => {
                 backdropScopeRef = null;
@@ -360,5 +383,126 @@ export class ModalStack implements IModalStackService {
             this.backdropDomEl = undefined;
             this.backdropScope = undefined;
         }
+    }
+
+    /**
+     * Watch changes affecting the stack
+     */
+    private hookEvents(): any {
+        this.$rootScope.$watch(() => this.backdropIndex, (newBackdropIndex) => {
+            if (this.backdropScope) {
+                this.backdropScope.index = newBackdropIndex;
+            }
+        });
+        this.$document.on("keydown", this.keydownListener);
+
+        this.$rootScope.$on("$destroy", () => {
+            this.$document.off("keydown", this.keydownListener);
+        });
+    }
+
+    /**
+     * React on key down event to close or change focus element
+     * @param evt the key event
+     */
+    private keydownListener(evt: JQueryKeyEventObject) {
+        if (evt.isDefaultPrevented()) {
+            return evt;
+        }
+
+        const modal = this.openedWindows.top();
+        if (modal) {
+            switch (evt.which) {
+                case 27: {
+                    if (modal.value.keyboard) {
+                        evt.preventDefault();
+                        this.$rootScope.$apply(() => {
+                            this.dismiss(modal.key, "escape key press");
+                        });
+                    }
+                    break;
+                }
+                case 9: {
+                    const list = this.loadFocusElementList(modal);
+                    let focusChanged = false;
+                    if (evt.shiftKey) {
+                        if (this.isFocusInFirstItem(evt, list) || this.isModalFocused(evt, modal)) {
+                            focusChanged = this.focusLastFocusableElement(list);
+                        }
+                    } else {
+                        if (this.isFocusInLastItem(evt, list)) {
+                            focusChanged = this.focusFirstFocusableElement(list);
+                        }
+                    }
+
+                    if (focusChanged) {
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    private focusFirstFocusableElement(list: HTMLElement[]): boolean {
+        if (list.length > 0) {
+            list[0].focus();
+            return true;
+          }
+        return false;
+    }
+
+    private isFocusInLastItem(evt: JQueryKeyEventObject, list: HTMLElement[]): boolean {
+        if (list.length > 0) {
+            return (evt.target || evt.srcElement) === list[list.length - 1];
+        }
+        return false;
+    }
+
+    private focusLastFocusableElement(list: HTMLElement[]): boolean {
+        if (list.length > 0) {
+            list[list.length - 1].focus();
+            return true;
+        }
+        return false;
+    }
+
+    private isModalFocused(evt: JQueryKeyEventObject, modalWindow: any): boolean {
+        if (evt && modalWindow) {
+            const modalDomEl = modalWindow.value.modalDomEl;
+            if (modalDomEl && modalDomEl.length) {
+                return (evt.target || evt.srcElement) === modalDomEl[0];
+            }
+        }
+        return false;
+    }
+
+    private isFocusInFirstItem(evt: JQueryKeyEventObject, list: HTMLElement[]): boolean {
+        if (list.length > 0) {
+            return (evt.target || evt.srcElement) === list[0];
+        }
+        return false;
+    }
+
+    private loadFocusElementList(modalWindow: any): any {
+        if (modalWindow) {
+            const modalDomE1 = modalWindow.value.modalDomEl;
+            if (modalDomE1 && modalDomE1.length) {
+                const elements = modalDomE1[0].querySelectorAll(this.tabbableSelector);
+                return elements ?
+                    Array.prototype.filter.call(elements, (element: HTMLElement) => {
+                        return this.isVisible(element);
+                    }) : elements;
+            }
+        }
+    }
+
+    private isVisible(element: HTMLElement) {
+        return !!(
+            element.offsetWidth ||
+            element.offsetHeight ||
+            element.getClientRects().length);
     }
 }

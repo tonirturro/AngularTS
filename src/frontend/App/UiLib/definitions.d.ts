@@ -91,12 +91,12 @@ interface IModalStackService {
     /**
      * Closes a modal instance with an optional result.
      */
-    close(modalInstance: IModalInstanceService, result?: any): void;
+    close(modalInstance: IModalInstanceService, result?: any): boolean;
 
     /**
      * Dismisses a modal instance with an optional reason.
      */
-    dismiss(modalInstance: IModalInstanceService, reason?: any): void;
+    dismiss(modalInstance: IModalInstanceService, reason?: any): boolean;
 
     /**
      * Dismiss all open modal instances with an optional reason that will be passed to each instance.

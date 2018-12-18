@@ -47,10 +47,13 @@ export const UibModalWindow = (
                     }).start();
 
                     scope.$on($modalStack.closingEvent, (e: any, setIsAsync: any) => {
-                        const done = setIsAsync();
-                        $animateCss(element, {
+                        const done = setIsAsync() as () => void;
+                        const animationRunner = $animateCss(element, {
                             removeClass: attrs.modalInClass
-                        }).start().then(done);
+                        });
+                        animationRunner.start().then(() => {
+                            done();
+                        });
                     });
                 }
 

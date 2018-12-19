@@ -1,4 +1,4 @@
-import { IAugmentedJQuery , IPromise, IScope} from "angular";
+import { IAugmentedJQuery , IPromise, IScope, IServiceProvider} from "angular";
 
 interface IPositionCoordinates {
     width?: number;

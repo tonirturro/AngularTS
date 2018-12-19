@@ -394,10 +394,13 @@ export class ModalStack implements IModalStackService {
                 this.backdropScope.index = newBackdropIndex;
             }
         });
-        this.$document.on("keydown", this.keydownListener);
+
+        const onKeyDown = (evt: JQueryKeyEventObject) => { this.keydownListener(evt); };
+
+        this.$document.on("keydown", onKeyDown);
 
         this.$rootScope.$on("$destroy", () => {
-            this.$document.off("keydown", this.keydownListener);
+            this.$document.off("keydown", onKeyDown);
         });
     }
 

@@ -44,7 +44,6 @@ export class MainPageController implements IComponentController {
      */
     public close() {
         const modalInstance: IModalInstanceService = this.$uiLibModal.open({
-            animation: false,
             backdrop: "static",
             component: "closeDialog",
             keyboard: false,

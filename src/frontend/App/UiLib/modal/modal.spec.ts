@@ -1084,11 +1084,14 @@ describe("Given a modal service", () => {
                 expect(documentService).toHaveModalOpenWithContent("Content from ctrl true", "div");
             });
 
-            xit("should accept controllerAs alias", () => {
+            it("should accept controllerAs alias", () => {
                 controllerProvider.register("TestCtrl", ($uibModalInstance) => {
-                    this.fromCtrl = "Content from ctrl";
-                    this.isModalInstance =
-                        angular.isObject($uibModalInstance) && angular.isFunction($uibModalInstance.close);
+                    return {
+                        fromCtrl: "Content from ctrl",
+                        isModalInstance:
+                            angular.isObject($uibModalInstance) &&
+                            angular.isFunction($uibModalInstance.close)
+                    };
                 });
 
                 open({
@@ -1098,11 +1101,14 @@ describe("Given a modal service", () => {
                 expect(documentService).toHaveModalOpenWithContent("Content from ctrl true", "div");
             });
 
-            xit("should respect the controllerAs property as an alternative for the controller-as syntax", () => {
+            it("should respect the controllerAs property as an alternative for the controller-as syntax", () => {
                 controllerProvider.register("TestCtrl", ($uibModalInstance) => {
-                    this.fromCtrl = "Content from ctrl";
-                    this.isModalInstance =
-                        angular.isObject($uibModalInstance) && angular.isFunction($uibModalInstance.close);
+                    return {
+                        fromCtrl: "Content from ctrl",
+                        isModalInstance:
+                            angular.isObject($uibModalInstance) &&
+                            angular.isFunction($uibModalInstance.close)
+                    };
                 });
 
                 open({
@@ -1113,12 +1119,15 @@ describe("Given a modal service", () => {
                 expect(documentService).toHaveModalOpenWithContent("Content from ctrl true", "div");
             });
 
-            xit("should allow defining in-place controller-as controllers", () => {
+            it("should allow defining in-place controller-as controllers", () => {
                 open({
                     controller: ($uibModalInstance) => {
-                        this.fromCtrl = "Content from ctrl";
-                        this.isModalInstance =
-                            angular.isObject($uibModalInstance) && angular.isFunction($uibModalInstance.close);
+                        return {
+                            fromCtrl: "Content from ctrl",
+                            isModalInstance:
+                                angular.isObject($uibModalInstance) &&
+                                angular.isFunction($uibModalInstance.close)
+                        };
                     },
                     controllerAs: "test",
                     template: "<div>{{test.fromCtrl}} {{test.isModalInstance}}</div>",
@@ -1126,16 +1135,16 @@ describe("Given a modal service", () => {
                 expect(documentService).toHaveModalOpenWithContent("Content from ctrl true", "div");
             });
 
-            xit("should allow usage of bindToController", () => {
+            it("should allow usage of bindToController", () => {
                 const $scope = rootScope.$new(true) as any;
                 $scope.foo = "bar";
                 open({
                     bindToController: true,
                     controller: ($uibModalInstance) => {
-                        expect(this.foo).toEqual($scope.foo);
-                        this.fromCtrl = "Content from ctrl";
-                        this.closeDismissPresent = () => {
-                            return angular.isFunction(this.$close) && angular.isFunction(this.$dismiss);
+                        return {
+                            closeDismissPresent: () => true,
+                            foo: $scope.foo,
+                            fromCtrl: "Content from ctrl"
                         };
                     },
                     controllerAs: "test",

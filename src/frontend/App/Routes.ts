@@ -1,22 +1,22 @@
-import { Ng1StateDeclaration, StateProvider, Transition } from "@uirouter/angularjs";
+import { IState, IStateProvider, ITransition } from "./ui-routes";
 
 export class Routes {
     public static $inject = [ "$stateProvider" ];
 
-    constructor(private $stateProvider: StateProvider) {
-        const deviceEditState: Ng1StateDeclaration = {
+    constructor(private $stateProvider: IStateProvider) {
+        const deviceEditState: IState = {
             component: "deviceEdit",
             name: "device",
             resolve: {
-                selectedDeviceId: [ "$transition$", ($transition$: Transition) => $transition$.params().deviceId]
+                selectedDeviceId: [ "$transition$", ($transition$: ITransition) => $transition$.params().deviceId]
             },
             url: "/device/{deviceId}"
         };
-        const pagesEditState: Ng1StateDeclaration = {
+        const pagesEditState: IState = {
             component: "pageGrid",
             name: "pages",
             resolve: {
-                selectedDeviceId: [ "$transition$", ($transition$: Transition) => $transition$.params().deviceId]
+                selectedDeviceId: [ "$transition$", ($transition$: ITransition) => $transition$.params().deviceId]
             },
             url: "/pages/{deviceId}"
         };

@@ -5,7 +5,7 @@ import {
         IRootScopeService,
         ITemplateRequestService} from "angular";
 import * as angular from "angular";
-import { IModalInstanceService, IModalService, IModalSettings, IModalStackService, IResolver } from "../definitions";
+import { IModalInstanceService, IModalService, IModalSettings, IModalStackService, IResolver } from "../../definitions";
 
 export class UiLibModal implements IModalService {
 

@@ -1,5 +1,5 @@
 import { IAttributes, IAugmentedJQuery, IDocumentService, IQService, } from "angular";
-import { IModalStackService } from "../definitions";
+import { IModalStackService } from "../../definitions";
 
 export const UibModalWindow = (
     $modalStack: IModalStackService,

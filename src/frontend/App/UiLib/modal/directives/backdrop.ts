@@ -1,5 +1,5 @@
 import { IAttributes, IAugmentedJQuery } from "angular";
-import { IModalStackService } from "../definitions";
+import { IModalStackService } from "../../definitions";
 
 export const UibModalBackdrop = ($animate: angular.animate.IAnimateService, $modalStack: IModalStackService) => {
     const linkFn = (scope: any, element: IAugmentedJQuery, attrs: IAttributes) => {

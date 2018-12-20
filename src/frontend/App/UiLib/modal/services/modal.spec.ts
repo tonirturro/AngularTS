@@ -15,7 +15,7 @@ import {
     IModalService,
     IModalSettings,
     IModalStackService
-} from "../definitions";
+} from "../../definitions";
 
 describe("Given a modal service", () => {
     let serviceToTest: IModalService;

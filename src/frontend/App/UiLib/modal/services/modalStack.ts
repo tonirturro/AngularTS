@@ -9,7 +9,7 @@ import {
     IPositionService,
     IStackedMapFactory,
     IStakedMap
-} from "../definitions";
+} from "../../definitions";
 
 export class ModalStack implements IModalStackService {
     public static $inject = [

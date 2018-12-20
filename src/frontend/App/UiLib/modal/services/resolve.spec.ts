@@ -1,6 +1,6 @@
 import { IQService, IRootScopeService } from "angular";
 import * as angular from "angular";
-import { IResolver } from "../definitions";
+import { IResolver } from "../../definitions";
 
 describe("Given a resolve provider", () => {
     beforeEach(angular.mock.module("ui-lib"));

@@ -1,7 +1,7 @@
-import { StateService } from "@uirouter/core";
 import { IComponentController, ILogService, IWindowService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
+import { IStateService } from "../ui-routes";
 import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 
 export interface IDeviceSelection {
@@ -19,7 +19,7 @@ export class MainPageController implements IComponentController {
     public editingDevices: boolean = false;
 
     constructor(
-        private $state: StateService,
+        private $state: IStateService,
         private $log: ILogService,
         private $window: IWindowService,
         private dataService: DataService,

@@ -1,9 +1,10 @@
-import { IAugmentedJQuery, ICompileService, IRootScopeService } from "angular";
+import { IAugmentedJQuery, ICompileService, IRootScopeService, IWindowService } from "angular";
 import * as angular from "angular";
 
 describe("Given a toolbar component", () => {
     let element: IAugmentedJQuery;
     let rootScope: IRootScopeService;
+    let window: IWindowService;
     let scope: any;
     let clickedOk: boolean;
     let clickedCancel: boolean;
@@ -12,8 +13,10 @@ describe("Given a toolbar component", () => {
 
     beforeEach(inject((
         $compile: ICompileService,
-        $rootScope: IRootScopeService) => {
+        $rootScope: IRootScopeService,
+        $window: IWindowService) => {
         rootScope = $rootScope;
+        window = $window;
         scope = $rootScope.$new();
         scope.ok = () => {
             clickedOk = true;
@@ -34,13 +37,15 @@ describe("Given a toolbar component", () => {
         expect(element.html).toBeDefined();
     });
 
-    it("When clicking the first button Then an ok is reported", () => {
+    it("When clicking the first button Then an ok is reported and the main window is closed", () => {
+        spyOn(window, "close");
         const firstButton = element.find("button")[0];
 
         firstButton.click();
 
         expect(clickedOk).toBeTruthy();
         expect(clickedCancel).toBeFalsy();
+        expect(window.close).toHaveBeenCalled();
     });
 
     it("When clicking the second button Then a cancel is reported", () => {

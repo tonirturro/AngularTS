@@ -23,9 +23,11 @@ import { PageGrid } from "./Components/pageGrid/page-grid.component";
 import { ToolBar } from "./Components/toolBar/toolbar.component";
 import { Routes } from "./Routes";
 import { DataService } from "./Services/DataService";
+import { ModalStateProvider } from "./Services/ModalStateProvider";
 
 export let app = angular
     .module("myApp", ["templates", "ui.router", "ui-lib"] )
+    .provider("modalState", ModalStateProvider)
     .service("dataService", DataService)
     .config(Routes)
     .component("closeDialog", CloseDialog)

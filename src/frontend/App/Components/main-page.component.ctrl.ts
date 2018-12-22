@@ -1,8 +1,7 @@
-import { IComponentController, ILogService, IWindowService } from "angular";
+import { IComponentController, ILogService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 import { IStateService } from "../ui-routes";
-import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -12,7 +11,7 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$state", "$log", "$window", "dataService", "$uiLibModal"];
+    public static $inject = ["$state", "$log", "dataService", "$uiLibModal"];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
@@ -21,9 +20,7 @@ export class MainPageController implements IComponentController {
     constructor(
         private $state: IStateService,
         private $log: ILogService,
-        private $window: IWindowService,
-        private dataService: DataService,
-        private $uiLibModal: IModalService) {}
+        private dataService: DataService) {}
 
     /**
      * Exposes the devices from the data service
@@ -43,18 +40,8 @@ export class MainPageController implements IComponentController {
      * Close main window
      */
     public close() {
-        const modalInstance: IModalInstanceService = this.$uiLibModal.open({
-            backdrop: "static",
-            component: "closeDialog",
-            keyboard: false,
-            size: "sm"
-        } as IModalSettings);
-
-        modalInstance.result.then(() => {
-            this.$window.close();
-        }, () => {
-            this.$log.info("Modal closed");
-        });
+        const state = this.$state.current.name + ".close";
+        this.$state.go(state);
     }
 
     /**

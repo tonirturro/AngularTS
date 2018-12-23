@@ -1,4 +1,4 @@
-import { IComponentController, ILogService } from "angular";
+import { IComponentController, ILogService, IRootScopeService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 import { IStateService } from "../ui-routes";
@@ -26,6 +26,9 @@ export class MainPageController implements IComponentController {
      * Exposes the devices from the data service
      */
     public get devices(): IDevice[] {
+        if (this.selectedDeviceId === -1 && this.dataService.devices.length > 0) {
+            this.selectDevice(this.dataService.devices[0].id);
+        }
         return this.dataService.devices;
     }
 
@@ -84,7 +87,8 @@ export class MainPageController implements IComponentController {
         this.dataService.deleteDevice(deviceId).then((sucess) => {
             if (sucess) {
                 if (this.selectedDeviceId === deviceId) {
-                    this.selectedDeviceId = -1;
+                    this.selectedDeviceId = this.dataService.devices.length > 0 ?
+                        this.dataService.devices[0].id : -1;
                     this.changeView();
                 }
             } else {

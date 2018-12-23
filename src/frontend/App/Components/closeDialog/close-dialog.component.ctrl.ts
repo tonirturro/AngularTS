@@ -1,22 +1,19 @@
 import { IWindowService } from "angular";
+import { IStateService } from "../../ui-routes";
 
 export class CloseDialogController {
 
-    public static $inject = [ "$window" ];
+    public static $inject = [ "$window",  "$state" ];
 
-    /**
-     * From bindings
-     */
-    public dismiss: () => void;
-    public close: () => void;
-
-    constructor(private $window: IWindowService) {}
+    constructor(
+        private $window: IWindowService,
+        private $state: IStateService) {}
 
     /**
      * When clicked cancel
      */
     public cancel() {
-        this.dismiss();
+        this.$state.go("^");
     }
 
     /**
@@ -24,6 +21,5 @@ export class CloseDialogController {
      */
     public ok() {
         this.$window.close();
-        this.close();
     }
 }

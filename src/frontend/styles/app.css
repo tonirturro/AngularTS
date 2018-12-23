@@ -38,26 +38,26 @@ header {
     margin-left: 868px;
 }
 
-.close-dialog {
+.app-dialog {
     display: flex;
     flex-direction: column;
     height: 200px;
 }
 
-.close-dialog .content {
+.app-dialog .content {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.close-dialog .footer {
+.app-dialog .footer {
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
 }
 
-.close-dialog .footer button {
+.app-dialog .footer button {
     margin-right: 5px;
 }

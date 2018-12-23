@@ -1,10 +1,9 @@
-import { IAugmentedJQuery, ICompileService, IRootScopeService, IWindowService } from "angular";
+import { IAugmentedJQuery, ICompileService, IRootScopeService} from "angular";
 import * as angular from "angular";
 import { IStateService } from "../../ui-routes";
 
 describe("Given a toolbar component", () => {
     let element: IAugmentedJQuery;
-    let window: IWindowService;
     let state: IStateService;
 
     beforeEach(angular.mock.module("myApp"));
@@ -12,11 +11,9 @@ describe("Given a toolbar component", () => {
     beforeEach(inject((
         $compile: ICompileService,
         $rootScope: IRootScopeService,
-        $window: IWindowService,
         $state: IStateService) => {
-        window = $window;
         state = $state;
-        element = angular.element(`<close-dialog />`);
+        element = angular.element(`<delete-device-dialog />`);
         element = $compile(element)($rootScope.$new());
         $rootScope.$apply();
     }));
@@ -25,13 +22,13 @@ describe("Given a toolbar component", () => {
         expect(element.html).toBeDefined();
     });
 
-    it("When clicking the first button Then the main window is closed", () => {
-        spyOn(window, "close");
+    it("When clicking the first button Then the dialog is closed", () => {
+        spyOn(state, "go");
         const firstButton = element.find("button")[0];
 
         firstButton.click();
 
-        expect(window.close).toHaveBeenCalled();
+        expect(state.go).toHaveBeenCalledWith("^");
     });
 
     it("When clicking the second button Then the dialog is closed", () => {

@@ -16,6 +16,7 @@ import "./templates";
 import "./UiLib";
 
 import { CloseDialog } from "./Components/closeDialog/close-dialog.component";
+import { DeleteDeviceDialog } from "./Components/deleteDevice/delete-device-dialog.component";
 import { DeviceEdit } from "./Components/deviceEdit/device-edit.component";
 import { DevicePanel } from "./Components/devicePanel/device-panel.component";
 import { MainPage } from "./Components/main-page.component";
@@ -31,6 +32,7 @@ export let app = angular
     .service("dataService", DataService)
     .config(Routes)
     .component("closeDialog", CloseDialog)
+    .component("deleteDeviceDialog", DeleteDeviceDialog)
     .component("toolbar", ToolBar)
     .component("devicePanel", DevicePanel)
     .component("deviceEdit", DeviceEdit)

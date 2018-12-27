@@ -3,9 +3,9 @@ const webpackBaseConfig = require('./webpack.config.base');
 
 module.exports = merge(webpackBaseConfig, {
     output: {
-        filename: 'server.js' 
+        filename: 'main.js' 
     },
-    target: 'node',
+    target: 'electron-main',
     mode: 'development',
     devtool: 'inline-source-map'
 });

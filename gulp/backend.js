@@ -1,22 +1,14 @@
 const gulp = require('gulp');
 const path = require('path');
-const del = require('del');
 const webpack = require('webpack-stream');
-const runSequence = require('run-sequence');
-const webpackConfigServer = require('../webpack/webpack.config.server');
+const webpackConfigBackend = require('../webpack/webpack.config.backend');
 
-const serverOutput = path.resolve(__dirname, '../server');
-const serverSources = path.resolve(__dirname, '../src/backend');
-const serverMain = path.resolve(serverSources, 'server.js');
+const backendOutput = path.resolve(__dirname, '../dist');
+const backendSources = path.resolve(__dirname, '../src/backend');
+const backendMain = path.resolve(backendSources, 'main.ts');
 
-gulp.task('server-modules', () => {
-    return gulp.src(serverMain)
-        .pipe(webpack(webpackConfigServer))
-        .pipe(gulp.dest(serverOutput));
-});
-
-gulp.task('server-clean', () => del(serverOutput));
-
-gulp.task('backend', (done) => {
-    runSequence('server-clean', 'server-modules', () => done());
+gulp.task('backend', () => {
+    return gulp.src(backendMain)
+    .pipe(webpack(webpackConfigBackend))
+    .pipe(gulp.dest(backendOutput));
 });

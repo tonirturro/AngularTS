@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require("fs");
 const gulp = require('gulp');
-const del = require('del');
 const templateCache = require('gulp-angular-templatecache');
 const webpack = require('webpack-stream');
 const tslint = require('gulp-tslint');
@@ -17,8 +16,6 @@ const boot = path.resolve(frontEndSources, 'Boot.ts');
 const frontEndTSFiles = path.resolve(frontEndSources, '**/*.ts');
 const appOutput = path.resolve(__dirname, '../dist');
 const frontEndBundle = path.resolve(appOutput, 'bundle.js');
-
-gulp.task('clean-frontend', () => del(appOutput));
 
 gulp.task('views', function() {
   return gulp.src(templates)
@@ -67,7 +64,7 @@ gulp.task('frontend', (done) => {
   if (process.argv.length > 3 && process.argv[3] === "--dev") {
     buildAppTask = 'angular-app-dev';
   }
-  runSequence(['clean-frontend', 'tslint'], ['index', 'icon', 'views', 'electron-launch-files'], buildAppTask, () => done());
+  runSequence('tslint', ['index', 'icon', 'views', 'electron-launch-files'], buildAppTask, () => done());
 });
 
 gulp.task('watch-templates', () => {
@@ -80,5 +77,5 @@ gulp.task('watch-frontend', (done) => {
       ignored: [ 'node_modules' ],
       aggregateTimeout: 500
     };
-    runSequence('clean-frontend', ['index', 'icon', 'views', 'electron-launch-files'], 'empty-bundle', ['angular-app-dev', 'electron-watch', 'watch-templates'], done);
+    runSequence(['index', 'icon', 'views', 'electron-launch-files'], 'empty-bundle', ['angular-app-dev', 'electron-watch', 'watch-templates'], done);
  });

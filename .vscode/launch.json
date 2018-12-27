@@ -7,6 +7,16 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch app",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+            "windows": {
+                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+            },
+            "args" : ["dist"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Launch Backend Tests",
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
@@ -15,16 +25,10 @@
                 "--timeout",
                 "999999",
                 "--colors",
-                "${workspaceRoot}/App",
+                "${workspaceRoot}/src/backend",
                 "--recursive"
             ],
             "internalConsoleOptions": "openOnSessionStart"
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch BackEnd",
-            "program": "${workspaceRoot}/server/server.js"
         }
     ]
 }

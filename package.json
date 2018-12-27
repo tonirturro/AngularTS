@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "server": "node server/server.js",
-    "electron": "electron dist",
-    "start": "run-p server electron",
+    "start": "electron dist",
     "develop": "gulp watch-frontend",
     "build": "gulp buildAll",
     "build:frontend:dev": "gulp frontend --dev",
@@ -21,7 +19,6 @@
   "author": {
     "name": "angarcia"
   },
-  "main": "app.js",
   "dependencies": {
     "@uirouter/angularjs": "1.0.20",
     "angular": "1.7.5",

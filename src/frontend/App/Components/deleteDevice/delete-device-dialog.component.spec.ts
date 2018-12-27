@@ -1,20 +1,36 @@
 import { IAugmentedJQuery, ICompileService, IRootScopeService} from "angular";
 import * as angular from "angular";
+import { IDevice } from "../../../../common/rest";
+import { DataService } from "../../Services/DataService";
 import { IStateService } from "../../ui-routes";
 
-describe("Given a toolbar component", () => {
+describe("Given a delete device dialog component", () => {
+    const deviceList: IDevice[] = [
+        { id: 0, name: "Device Name" }
+    ];
     let element: IAugmentedJQuery;
     let state: IStateService;
+    let dataServiceToMock: DataService;
+    let scope: any;
 
     beforeEach(angular.mock.module("myApp"));
 
     beforeEach(inject((
         $compile: ICompileService,
         $rootScope: IRootScopeService,
-        $state: IStateService) => {
+        $state: IStateService,
+        dataService: DataService) => {
         state = $state;
-        element = angular.element(`<delete-device-dialog />`);
-        element = $compile(element)($rootScope.$new());
+        dataServiceToMock = dataService;
+        spyOnProperty(dataServiceToMock, "devices").and.returnValue(deviceList);
+        scope = $rootScope.$new();
+        scope.resolve = {
+            params: {
+                id: 0
+            }
+        };
+        element = angular.element(`<delete-device-dialog resolve="resolve" />`);
+        element = $compile(element)(scope);
         $rootScope.$apply();
     }));
 
@@ -22,12 +38,20 @@ describe("Given a toolbar component", () => {
         expect(element.html).toBeDefined();
     });
 
-    it("When clicking the first button Then the dialog is closed", () => {
+    it("When created Then it displays the device name", () => {
+        const text = element.find("h3").eq(0).text();
+
+        expect(text).toContain(deviceList[0].name);
+    });
+
+    it("When clicking the first button Then the device is deleted and the dialog is closed", () => {
         spyOn(state, "go");
+        spyOn(dataServiceToMock, "deleteDevice");
         const firstButton = element.find("button")[0];
 
         firstButton.click();
 
+        expect(dataServiceToMock.deleteDevice).toHaveBeenCalledWith(scope.resolve.params.id);
         expect(state.go).toHaveBeenCalledWith("^");
     });
 

@@ -2,6 +2,7 @@ import { IComponentController, ILogService, IRootScopeService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 import { IStateService } from "../ui-routes";
+import { IIdParam } from "./definitions";
 
 export interface IDeviceSelection {
     deviceId: number;
@@ -11,7 +12,7 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = ["$state", "$log", "dataService", "$uiLibModal"];
+    public static $inject = [ "$state", "dataService" ];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
@@ -19,14 +20,14 @@ export class MainPageController implements IComponentController {
 
     constructor(
         private $state: IStateService,
-        private $log: ILogService,
         private dataService: DataService) {}
 
     /**
      * Exposes the devices from the data service
      */
     public get devices(): IDevice[] {
-        if (this.selectedDeviceId === -1 && this.dataService.devices.length > 0) {
+        if ((this.selectedDeviceId === -1 && this.dataService.devices.length > 0)
+            || (!this.dataService.devices.some((d) => d.id === this.selectedDeviceId) && this.selectedDeviceId > -1 )) {
             this.selectDevice(this.dataService.devices[0].id);
         }
         return this.dataService.devices;
@@ -84,23 +85,18 @@ export class MainPageController implements IComponentController {
      * @param deviceId the device to be deleted
      */
     public deleteDevice(deviceId: number): void {
-        this.dataService.deleteDevice(deviceId).then((sucess) => {
-            if (sucess) {
-                if (this.selectedDeviceId === deviceId) {
-                    this.selectedDeviceId = this.dataService.devices.length > 0 ?
-                        this.dataService.devices[0].id : -1;
-                    this.changeView();
-                }
-            } else {
-                this.$log.log(`Failed to delete device id ${deviceId}`);
-            }
-        });
+        const deviceSelection: IIdParam = { id: deviceId };
+        const state = this.$state.current.name + ".deletedevice";
+        this.$state.go(state, deviceSelection);
     }
 
     /**
      * Selects the edition view
      */
     private changeView() {
+        if (this.selectedDeviceId < 0) {
+            return;
+        }
         const deviceSelection: IDeviceSelection = { deviceId: this.selectedDeviceId };
         const view = this.editingDevices ? "device" : "pages";
         this.$state.go(view, deviceSelection);

@@ -212,18 +212,13 @@ describe("Given a data service", () => {
             expect(http.get).toHaveBeenCalledWith(devicesUrl);
         });
 
-        it("Can delete devices", (done) => {
+        it("Can delete devices", () => {
             const expectedCall = `${devicesUrl}${deleteDeviceResponse.data.deletedDeviceId}`;
             spyOn(http, "delete").and.returnValue(q.resolve(deleteDeviceResponse));
-            spyOn(http, "get").and.returnValue(q.resolve(devicesResponse));
 
-            service.deleteDevice(deleteDeviceResponse.data.deletedDeviceId).then((success) => {
-                expect(http.delete).toHaveBeenCalledWith(expectedCall);
-                expect(success).toBeTruthy();
-                done();
-            });
+            service.deleteDevice(deleteDeviceResponse.data.deletedDeviceId);
 
-            rootscope.$apply();
+            expect(http.delete).toHaveBeenCalledWith(expectedCall);
         });
 
         it("When deleting devices Then the device list is reloaded", () => {

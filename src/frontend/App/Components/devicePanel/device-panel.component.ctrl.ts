@@ -21,8 +21,10 @@ export class DevicePanelController {
     /**
      * Delete the requested device
      * @param deviceId the device to be deleted
+     * @param event the mouse event that should not go to select
      */
-    public deleteDevice(deviceId: number): void {
+    public deleteDevice(event: Event, deviceId: number): void {
+        event.stopPropagation();
         this.onDeleteDevice({ deviceId });
     }
 

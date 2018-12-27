@@ -159,18 +159,12 @@ export class DataService {
      * Delete an existing device
      * @param idToDelete is the id for the device to be deleted
      */
-    public deleteDevice(idToDelete: number): IPromise<boolean> {
-        const deferred: IDeferred<boolean> = this.$q.defer();
-
-        this.$http.delete<IDeleteDeviceResponse>(`${this.getUrl("devices")}${idToDelete}`).then((response) => {
+    public deleteDevice(idToDelete: number) {
+        this.$http.delete<IDeleteDeviceResponse>(`${this.getUrl("devices")}${idToDelete}`).then(() => {
             this.updateDevices();
-            deferred.resolve(response.data.success && response.data.deletedDeviceId === idToDelete);
-        }, (errors) => {
+        }, () => {
             this.$log.error(`Failure to delete ${this.getUrl("devices")}${idToDelete}`);
-            deferred.reject(errors.data);
         });
-
-        return deferred.promise;
     }
 
     /**

@@ -23,15 +23,17 @@ export class Routes {
             url: "/pages/{deviceId}"
         };
         const closeDialog: IModalSettings = {
-            backdrop: "static",
-            component: "closeDialog",
-            keyboard: false,
-            size: "sm"
+            component: "closeDialog"
+        };
+        const deleteDeviceDialog: IModalSettings = {
+            component: "deleteDeviceDialog"
         };
 
         this.$stateProvider.state(deviceEditState);
         this.$stateProvider.state(pagesEditState);
         this.$stateProvider.state(this.modalStateProvider.create("pages.close", closeDialog));
         this.$stateProvider.state(this.modalStateProvider.create("device.close", closeDialog));
+        this.$stateProvider.state(this.modalStateProvider.create("pages.deletedevice", deleteDeviceDialog));
+        this.$stateProvider.state(this.modalStateProvider.create("device.deletedevice", deleteDeviceDialog));
     }
 }

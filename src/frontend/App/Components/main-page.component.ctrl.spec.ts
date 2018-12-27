@@ -1,18 +1,19 @@
 import { StateService } from "@uirouter/core";
 import * as angular from "angular";
-import { IPromise, IQService, IRootScopeService, IWindowService } from "angular";
+import { IPromise, IQService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { IDevice, ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
+import { IIdParam } from "./definitions";
 import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
 
 describe("Given a main page component controller", () => {
     let controller: MainPageController;
     let q: IQService;
-    let rootScopeService: IRootScopeService;
     let stateServiceToMock: StateService;
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
+    let deviceSpy: jasmine.Spy;
 
     const devices: IDevice[] = [{
         id: 1,
@@ -37,14 +38,13 @@ describe("Given a main page component controller", () => {
 
     beforeEach(angular.mock.module("myApp"));
 
-    beforeEach(inject(($componentController, $q, $rootScope, $state: StateService, $window, dataService) => {
-        rootScopeService = $rootScope;
+    beforeEach(inject(($componentController, $q, $state: StateService, $window, dataService) => {
         stateServiceToMock = $state;
         windowServiceToMock = $window;
         dataServiceToMock = dataService;
         q = $q;
         spyOn(stateServiceToMock, "go");
-        spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
+        deviceSpy = spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "updatePageField").and.returnValue(q.resolve(true));
@@ -79,6 +79,7 @@ describe("Given a main page component controller", () => {
     });
 
     it("When it is initialized Then it goes to the pages edition", () => {
+        controller.selectedDeviceId = devices[0].id;
         const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.$onInit();
 
@@ -94,6 +95,7 @@ describe("Given a main page component controller", () => {
     });
 
     it("When calling edit devices Then the view changes to the device edition", () => {
+        controller.selectedDeviceId = devices[0].id;
         const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editDevices();
 
@@ -102,6 +104,7 @@ describe("Given a main page component controller", () => {
     });
 
     it("When calling edit pages Then the view changes to the pages edition", () => {
+        controller.selectedDeviceId = devices[0].id;
         const expectedDeviceSelection: IDeviceSelection = { deviceId: controller.selectedDeviceId };
         controller.editPages();
 
@@ -130,31 +133,15 @@ describe("Given a main page component controller", () => {
         expect(dataServiceToMock.addNewDevice).toHaveBeenCalled();
     });
 
-    it("When deleting a device Then the data service is called", () => {
+    it("When deleting the selected device Then the view is changed", () => {
         const idToDelete = 4;
+        const currentView = "pages";
+        const expectedView = currentView + ".deletedevice";
+        const expectedDeviceSelection: IIdParam = { id: idToDelete };
+        spyOnProperty(stateServiceToMock, "current").and.returnValue( { name: currentView });
 
         controller.deleteDevice(idToDelete);
 
-        expect(dataServiceToMock.deleteDevice).toHaveBeenCalledWith(idToDelete);
-    });
-
-    it("When deleting the selected device Then the selection is changed", () => {
-        const SelectedDeviceId = 4;
-        controller.selectedDeviceId = SelectedDeviceId;
-
-        controller.deleteDevice(SelectedDeviceId);
-        rootScopeService.$apply();
-
-        expect(controller.selectedDeviceId).not.toEqual(SelectedDeviceId);
-    });
-
-    it("When deleting the selected device Then the view is changed", () => {
-        const SelectedDeviceId = 4;
-        controller.selectedDeviceId = SelectedDeviceId;
-
-        controller.deleteDevice(SelectedDeviceId);
-        rootScopeService.$apply();
-
-        expect(stateServiceToMock.go).toHaveBeenCalled();
+        expect(stateServiceToMock.go).toHaveBeenCalledWith(expectedView, expectedDeviceSelection);
     });
 });

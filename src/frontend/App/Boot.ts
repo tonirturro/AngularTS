@@ -1,8 +1,7 @@
 /*
 * Styles loader
 */
-import "bootstrap/dist/css/bootstrap.css";
-import "../styles/app.css";
+import "./UiLib/styles";
 
 /*
 ** Angular loader

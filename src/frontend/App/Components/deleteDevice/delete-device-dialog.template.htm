@@ -1,9 +1,7 @@
-<div class="app-dialog">
-    <div class="content">
-        <h3><b>Delete : </b>{{ deleteDeviceDialogController.name }}</h3>
-    </div>
-    <div class="footer">
-        <button class="btn btn-info" ng-click="deleteDeviceDialogController.ok()">Yes</button>
-        <button class="btn" ng-click="deleteDeviceDialogController.cancel()">No</button>
-    </div>
+<div class="modal-body">
+    <h2>Delete : {{ deleteDeviceDialogController.name }}</h2>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="deleteDeviceDialogController.ok()">Yes</button>
+    <button class="btn btn-warning" ng-click="deleteDeviceDialogController.cancel()">No</button>
 </div>

@@ -1,6 +1,6 @@
-<header>
+<div>
     <button type="button" class="btn btn-info" ng-click="toolBarController.addDevice()">Add new device</button>
     <button type="button" class="btn" ng-disabled="toolBarController.editingDevices" ng-click="toolBarController.editDevices()">Edit Devices</button>
     <button type="button" class="btn" ng-disabled="!toolBarController.editingDevices" ng-click="toolBarController.editPages()">Edit Pages</button>
-    <button type="button" class="btn btn-danger toolbar-button-right" ng-click="toolBarController.close()">x</button>
-</header>
+    <button type="button" class="btn btn-danger" ng-click="toolBarController.close()">x</button>
+</div>

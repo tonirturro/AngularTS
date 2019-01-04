@@ -24,6 +24,7 @@ html, body {
         .left-panel {
             width: 25%;
             background-color: lightgray;
+            overflow: auto;
         }
         .right-panel {
             flex: 1;

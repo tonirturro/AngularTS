@@ -1,5 +1,6 @@
 import { IComponentOptions } from "angular";
 import { ToolBarController } from "./toolbar.component.ctrl";
+import "./toolbar.styles.scss";
 
 /**
  * Defines the bar with the program commands

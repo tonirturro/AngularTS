@@ -1,11 +1,11 @@
-    <table class="table table-bordered" ng-if="$ctrl.selectedDeviceId > -1">
+    <table class="table table-bordered table-fixed-header" ng-if="$ctrl.selectedDeviceId > -1">
     <thead>
         <tr>
             <td>Page Size</td>
             <td>Print Quality</td>
             <td>Media Type</td>
             <td>Destination</td>
-            <td><button type="button" class="btn btn-info" ng-click="$ctrl.addPage()">Add Page</button></td>
+            <td><button type="button" class="btn btn-primary" ng-click="$ctrl.addPage()"><span class="glyphicon glyphicon-plus"></span></button></td>
         </tr>
     </thead>
     <tbody>
@@ -33,7 +33,7 @@
                     <option ng-repeat="destination in $ctrl.DestinationOptions" value="{{ destination.value }}">{{ destination.label }}</option>
                 </select>
             </td>
-            <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)">x</button></td>
+            <td><button type="button" class="btn btn-danger" ng-click="$ctrl.deletePage(page.id)"><span class="glyphicon glyphicon-trash"></span></button></td>
         </tr>
     </tbody>
 </table>

@@ -39,7 +39,7 @@ describe("Given a delete device dialog component", () => {
     });
 
     it("When created Then it displays the device name", () => {
-        const text = element.find("h3").eq(0).text();
+        const text = element.find("h2").eq(0).text();
 
         expect(text).toContain(deviceList[0].name);
     });

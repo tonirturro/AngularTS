@@ -1,21 +1,14 @@
-<div>
-    <toolbar 
-        editing-devices="mainPageController.editingDevices"
-        on-edit-devices="mainPageController.editDevices()"
-        on-add-device="mainPageController.addDevice()"
-        on-edit-pages="mainPageController.editPages()"
-        on-close="mainPageController.close()" />
-</div>
-<div class="container">
-    <div class="row">
-        <div class="col-md-3 app-printer-panel no-float">
-            <device-panel
-                devices="mainPageController.devices"
-                selected-device-id="mainPageController.selectedDeviceId"
-                on-delete-device="mainPageController.deleteDevice(deviceId)"
-                on-selected-device="mainPageController.selectDevice(deviceId)" />
+<div class="dashboard">
+    <div class="dashboard__head ">
+        <toolbar editing-devices="mainPageController.editingDevices" on-edit-devices="mainPageController.editDevices()"
+            on-add-device="mainPageController.addDevice()" on-edit-pages="mainPageController.editPages()" on-close="mainPageController.close()" />
+    </div>
+    <div class="dashboard__content">
+        <div class="left-panel">
+            <device-panel devices="mainPageController.devices" selected-device-id="mainPageController.selectedDeviceId"
+                on-delete-device="mainPageController.deleteDevice(deviceId)" on-selected-device="mainPageController.selectDevice(deviceId)" />
         </div>
-        <div class="col-md-9 no-float">
+        <div class="right-panel">
             <ui-view></ui-view>
         </div>
     </div>

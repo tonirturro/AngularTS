@@ -40,7 +40,7 @@ describe("Given a page grid component ", () => {
         { value: "1", label: "destination1" }
     ];
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(() => {
         Capabilities[PageFields.PageSize] = PageSizeCapabilities;

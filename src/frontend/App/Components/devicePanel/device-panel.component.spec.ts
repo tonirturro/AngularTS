@@ -17,7 +17,7 @@ describe("Given a device panel component", () => {
     let reportedDeletedDeviceId: number;
     let rootScope: IRootScopeService;
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         $compile: ICompileService,

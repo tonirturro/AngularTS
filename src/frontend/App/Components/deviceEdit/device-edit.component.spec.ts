@@ -12,7 +12,7 @@ describe("Given a device edit component", () => {
     let scope: any;
     let element: IAugmentedJQuery;
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         dataService: DataService,

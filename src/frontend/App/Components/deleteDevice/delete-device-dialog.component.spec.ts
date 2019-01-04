@@ -13,7 +13,7 @@ describe("Given a delete device dialog component", () => {
     let dataServiceToMock: DataService;
     let scope: any;
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         $compile: ICompileService,

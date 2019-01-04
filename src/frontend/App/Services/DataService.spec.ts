@@ -57,7 +57,7 @@ describe("Given a data service", () => {
         /**
          * Initialize test environment
          */
-        beforeEach(angular.mock.module("myApp"));
+        beforeEach(angular.mock.module("myApp.services"));
 
         beforeEach(inject((
                 dataService: DataService,

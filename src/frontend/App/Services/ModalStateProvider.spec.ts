@@ -8,7 +8,7 @@ describe("Given a modal state provider", () => {
     let modalService: IModalService;
 
     beforeEach(() => {
-        angular.mock.module("myApp", (modalStateProvider: IServiceProvider) => {
+        angular.mock.module("myApp.services", (modalStateProvider: IServiceProvider) => {
             modalStates = modalStateProvider.$get();
         });
     });

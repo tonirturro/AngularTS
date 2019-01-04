@@ -11,7 +11,7 @@ import { MultiMapFactory } from "./multiMap/multiMapFactory";
 import { Position } from "./position/position";
 import { StackedMapFactory } from "./stackedMap/stakedMapFactory";
 
-angular.module("ui-lib", [])
+export const UI_LIB_NAME = angular.module("ui-lib", [])
     .directive("uibModalBackdrop", UibModalBackdrop)
     .directive("uibModalWindow", UibModalWindow)
     .directive("uibModalAnimationClass", UibModalAnimationClass)
@@ -24,4 +24,4 @@ angular.module("ui-lib", [])
     .service("$uiLibModal", UiLibModal)
     .run(["$templateCache", ($templateCache: ITemplateCacheService) => {
         $templateCache.put("uib/template/modal/window.html", require("./modal/window.htm"));
-    }]);
+    }]).name;

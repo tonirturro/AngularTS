@@ -27,7 +27,7 @@ describe("Given a page grid controller", () => {
     /**
      * Initialize the test environment
      */
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         $componentController: IComponentControllerService,

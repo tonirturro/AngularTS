@@ -36,7 +36,7 @@ describe("Given a main page component controller", () => {
         { value: "1", label: "destination1" }
     ];
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject(($componentController, $q, $state: StateService, $window, dataService) => {
         stateServiceToMock = $state;

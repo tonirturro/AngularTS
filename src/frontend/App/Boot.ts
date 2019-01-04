@@ -1,42 +1,14 @@
-/*
-* Styles loader
-*/
-import "./UiLib/styles";
-
-/*
-** Angular loader
-*/
-
 import "@uirouter/angularjs";
 import * as angular from "angular";
 import "angular-animate";
 
-import "./templates";
-import "./UiLib";
+import { COMPONENTS_MODULE_NAME } from "./Components";
 
-import { CloseDialog } from "./Components/closeDialog/close-dialog.component";
-import { DeleteDeviceDialog } from "./Components/deleteDevice/delete-device-dialog.component";
-import { DeviceEdit } from "./Components/deviceEdit/device-edit.component";
-import { DevicePanel } from "./Components/devicePanel/device-panel.component";
-import { MainPage } from "./Components/main-page.component";
-import { PageGrid } from "./Components/pageGrid/page-grid.component";
-import { ToolBar } from "./Components/toolBar/toolbar.component";
 import { Routes } from "./Routes";
-import { DataService } from "./Services/DataService";
-import { ModalStateProvider } from "./Services/ModalStateProvider";
 
 export let app = angular
-    .module("myApp", ["templates", "ui.router", "ui-lib"] )
-    .provider("modalState", ModalStateProvider)
-    .service("dataService", DataService)
-    .config(Routes)
-    .component("closeDialog", CloseDialog)
-    .component("deleteDeviceDialog", DeleteDeviceDialog)
-    .component("toolbar", ToolBar)
-    .component("devicePanel", DevicePanel)
-    .component("deviceEdit", DeviceEdit)
-    .component("pageGrid", PageGrid)
-    .component("mainPage", MainPage);
+    .module("myApp", [ "ui.router", COMPONENTS_MODULE_NAME ] )
+    .config(Routes);
 
 angular.element(document).ready(() => {
     angular.bootstrap(document.body, [app.name]);

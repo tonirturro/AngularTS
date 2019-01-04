@@ -7,7 +7,7 @@ describe("Given a toolbar component", () => {
     let window: IWindowService;
     let state: IStateService;
 
-    beforeEach(angular.mock.module("myApp"));
+    beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         $compile: ICompileService,

@@ -5,17 +5,9 @@ import { ModalManager } from "./ModalManager";
 fdescribe("Given a Modal Manager", () => {
     const dialogName = "name";
     const dialogSettings: IModalSettings = {};
-    const expectedModalInstance: IModalInstanceService = {
-        close: () => { angular.noop(); },
-        closed: null,
-        dismiss: () => { angular.noop(); },
-        opened: null,
-        rendered: null,
-        result: undefined
-    };
     let service: ModalManager;
     let modalServiceMock: IModalService;
-    let openModalMock: jasmine.Spy;
+    let instanceMock: IModalInstanceService;
 
     beforeEach(angular.mock.module("myApp.services"));
 
@@ -24,7 +16,8 @@ fdescribe("Given a Modal Manager", () => {
         $uiLibModal: IModalService) => {
         service = modalManager;
         modalServiceMock = $uiLibModal;
-        openModalMock = spyOn(modalServiceMock, "open").and.returnValue(expectedModalInstance);
+        instanceMock = jasmine.createSpyObj("instanceMock", [ "close" ]);
+        spyOn(modalServiceMock, "open").and.returnValue(instanceMock);
     }));
 
     it("Is instantiated", () => {
@@ -54,7 +47,7 @@ fdescribe("Given a Modal Manager", () => {
 
             const instance = service.push(dialogName);
 
-            expect(instance).toEqual(expectedModalInstance);
+            expect(instance).toEqual(instanceMock);
         });
 
         it("When the dialog has been previously registered Then it opens a dialog", () => {
@@ -83,11 +76,7 @@ fdescribe("Given a Modal Manager", () => {
     });
 
     describe("And poping one dialog", () => {
-        let instanceMock: IModalInstanceService;
-
         beforeEach(() => {
-            instanceMock = jasmine.createSpyObj("instanceMock", [ "close" ]);
-            openModalMock.and.returnValue(instanceMock);
             service.register(dialogName, dialogSettings);
         });
 
@@ -107,5 +96,21 @@ fdescribe("Given a Modal Manager", () => {
 
             expect(instanceMock.close).toHaveBeenCalled();
         });
+    });
+
+    describe("And replacing the top dialog", () => {
+
+        it("When the dialog has not been previously registered Then it fails", () => {
+            expect(service.replaceTop("name")).toBeFalsy();
+        });
+
+        it("When the dialog has been previously registered Then it opens a dialog", () => {
+            service.register(dialogName, dialogSettings);
+
+            service.replaceTop(dialogName);
+
+            expect(modalServiceMock.open).toHaveBeenCalled();
+        });
+
     });
 });

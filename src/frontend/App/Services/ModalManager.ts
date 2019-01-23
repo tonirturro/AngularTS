@@ -61,4 +61,14 @@ export class ModalManager {
 
         return false;
     }
+
+    /**
+     * Replaces the last opened dialog
+     * @param name the name of the dialog to be opened
+     */
+    public replaceTop(name: string): any {
+        this.pop();
+        return this.push(name);
+    }
+
 }

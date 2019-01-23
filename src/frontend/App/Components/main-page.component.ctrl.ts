@@ -1,18 +1,34 @@
 import { IComponentController, ILogService, IRootScopeService } from "angular";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
+import { ModalManager } from "../Services/ModalManager";
 import { IStateService } from "../ui-routes";
+import { IModalSettings } from "../UiLib/definitions";
 import { IIdParam } from "./definitions";
 
 export interface IDeviceSelection {
     deviceId: number;
 }
+export enum EModals {
+    Close = "close",
+    DeleteDevice = "delete.device"
+}
+
+interface IModalDefinition {
+    name: EModals;
+    settings: IModalSettings;
+}
+
+const modals: IModalDefinition[] = [
+    { name: EModals.Close, settings: { component: "closeDialog" }},
+    { name: EModals.DeleteDevice, settings: { component: "deleteDeviceDialog" }}
+];
 
 export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = [ "$state", "dataService" ];
+    public static $inject = [ "$state", "dataService", "modalManager" ];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
@@ -20,7 +36,8 @@ export class MainPageController implements IComponentController {
 
     constructor(
         private $state: IStateService,
-        private dataService: DataService) {}
+        private dataService: DataService,
+        private modalManager: ModalManager) {}
 
     /**
      * Exposes the devices from the data service
@@ -37,6 +54,11 @@ export class MainPageController implements IComponentController {
      * Component initialization
      */
     public $onInit() {
+        // Register modals
+        modals.forEach((modal) => {
+            this.modalManager.register(modal.name, modal.settings);
+        });
+        // Select view
         this.changeView();
     }
 
@@ -44,8 +66,7 @@ export class MainPageController implements IComponentController {
      * Close main window
      */
     public close() {
-        const state = this.$state.current.name + ".close";
-        this.$state.go(state);
+        this.modalManager.push(EModals.Close);
     }
 
     /**
@@ -86,8 +107,7 @@ export class MainPageController implements IComponentController {
      */
     public deleteDevice(deviceId: number): void {
         const deviceSelection: IIdParam = { id: deviceId };
-        const state = this.$state.current.name + ".deletedevice";
-        this.$state.go(state, deviceSelection);
+        this.modalManager.push(EModals.DeleteDevice, deviceSelection);
     }
 
     /**

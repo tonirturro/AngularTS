@@ -2,20 +2,17 @@ import * as angular from "angular";
 import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 import { ModalManager } from "./ModalManager";
 
-fdescribe("Given a Modal Manager", () => {
+describe("Given a Modal Manager", () => {
     const dialogName = "name";
     const dialogSettings: IModalSettings = {};
-    const expectedModalInstance: IModalInstanceService = {
-        close: () => { angular.noop(); },
-        closed: null,
-        dismiss: () => { angular.noop(); },
-        opened: null,
-        rendered: null,
-        result: undefined
+    const minimumSettings = {
+        backdrop: "static",
+        keyboard: false,
+        size: "sm"
     };
     let service: ModalManager;
     let modalServiceMock: IModalService;
-    let openModalMock: jasmine.Spy;
+    let instanceMock: IModalInstanceService;
 
     beforeEach(angular.mock.module("myApp.services"));
 
@@ -24,7 +21,8 @@ fdescribe("Given a Modal Manager", () => {
         $uiLibModal: IModalService) => {
         service = modalManager;
         modalServiceMock = $uiLibModal;
-        openModalMock = spyOn(modalServiceMock, "open").and.returnValue(expectedModalInstance);
+        instanceMock = jasmine.createSpyObj("instanceMock", ["close"]);
+        spyOn(modalServiceMock, "open").and.returnValue(instanceMock);
     }));
 
     it("Is instantiated", () => {
@@ -39,7 +37,7 @@ fdescribe("Given a Modal Manager", () => {
 
         it("When the dialog has been previously registered it fails", () => {
             service.register(dialogName, dialogSettings);
-            expect(service.register("name", dialogSettings)).toBeFalsy();
+            expect(service.register(dialogName, dialogSettings)).toBeFalsy();
         });
     });
 
@@ -49,45 +47,56 @@ fdescribe("Given a Modal Manager", () => {
             expect(service.push("name")).toBeFalsy();
         });
 
-        it("When the dialog has been previously registered Then it returns a modal instance", () => {
-            service.register(dialogName, dialogSettings);
+        describe("And the dialog has been previously registered", () => {
+            beforeEach(() => {
+                service.register(dialogName, dialogSettings);
+            });
 
-            const instance = service.push(dialogName);
+            it("Then it returns a modal instance", () => {
+                const instance = service.push(dialogName);
 
-            expect(instance).toEqual(expectedModalInstance);
+                expect(instance).toEqual(instanceMock);
+            });
+
+            it("Then it opens a dialog", () => {
+                service.push(dialogName);
+
+                expect(modalServiceMock.open).toHaveBeenCalled();
+            });
+
+            it("Then it opens a dialog", () => {
+                service.push(dialogName);
+
+                expect(modalServiceMock.open).toHaveBeenCalled();
+            });
+
+            it("Then it opens a dialog whit at least the minimum dialog settings", () => {
+                const expectedSettings: IModalSettings = {};
+                angular.extend(expectedSettings, dialogSettings, minimumSettings);
+
+                service.push(dialogName);
+
+                expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
+            });
+
+            it("When params are pushed Then the dialog is opened with this params", () => {
+                const params = {
+                    id: 1
+                };
+                const expectedSettings: IModalSettings = {};
+                angular.extend(expectedSettings, dialogSettings, minimumSettings, { resolve: params });
+
+                service.push(dialogName, params);
+
+                expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
+            });
         });
 
-        it("When the dialog has been previously registered Then it opens a dialog", () => {
-            service.register(dialogName, dialogSettings);
-
-            service.push(dialogName);
-
-            expect(modalServiceMock.open).toHaveBeenCalled();
-        });
-
-        it("When the dialog has been previously registered " +
-           "Then it opens a dialog whit at least the minimum dialog settings", () => {
-            const minimumSettings = {
-                backdrop: "static",
-                keyboard: false,
-                size: "sm"
-            };
-            const expectedSettings: IModalSettings = {};
-            angular.extend(expectedSettings, dialogSettings, minimumSettings);
-            service.register(dialogName, dialogSettings);
-
-            service.push(dialogName);
-
-            expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
-        });
     });
 
     describe("And poping one dialog", () => {
-        let instanceMock: IModalInstanceService;
 
         beforeEach(() => {
-            instanceMock = jasmine.createSpyObj("instanceMock", [ "close" ]);
-            openModalMock.and.returnValue(instanceMock);
             service.register(dialogName, dialogSettings);
         });
 
@@ -106,6 +115,42 @@ fdescribe("Given a Modal Manager", () => {
             service.pop();
 
             expect(instanceMock.close).toHaveBeenCalled();
+        });
+    });
+
+    describe("And replacing a dialog", () => {
+        const otherDialog = {
+            name: "dialogName",
+            settings: {} as IModalSettings
+        };
+
+        beforeEach(() => {
+            service.register(dialogName, dialogSettings);
+            service.push(dialogName);
+        });
+
+        it("When the dialog has not been previously registered Then it fails", () => {
+            expect(service.replace(otherDialog.name)).toBeFalsy();
+        });
+
+        it("When there is a dialog opened Then it closes the dialog", () => {
+            service.register(otherDialog.name, otherDialog.settings);
+            service.replace(otherDialog.name);
+
+            expect(instanceMock.close).toHaveBeenCalled();
+        });
+
+        it("When params are send Then the dialog is opened with this params", () => {
+            const params = {
+                id: 1
+            };
+            const expectedSettings: IModalSettings = {};
+            service.register(otherDialog.name, otherDialog.settings);
+            angular.extend(expectedSettings, otherDialog.settings, minimumSettings, { resolve: params });
+
+            service.replace(dialogName, params);
+
+            expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
         });
     });
 });

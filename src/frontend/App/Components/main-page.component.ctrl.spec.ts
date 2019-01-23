@@ -1,19 +1,20 @@
-import { StateService } from "@uirouter/core";
 import * as angular from "angular";
-import { IPromise, IQService, IWindowService } from "angular";
+import { IComponentControllerService, IPromise, IQService, IWindowService } from "angular";
 import { PageFields } from "../../../common/model";
 import { IDevice, ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
+import { ModalManager } from "../Services/ModalManager";
+import { IStateService } from "../ui-routes";
 import { IIdParam } from "./definitions";
-import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
+import { EModals, IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
 
 describe("Given a main page component controller", () => {
     let controller: MainPageController;
     let q: IQService;
-    let stateServiceToMock: StateService;
+    let stateServiceToMock: IStateService;
     let dataServiceToMock: DataService;
     let windowServiceToMock: IWindowService;
-    let deviceSpy: jasmine.Spy;
+    let modalManagerMock: ModalManager;
 
     const devices: IDevice[] = [{
         id: 1,
@@ -38,13 +39,21 @@ describe("Given a main page component controller", () => {
 
     beforeEach(angular.mock.module("myApp.components"));
 
-    beforeEach(inject(($componentController, $q, $state: StateService, $window, dataService) => {
+    beforeEach(inject((
+            $componentController: IComponentControllerService,
+            $q: IQService,
+            $state: IStateService,
+            $window: IWindowService,
+            dataService: DataService,
+            modalManager: ModalManager) => {
         stateServiceToMock = $state;
         windowServiceToMock = $window;
         dataServiceToMock = dataService;
+        modalManagerMock = modalManager;
         q = $q;
         spyOn(stateServiceToMock, "go");
-        deviceSpy = spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
+        spyOn(modalManagerMock, "push");
+        spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "updatePageField").and.returnValue(q.resolve(true));
@@ -65,7 +74,7 @@ describe("Given a main page component controller", () => {
                         return q.reject("Invalid field");
                 }
             });
-        controller = $componentController("mainPage");
+        controller = $componentController("mainPage", {});
     }));
 
     it("When is ititialized Then it gets the existing devices", () => {
@@ -133,15 +142,12 @@ describe("Given a main page component controller", () => {
         expect(dataServiceToMock.addNewDevice).toHaveBeenCalled();
     });
 
-    it("When deleting the selected device Then the view is changed", () => {
+    it("When deleting a device Then a dialog is open", () => {
         const idToDelete = 4;
-        const currentView = "pages";
-        const expectedView = currentView + ".deletedevice";
         const expectedDeviceSelection: IIdParam = { id: idToDelete };
-        spyOnProperty(stateServiceToMock, "current").and.returnValue( { name: currentView });
 
         controller.deleteDevice(idToDelete);
 
-        expect(stateServiceToMock.go).toHaveBeenCalledWith(expectedView, expectedDeviceSelection);
+        expect(modalManagerMock.push).toHaveBeenCalledWith(EModals.DeleteDevice, expectedDeviceSelection);
     });
 });

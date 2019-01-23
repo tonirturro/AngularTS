@@ -38,10 +38,17 @@ export class ModalManager {
     /**
      * Open a new dialog on the top of the current one
      * @param name the name of the dialog to be opened
+     * @param params optional params to be submitted to the dialog
      */
-    public push(name: string): IModalInstanceService {
+    public push(name: string, params?: any): IModalInstanceService {
         if (this.modalDefinitions.hasOwnProperty(name)) {
-            const modalInstance = this.$uiLibModal.open(this.modalDefinitions[name]);
+            let dialogSettings: IModalSettings = {};
+            if (params) {
+                angular.extend(dialogSettings, this.modalDefinitions[name], { resolve: params });
+            } else {
+                dialogSettings = this.modalDefinitions[name];
+            }
+            const modalInstance = this.$uiLibModal.open(dialogSettings);
             this.modalStack.push(modalInstance);
             return modalInstance;
         }
@@ -61,4 +68,14 @@ export class ModalManager {
 
         return false;
     }
+
+    /**
+     * Closes the last opened dialog and open a new dialog at the same stack level
+     * @param name the name of the dialog to be opened
+     */
+    public replace(name: string, params?: any): any {
+        this.pop();
+        return this.push(name, params);
+    }
+
 }

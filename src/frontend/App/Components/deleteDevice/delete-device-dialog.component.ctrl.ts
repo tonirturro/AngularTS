@@ -9,16 +9,17 @@ interface IDialogParamsId {
 
 export class DeleteDeviceDialogController implements IComponentController {
 
-    public static $inject = [ "$state", "dataService" ];
+    public static $inject = [ "dataService" ];
 
     // from/to bindings
     public resolve: IDialogParamsId;
+    public close: () => void;
+    public dismiss: () => void;
+
     public name: string;
     private deviceId: number;
 
-    constructor(
-        private $state: IStateService,
-        private dataService: DataService) {}
+    constructor(private dataService: DataService) {}
 
     public $onInit() {
         this.deviceId = this.resolve.params.id;
@@ -29,7 +30,7 @@ export class DeleteDeviceDialogController implements IComponentController {
      * When clicked cancel
      */
     public cancel() {
-        this.$state.go("^");
+        this.dismiss();
     }
 
     /**
@@ -37,6 +38,6 @@ export class DeleteDeviceDialogController implements IComponentController {
      */
     public ok() {
         this.dataService.deleteDevice(this.deviceId);
-        this.$state.go("^");
+        this.close();
     }
 }

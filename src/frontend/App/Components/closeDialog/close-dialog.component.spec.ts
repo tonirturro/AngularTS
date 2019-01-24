@@ -1,11 +1,11 @@
 import { IAugmentedJQuery, ICompileService, IRootScopeService, IWindowService } from "angular";
 import * as angular from "angular";
-import { IStateService } from "../../ui-routes";
+import { ModalManager } from "../modal-manager.service";
 
 describe("Given a toolbar component", () => {
     let element: IAugmentedJQuery;
     let window: IWindowService;
-    let state: IStateService;
+    let modalManagerToMock: ModalManager;
 
     beforeEach(angular.mock.module("myApp.components"));
 
@@ -13,9 +13,9 @@ describe("Given a toolbar component", () => {
         $compile: ICompileService,
         $rootScope: IRootScopeService,
         $window: IWindowService,
-        $state: IStateService) => {
+        modalManager: ModalManager) => {
         window = $window;
-        state = $state;
+        modalManagerToMock = modalManager;
         element = angular.element(`<close-dialog />`);
         element = $compile(element)($rootScope.$new());
         $rootScope.$apply();
@@ -34,12 +34,12 @@ describe("Given a toolbar component", () => {
         expect(window.close).toHaveBeenCalled();
     });
 
-    xit("When clicking the second button Then the dialog is closed", () => {
-        spyOn(state, "go");
+    it("When clicking the second button Then the dialog is closed", () => {
+        spyOn(modalManagerToMock, "pop");
         const secondButton = element.find("button")[1];
 
         secondButton.click();
 
-        expect(state.go).toHaveBeenCalledWith("^");
+        expect(modalManagerToMock.pop).toHaveBeenCalled();
     });
 });

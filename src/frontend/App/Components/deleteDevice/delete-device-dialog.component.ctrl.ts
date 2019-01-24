@@ -1,7 +1,7 @@
 import { IComponentController } from "angular";
 import { DataService } from "../../Services/DataService";
-import { IStateService } from "../../ui-routes";
 import { IIdParam } from "../definitions";
+import { ModalManager } from "../modal-manager.service";
 
 interface IDialogParamsId {
     params: IIdParam;
@@ -9,17 +9,17 @@ interface IDialogParamsId {
 
 export class DeleteDeviceDialogController implements IComponentController {
 
-    public static $inject = [ "dataService" ];
+    public static $inject = [ "dataService", "modalManager" ];
 
     // from/to bindings
     public resolve: IDialogParamsId;
-    public close: () => void;
-    public dismiss: () => void;
 
     public name: string;
     private deviceId: number;
 
-    constructor(private dataService: DataService) {}
+    constructor(
+        private dataService: DataService,
+        private modalManager: ModalManager) {}
 
     public $onInit() {
         this.deviceId = this.resolve.params.id;
@@ -30,7 +30,7 @@ export class DeleteDeviceDialogController implements IComponentController {
      * When clicked cancel
      */
     public cancel() {
-        this.dismiss();
+        this.modalManager.pop();
     }
 
     /**
@@ -38,6 +38,6 @@ export class DeleteDeviceDialogController implements IComponentController {
      */
     public ok() {
         this.dataService.deleteDevice(this.deviceId);
-        this.close();
+        this.modalManager.pop();
     }
 }

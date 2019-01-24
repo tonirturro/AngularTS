@@ -1,28 +1,14 @@
-import { IComponentController, ILogService, IRootScopeService } from "angular";
+import { IComponentController } from "angular";
+import { EModals } from ".";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-import { ModalManager } from "../Services/ModalManager";
 import { IStateService } from "../ui-routes";
-import { IModalSettings } from "../UiLib/definitions";
 import { IIdParam } from "./definitions";
+import { ModalManager } from "./modal-manager.service";
 
 export interface IDeviceSelection {
     deviceId: number;
 }
-export enum EModals {
-    Close = "close",
-    DeleteDevice = "delete.device"
-}
-
-interface IModalDefinition {
-    name: EModals;
-    settings: IModalSettings;
-}
-
-const modals: IModalDefinition[] = [
-    { name: EModals.Close, settings: { component: "closeDialog" }},
-    { name: EModals.DeleteDevice, settings: { component: "deleteDeviceDialog" }}
-];
 
 export class MainPageController implements IComponentController {
     /**
@@ -54,10 +40,6 @@ export class MainPageController implements IComponentController {
      * Component initialization
      */
     public $onInit() {
-        // Register modals
-        modals.forEach((modal) => {
-            this.modalManager.register(modal.name, modal.settings);
-        });
         // Select view
         this.changeView();
     }

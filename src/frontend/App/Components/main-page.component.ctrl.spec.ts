@@ -1,12 +1,13 @@
 import * as angular from "angular";
 import { IComponentControllerService, IPromise, IQService, IWindowService } from "angular";
+import { EModals } from ".";
 import { PageFields } from "../../../common/model";
 import { IDevice, ISelectableOption } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
-import { ModalManager } from "../Services/ModalManager";
 import { IStateService } from "../ui-routes";
 import { IIdParam } from "./definitions";
-import { EModals, IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
+import { IDeviceSelection, MainPageController } from "./main-page.component.ctrl";
+import { ModalManager } from "./modal-manager.service";
 
 describe("Given a main page component controller", () => {
     let controller: MainPageController;

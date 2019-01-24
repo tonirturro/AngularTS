@@ -2,14 +2,14 @@ import { IAugmentedJQuery, ICompileService, IRootScopeService} from "angular";
 import * as angular from "angular";
 import { IDevice } from "../../../../common/rest";
 import { DataService } from "../../Services/DataService";
-import { IStateService } from "../../ui-routes";
+import { ModalManager } from "../modal-manager.service";
 
 describe("Given a delete device dialog component", () => {
     const deviceList: IDevice[] = [
         { id: 0, name: "Device Name" }
     ];
     let element: IAugmentedJQuery;
-    let state: IStateService;
+    let modalManagerToMock: ModalManager;
     let dataServiceToMock: DataService;
     let scope: any;
 
@@ -18,11 +18,12 @@ describe("Given a delete device dialog component", () => {
     beforeEach(inject((
         $compile: ICompileService,
         $rootScope: IRootScopeService,
-        $state: IStateService,
-        dataService: DataService) => {
-        state = $state;
+        dataService: DataService,
+        modalManager: ModalManager) => {
         dataServiceToMock = dataService;
+        modalManagerToMock = modalManager;
         spyOnProperty(dataServiceToMock, "devices").and.returnValue(deviceList);
+        spyOn(modalManagerToMock, "pop");
         scope = $rootScope.$new();
         scope.resolve = {
             params: {
@@ -45,22 +46,20 @@ describe("Given a delete device dialog component", () => {
     });
 
     it("When clicking the first button Then the device is deleted and the dialog is closed", () => {
-        // spyOn(state, "go");
         spyOn(dataServiceToMock, "deleteDevice");
         const firstButton = element.find("button")[0];
 
         firstButton.click();
 
         expect(dataServiceToMock.deleteDevice).toHaveBeenCalledWith(scope.resolve.params.id);
-        // expect(state.go).toHaveBeenCalledWith("^");
+        expect(modalManagerToMock.pop).toHaveBeenCalled();
     });
 
-    xit("When clicking the second button Then the dialog is closed", () => {
-        spyOn(state, "go");
+    it("When clicking the second button Then the dialog is closed", () => {
         const secondButton = element.find("button")[1];
 
         secondButton.click();
 
-        expect(state.go).toHaveBeenCalledWith("^");
+        expect(modalManagerToMock.pop).toHaveBeenCalled();
     });
 });

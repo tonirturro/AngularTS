@@ -3,7 +3,9 @@ import { DeleteDeviceDialogController } from "./delete-device-dialog.component.c
 
 export const DeleteDeviceDialog: IComponentOptions = {
     bindings: {
-        resolve: "<"
+        close: "&",
+        dismiss: "&",
+        resolve: "<",
     },
     controller: DeleteDeviceDialogController,
     controllerAs: "deleteDeviceDialogController",

@@ -34,7 +34,7 @@ describe("Given a toolbar component", () => {
         expect(window.close).toHaveBeenCalled();
     });
 
-    it("When clicking the second button Then the dialog is closed", () => {
+    xit("When clicking the second button Then the dialog is closed", () => {
         spyOn(state, "go");
         const secondButton = element.find("button")[1];
 

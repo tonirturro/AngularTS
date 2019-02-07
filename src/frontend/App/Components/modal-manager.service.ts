@@ -1,4 +1,5 @@
 import * as angular from "angular";
+import { IPromise, IQService } from "angular";
 import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 
 interface IDialogDictionary {
@@ -7,7 +8,7 @@ interface IDialogDictionary {
 
 export class ModalManager {
 
-    public static $inject = ["$uiLibModal"];
+    public static $inject = ["$uiLibModal", "$q"];
 
     private readonly modalDefinitions: IDialogDictionary = {};
     private readonly modalStack: IModalInstanceService[] = [];
@@ -17,7 +18,9 @@ export class ModalManager {
         size: "sm"
     };
 
-    constructor(private $uiLibModal: IModalService) {}
+    constructor(
+        private $uiLibModal: IModalService,
+        private $q: IQService) {}
 
     /**
      * Registers the modal settings to be used when opening it
@@ -40,7 +43,7 @@ export class ModalManager {
      * @param name the name of the dialog to be opened
      * @param params optional params to be submitted to the dialog
      */
-    public push(name: string, params?: any) {
+    public push(name: string, params?: any): IPromise<any> {
         if (this.modalDefinitions.hasOwnProperty(name)) {
             let dialogSettings: IModalSettings = {};
             if (params) {
@@ -50,6 +53,12 @@ export class ModalManager {
             }
             const modalInstance = this.$uiLibModal.open(dialogSettings);
             this.modalStack.push(modalInstance);
+            const deferred = this.$q.defer();
+            modalInstance.result.then((result) => {
+                this.modalStack.pop();
+                deferred.resolve(result);
+            });
+            return deferred.promise;
         }
     }
 
@@ -58,7 +67,7 @@ export class ModalManager {
      */
     public pop() {
         if (this.modalStack.length > 0) {
-            const instance = this.modalStack.pop();
+            const instance = this.modalStack[0];
             instance.close();
         }
     }

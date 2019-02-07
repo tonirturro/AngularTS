@@ -18,10 +18,16 @@ describe("Given a Modal Manager", () => {
 
     beforeEach(inject((
         modalManager: ModalManager,
-        $uiLibModal: IModalService) => {
+        $uiLibModal: IModalService,
+        $q: angular.IQService) => {
         service = modalManager;
         modalServiceMock = $uiLibModal;
-        instanceMock = jasmine.createSpyObj("instanceMock", ["close"]);
+        const promise = $q.resolve();
+        instanceMock = {
+            close: () => { angular.noop(); },
+            result: promise
+        }  as IModalInstanceService;
+        spyOn(instanceMock, "close");
         spyOn(modalServiceMock, "open").and.returnValue(instanceMock);
     }));
 

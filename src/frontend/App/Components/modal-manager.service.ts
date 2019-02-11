@@ -54,9 +54,12 @@ export class ModalManager {
             const modalInstance = this.$uiLibModal.open(dialogSettings);
             this.modalStack.push(modalInstance);
             const deferred = this.$q.defer();
-            modalInstance.result.then((result) => {
+            modalInstance.result.then((resultClose) => {
                 this.modalStack.pop();
-                deferred.resolve(result);
+                deferred.resolve(resultClose);
+            }, (resultDismiss) => {
+                this.modalStack.pop();
+                deferred.reject(resultDismiss);
             });
             return deferred.promise;
         }

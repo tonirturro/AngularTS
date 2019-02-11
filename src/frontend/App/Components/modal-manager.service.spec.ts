@@ -1,4 +1,5 @@
 import * as angular from "angular";
+import { IQService, IRootScopeService } from "angular";
 import { IModalInstanceService, IModalService, IModalSettings } from "../UiLib/definitions";
 import { ModalManager } from "./modal-manager.service";
 
@@ -11,24 +12,27 @@ describe("Given a Modal Manager", () => {
         size: "sm"
     };
     let service: ModalManager;
-    let modalServiceMock: IModalService;
-    let instanceMock: IModalInstanceService;
+    let openModalMock: jasmine.Spy;
+    let rootScope: IRootScopeService;
+    let dialogInstance: IModalInstanceService;
 
     beforeEach(angular.mock.module("myApp.components"));
 
     beforeEach(inject((
         modalManager: ModalManager,
         $uiLibModal: IModalService,
-        $q: angular.IQService) => {
+        $q: IQService,
+        $rootScope: IRootScopeService) => {
         service = modalManager;
-        modalServiceMock = $uiLibModal;
-        const promise = $q.resolve();
-        instanceMock = {
-            close: () => { angular.noop(); },
-            result: promise
-        }  as IModalInstanceService;
-        spyOn(instanceMock, "close");
-        spyOn(modalServiceMock, "open").and.returnValue(instanceMock);
+        rootScope = $rootScope;
+        const deferred = $q.defer();
+        dialogInstance = {
+            close: (result?: any) => { deferred.resolve(result); },
+            dismiss: (result?: any) => { deferred.reject(result); },
+            result: deferred.promise
+        } as IModalInstanceService;
+        openModalMock = spyOn($uiLibModal, "open");
+        openModalMock.and.returnValue(dialogInstance);
     }));
 
     it("Is instantiated", () => {
@@ -61,13 +65,13 @@ describe("Given a Modal Manager", () => {
             it("Then it opens a dialog", () => {
                 service.push(dialogName);
 
-                expect(modalServiceMock.open).toHaveBeenCalled();
+                expect(openModalMock).toHaveBeenCalled();
             });
 
             it("Then it opens a dialog", () => {
                 service.push(dialogName);
 
-                expect(modalServiceMock.open).toHaveBeenCalled();
+                expect(openModalMock).toHaveBeenCalled();
             });
 
             it("Then it opens a dialog whit at least the minimum dialog settings", () => {
@@ -76,7 +80,13 @@ describe("Given a Modal Manager", () => {
 
                 service.push(dialogName);
 
-                expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
+                expect(openModalMock).toHaveBeenCalledWith(expectedSettings);
+            });
+
+            it("Then it returns a promise", () => {
+                const result = service.push(dialogName);
+
+                expect(result.then).toBeDefined();
             });
 
             it("When params are pushed Then the dialog is opened with this params", () => {
@@ -88,7 +98,7 @@ describe("Given a Modal Manager", () => {
 
                 service.push(dialogName, params);
 
-                expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
+                expect(openModalMock).toHaveBeenCalledWith(expectedSettings);
             });
         });
 
@@ -110,10 +120,11 @@ describe("Given a Modal Manager", () => {
         });
 
         it("When there is a dialog opened Then it closes the dialog", () => {
+            const closeMock = spyOn(dialogInstance, "close");
             service.push(dialogName);
             service.pop();
 
-            expect(instanceMock.close).toHaveBeenCalled();
+            expect(closeMock).toHaveBeenCalled();
         });
     });
 
@@ -133,10 +144,11 @@ describe("Given a Modal Manager", () => {
         });
 
         it("When there is a dialog opened Then it closes the dialog", () => {
+            const closeMock = spyOn(dialogInstance, "close");
             service.register(otherDialog.name, otherDialog.settings);
             service.replaceTop(otherDialog.name);
 
-            expect(instanceMock.close).toHaveBeenCalled();
+            expect(closeMock).toHaveBeenCalled();
         });
 
         it("When params are send Then the dialog is opened with this params", () => {
@@ -149,7 +161,65 @@ describe("Given a Modal Manager", () => {
 
             service.replaceTop(dialogName, params);
 
-            expect(modalServiceMock.open).toHaveBeenCalledWith(expectedSettings);
+            expect(openModalMock).toHaveBeenCalledWith(expectedSettings);
+        });
+    });
+
+    describe("And closing a dialog", () => {
+
+        beforeEach(() => {
+            service.register(dialogName, dialogSettings);
+        });
+
+        it("When close Then it returns the close value", (done) => {
+            const closeResult = {
+                peekaboo: true
+            };
+
+            service.push(dialogName).then((result) => {
+                expect(result).toEqual(closeResult);
+                done();
+            });
+
+            dialogInstance.close(closeResult);
+            rootScope.$apply();
+        });
+
+        it("When dismiss Then it returns the dismissed value", (done) => {
+            const dismissResult = "Dialog dismiss";
+
+            service.push(dialogName).then(() => {
+                angular.noop();
+            },
+            (result) => {
+                expect(result).toEqual(dismissResult);
+                done();
+            });
+
+            dialogInstance.dismiss(dismissResult);
+            rootScope.$apply();
+        });
+
+        it("When closed Then dialog cannot be poped", (done) => {
+            service.push(dialogName).then(() => {
+                expect(service.pop()).toBeFalsy();
+                done();
+            });
+
+            dialogInstance.close();
+            rootScope.$apply();
+        });
+
+        it("When dismiss Then dialog cannot be poped", (done) => {
+            service.push(dialogName).then(
+                () => { angular.noop(); },
+                () => {
+                expect(service.pop()).toBeFalsy();
+                done();
+            });
+
+            dialogInstance.dismiss();
+            rootScope.$apply();
         });
     });
 });

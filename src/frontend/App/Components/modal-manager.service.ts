@@ -70,7 +70,7 @@ export class ModalManager {
      */
     public pop() {
         if (this.modalStack.length > 0) {
-            const instance = this.modalStack[0];
+            const instance = this.modalStack[this.modalStack.length - 1];
             instance.close();
         }
     }

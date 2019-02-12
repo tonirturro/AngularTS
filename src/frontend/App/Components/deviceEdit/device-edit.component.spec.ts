@@ -29,7 +29,7 @@ describe("Given a device edit component", () => {
     }));
 
     it("When created Then it has the html defined", () => {
-        expect(element.html).toBeDefined();
+        expect(element.html().includes("selectedDeviceId")).toBeTruthy();
     });
 
     it("When clicking on the apply button it stored the edited name", () => {

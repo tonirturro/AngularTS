@@ -1,9 +1,9 @@
-import { IComponentController } from "angular";
+import { IComponentController, ILogService, IWindowService } from "angular";
 import { EModals } from ".";
 import { IDevice } from "../../../common/rest";
 import { DataService } from "../Services/DataService";
 import { IStateService } from "../ui-routes";
-import { IIdParam } from "./definitions";
+import { IMessageParam } from "./definitions";
 import { ModalManager } from "./modal-manager.service";
 
 export interface IDeviceSelection {
@@ -14,13 +14,15 @@ export class MainPageController implements IComponentController {
     /**
      * Define dependencies
      */
-    public static $inject = [ "$state", "dataService", "modalManager" ];
+    public static $inject = [ "$log", "$window", "$state", "dataService", "modalManager" ];
 
     public selectedDeviceId: number = -1;
     public selectedPages: number[] = [];
     public editingDevices: boolean = false;
 
     constructor(
+        private $log: ILogService,
+        private $window: IWindowService,
         private $state: IStateService,
         private dataService: DataService,
         private modalManager: ModalManager) {}
@@ -48,7 +50,13 @@ export class MainPageController implements IComponentController {
      * Close main window
      */
     public close() {
-        this.modalManager.push(EModals.Close);
+        this.modalManager
+            .push(EModals.Confimation, { message: "Close Application" } as IMessageParam)
+            .then(() => {
+                this.$window.close();
+            }, () => {
+                this.$log.info("Dismissed close application");
+            });
     }
 
     /**
@@ -88,8 +96,13 @@ export class MainPageController implements IComponentController {
      * @param deviceId the device to be deleted
      */
     public deleteDevice(deviceId: number): void {
-        const deviceSelection: IIdParam = { id: deviceId };
-        this.modalManager.push(EModals.DeleteDevice, deviceSelection);
+        const name = this.dataService.devices.find((d) => d.id === deviceId).name;
+        this.modalManager.push(EModals.Confimation, { message: `Delete Device: ${name}`})
+            .then(() => {
+                this.dataService.deleteDevice(deviceId);
+            }, () => {
+                this.$log.info(`Dismissed delete device: ${name}`);
+            });
     }
 
     /**

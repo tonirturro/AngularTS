@@ -30,7 +30,7 @@ export class ModalManager {
     public register(name: string, settings: IModalSettings): boolean {
         if (!this.modalDefinitions.hasOwnProperty(name)) {
             const modalSettings: IModalSettings = {};
-            angular.extend(modalSettings, settings, this.baseDialogSettings);
+            angular.extend(modalSettings, this.baseDialogSettings, settings);
             this.modalDefinitions[name] = modalSettings;
             return true;
         }

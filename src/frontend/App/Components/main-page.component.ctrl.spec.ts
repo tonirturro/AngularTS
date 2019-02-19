@@ -15,7 +15,7 @@ describe("Given a main page component controller", () => {
     let rootScope: IRootScopeService;
     let stateServiceToMock: IStateService;
     let dataServiceToMock: DataService;
-    let windowServiceToMock: IWindowService;
+    let windowCloseMock: jasmine.Spy;
     let modalPushMock: jasmine.Spy;
 
     const devices: IDevice[] = [{
@@ -50,12 +50,12 @@ describe("Given a main page component controller", () => {
             dataService: DataService,
             modalManager: ModalManager) => {
         stateServiceToMock = $state;
-        windowServiceToMock = $window;
         dataServiceToMock = dataService;
         q = $q;
         rootScope = $rootScope;
         spyOn(stateServiceToMock, "go");
         modalPushMock = spyOn(modalManager, "push");
+        windowCloseMock = spyOn($window, "close");
         spyOnProperty(dataServiceToMock, "devices").and.returnValue(devices);
         spyOn(dataServiceToMock, "addNewDevice").and.returnValue(q.resolve(true));
         spyOn(dataServiceToMock, "deleteDevice").and.returnValue(q.resolve(true));
@@ -96,14 +96,6 @@ describe("Given a main page component controller", () => {
         controller.$onInit();
 
         expect(stateServiceToMock.go).toHaveBeenCalledWith("pages", expectedDeviceSelection);
-    });
-
-    xit("When calling close Then the window sercice is called to close the window", () => {
-        spyOn(windowServiceToMock, "close");
-
-        controller.close();
-
-        expect(windowServiceToMock.close).toHaveBeenCalled();
     });
 
     it("When calling edit devices Then the view changes to the device edition", () => {
@@ -168,5 +160,32 @@ describe("Given a main page component controller", () => {
         rootScope.$apply();
 
         expect(dataServiceToMock.deleteDevice).not.toHaveBeenCalled();
+    });
+
+    it("When calling close Then a dialog is open", () => {
+        modalPushMock.and.returnValue(q.reject());
+        const expectedDialogMessage: IMessageParam = { message: "Close Application" };
+
+        controller.close();
+
+        expect(modalPushMock).toHaveBeenCalledWith(EModals.Confimation, expectedDialogMessage);
+    });
+
+    it("When closing app is confirmed then the application is closed", () => {
+        modalPushMock.and.returnValue(q.resolve());
+
+        controller.close();
+        rootScope.$apply();
+
+        expect(windowCloseMock).toHaveBeenCalled();
+    });
+
+    it("When closing app is not confirmed then the application is not closed", () => {
+        modalPushMock.and.returnValue(q.reject());
+
+        controller.close();
+        rootScope.$apply();
+
+        expect(windowCloseMock).not.toHaveBeenCalled();
     });
 });
